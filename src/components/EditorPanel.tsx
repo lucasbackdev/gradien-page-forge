@@ -1,4 +1,4 @@
-import { PresellData, PresellElement } from '@/types/presell';
+import { PresellData, PresellElement, availableFonts } from '@/types/presell';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -208,6 +208,44 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
             <p className="text-xs text-muted-foreground mt-1">
               Aplicado a todos os botões CTA
             </p>
+          </Card>
+
+          <Card className="p-4">
+            <Label>Fonte dos Títulos</Label>
+            <Select 
+              value={data.fonts.title} 
+              onValueChange={(value) => onChange({ ...data, fonts: { ...data.fonts, title: value } })}
+            >
+              <SelectTrigger className="mt-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {availableFonts.map((font) => (
+                  <SelectItem key={font.value} value={font.value}>
+                    {font.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Card>
+
+          <Card className="p-4">
+            <Label>Fonte do Corpo</Label>
+            <Select 
+              value={data.fonts.body} 
+              onValueChange={(value) => onChange({ ...data, fonts: { ...data.fonts, body: value } })}
+            >
+              <SelectTrigger className="mt-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {availableFonts.map((font) => (
+                  <SelectItem key={font.value} value={font.value}>
+                    {font.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Card>
         </TabsContent>
 
