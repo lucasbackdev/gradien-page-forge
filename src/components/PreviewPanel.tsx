@@ -1,10 +1,11 @@
-import { PresellData } from '@/types/presell';
+import { PresellData, translations } from '@/types/presell';
 
 interface PreviewPanelProps {
   data: PresellData;
 }
 
 export const PreviewPanel = ({ data }: PreviewPanelProps) => {
+  const t = translations[data.language];
   const renderElement = (element: any) => {
     const style = {
       fontSize: element.fontSize,
@@ -31,16 +32,35 @@ export const PreviewPanel = ({ data }: PreviewPanelProps) => {
             {element.content}
           </p>
         );
+      case 'image':
+        return (
+          <div key={element.id} className="mb-4">
+            {element.imageUrl && (
+              <a 
+                href={data.globalImageAffiliateLink || data.affiliateLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                <img
+                  src={element.imageUrl}
+                  alt="Elemento"
+                  className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg hover:scale-105 transition-transform"
+                />
+              </a>
+            )}
+          </div>
+        );
       case 'cta':
         return (
           <a
             key={element.id}
-            href={element.link || data.affiliateLink}
+            href={element.link || data.globalCtaAffiliateLink || data.affiliateLink}
             target="_blank"
             rel="noopener noreferrer"
             style={{
               backgroundColor: data.colors.button,
               color: data.colors.buttonText,
+              fontSize: data.fontSizes.ctaButton,
             }}
             className="inline-block px-8 py-4 rounded-lg font-bold text-center hover:opacity-90 transition-opacity mb-4"
           >
@@ -73,7 +93,7 @@ export const PreviewPanel = ({ data }: PreviewPanelProps) => {
         <div className="text-center space-y-6">
           {/* Main Image */}
           {data.mainImage && (
-            <a href={data.affiliateLink} target="_blank" rel="noopener noreferrer">
+            <a href={data.globalImageAffiliateLink || data.affiliateLink} target="_blank" rel="noopener noreferrer">
               <img
                 src={data.mainImage}
                 alt="Produto"
@@ -84,22 +104,32 @@ export const PreviewPanel = ({ data }: PreviewPanelProps) => {
 
           {/* Main Title */}
           <h1
-            style={{ fontFamily: data.fonts.title, color: data.colors.text }}
-            className="text-4xl md:text-5xl font-bold mb-4"
+            style={{ 
+              fontFamily: data.fonts.title, 
+              color: data.colors.text,
+              fontSize: data.fontSizes.mainTitle 
+            }}
+            className="font-bold mb-4"
           >
             {data.mainTitle}
           </h1>
 
           {/* Subtitle */}
           <h2
-            style={{ color: data.colors.accent }}
-            className="text-2xl md:text-3xl font-semibold mb-6"
+            style={{ 
+              color: data.colors.accent,
+              fontSize: data.fontSizes.subtitle 
+            }}
+            className="font-semibold mb-6"
           >
             {data.subtitle}
           </h2>
 
           {/* Description */}
-          <p className="text-lg md:text-xl leading-relaxed mb-8 max-w-2xl mx-auto">
+          <p 
+            style={{ fontSize: data.fontSizes.description }}
+            className="leading-relaxed mb-8 max-w-2xl mx-auto"
+          >
             {data.description}
           </p>
 
@@ -115,14 +145,15 @@ export const PreviewPanel = ({ data }: PreviewPanelProps) => {
 
           {/* CTA Button */}
           <a
-            href={data.affiliateLink}
+            href={data.globalCtaAffiliateLink || data.affiliateLink}
             target="_blank"
             rel="noopener noreferrer"
             style={{
               backgroundColor: data.colors.button,
               color: data.colors.buttonText,
+              fontSize: data.fontSizes.ctaButton,
             }}
-            className="inline-block px-12 py-5 rounded-lg text-xl font-bold hover:opacity-90 transition-opacity shadow-lg"
+            className="inline-block px-12 py-5 rounded-lg font-bold hover:opacity-90 transition-opacity shadow-lg"
           >
             {data.ctaText}
           </a>
@@ -141,7 +172,7 @@ export const PreviewPanel = ({ data }: PreviewPanelProps) => {
             rel="noopener noreferrer"
             className="hover:underline opacity-70"
           >
-            Termos de Uso
+            {t.terms}
           </a>
           <span className="opacity-50">|</span>
           <a
@@ -150,7 +181,7 @@ export const PreviewPanel = ({ data }: PreviewPanelProps) => {
             rel="noopener noreferrer"
             className="hover:underline opacity-70"
           >
-            Política de Privacidade
+            {t.privacy}
           </a>
         </div>
       </div>

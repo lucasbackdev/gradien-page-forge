@@ -56,9 +56,10 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
   return (
     <div className="h-full overflow-y-auto p-6 space-y-6">
       <Tabs defaultValue="images" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="images">Imagens</TabsTrigger>
           <TabsTrigger value="texts">Textos</TabsTrigger>
+          <TabsTrigger value="sizes">Tamanhos</TabsTrigger>
           <TabsTrigger value="colors">Cores</TabsTrigger>
           <TabsTrigger value="elements">Elementos</TabsTrigger>
         </TabsList>
@@ -182,6 +183,74 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
               className="mt-2"
             />
           </Card>
+
+          <Card className="p-4">
+            <Label>Link Global de Afiliado para Imagens</Label>
+            <Input
+              value={data.globalImageAffiliateLink}
+              onChange={(e) => onChange({ ...data, globalImageAffiliateLink: e.target.value })}
+              className="mt-2"
+              placeholder="https://"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Aplicado a todas as imagens
+            </p>
+          </Card>
+
+          <Card className="p-4">
+            <Label>Link Global de Afiliado para CTAs</Label>
+            <Input
+              value={data.globalCtaAffiliateLink}
+              onChange={(e) => onChange({ ...data, globalCtaAffiliateLink: e.target.value })}
+              className="mt-2"
+              placeholder="https://"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Aplicado a todos os botões CTA
+            </p>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="sizes" className="space-y-4">
+          <Card className="p-4">
+            <Label>Tamanho do Título Principal</Label>
+            <Input
+              value={data.fontSizes.mainTitle}
+              onChange={(e) => onChange({ ...data, fontSizes: { ...data.fontSizes, mainTitle: e.target.value } })}
+              className="mt-2"
+              placeholder="48px"
+            />
+          </Card>
+
+          <Card className="p-4">
+            <Label>Tamanho do Subtítulo</Label>
+            <Input
+              value={data.fontSizes.subtitle}
+              onChange={(e) => onChange({ ...data, fontSizes: { ...data.fontSizes, subtitle: e.target.value } })}
+              className="mt-2"
+              placeholder="32px"
+            />
+          </Card>
+
+          <Card className="p-4">
+            <Label>Tamanho da Descrição</Label>
+            <Input
+              value={data.fontSizes.description}
+              onChange={(e) => onChange({ ...data, fontSizes: { ...data.fontSizes, description: e.target.value } })}
+              className="mt-2"
+              placeholder="20px"
+            />
+          </Card>
+
+          <Card className="p-4">
+            <Label>Tamanho do Botão CTA</Label>
+            <Input
+              value={data.fontSizes.ctaButton}
+              onChange={(e) => onChange({ ...data, fontSizes: { ...data.fontSizes, ctaButton: e.target.value } })}
+              className="mt-2"
+              placeholder="20px"
+            />
+          </Card>
         </TabsContent>
 
         <TabsContent value="colors" className="space-y-4">
@@ -247,6 +316,9 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
             <Button onClick={() => addElement('paragraph')} size="sm" variant="outline">
               <Plus className="w-4 h-4 mr-1" /> Parágrafo
             </Button>
+            <Button onClick={() => addElement('image')} size="sm" variant="outline">
+              <Plus className="w-4 h-4 mr-1" /> Imagem
+            </Button>
             <Button onClick={() => addElement('cta')} size="sm" variant="outline">
               <Plus className="w-4 h-4 mr-1" /> Botão CTA
             </Button>
@@ -266,22 +338,48 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                 </Button>
               </div>
 
-              <Textarea
-                value={element.content}
-                onChange={(e) => updateElement(element.id, { content: e.target.value })}
-                rows={2}
-              />
-
-              <div className="grid grid-cols-2 gap-2">
+              {element.type === 'image' ? (
                 <div>
-                  <Label className="text-xs">Tamanho</Label>
+                  <Label className="text-xs">Upload de Imagem</Label>
                   <Input
-                    value={element.fontSize}
-                    onChange={(e) => updateElement(element.id, { fontSize: e.target.value })}
-                    placeholder="16px"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          updateElement(element.id, { imageUrl: event.target?.result as string });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
                     className="mt-1"
                   />
+                  {element.imageUrl && (
+                    <img src={element.imageUrl} alt="Preview" className="mt-2 h-20 w-20 object-cover rounded" />
+                  )}
                 </div>
+              ) : (
+                <Textarea
+                  value={element.content}
+                  onChange={(e) => updateElement(element.id, { content: e.target.value })}
+                  rows={2}
+                />
+              )}
+
+              <div className="grid grid-cols-2 gap-2">
+                {element.type !== 'image' && (
+                  <div>
+                    <Label className="text-xs">Tamanho</Label>
+                    <Input
+                      value={element.fontSize}
+                      onChange={(e) => updateElement(element.id, { fontSize: e.target.value })}
+                      placeholder="16px"
+                      className="mt-1"
+                    />
+                  </div>
+                )}
                 <div>
                   <Label className="text-xs">Cor</Label>
                   <Input
@@ -295,11 +393,11 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
 
               {element.type === 'cta' && (
                 <div>
-                  <Label className="text-xs">Link</Label>
+                  <Label className="text-xs">Link (opcional)</Label>
                   <Input
                     value={element.link || ''}
                     onChange={(e) => updateElement(element.id, { link: e.target.value })}
-                    placeholder="https://"
+                    placeholder="https:// (usa link global se vazio)"
                     className="mt-1"
                   />
                 </div>

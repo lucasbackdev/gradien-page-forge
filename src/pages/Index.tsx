@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { TopBar } from '@/components/TopBar';
 import { EditorPanel } from '@/components/EditorPanel';
 import { PreviewPanel } from '@/components/PreviewPanel';
-import { PresellData, defaultPresellData } from '@/types/presell';
+import { PresellData, defaultPresellData, translations } from '@/types/presell';
 import { toast } from '@/hooks/use-toast';
+import JSZip from 'jszip';
 
 const Index = () => {
   const [presellData, setPresellData] = useState<PresellData>(defaultPresellData);
@@ -17,15 +18,17 @@ const Index = () => {
     }
   }, [darkMode]);
 
-  const handleDownload = () => {
-    // Generate HTML
-    const html = generateHTML(presellData);
-    const css = generateCSS(presellData);
-    
-    // Create blob and download
-    const blob = new Blob(
-      [
-        `<!DOCTYPE html>
+  const handleDownload = async () => {
+    try {
+      const zip = new JSZip();
+      const t = translations[presellData.language];
+      
+      // Generate HTML
+      const html = generateHTML(presellData, t);
+      const css = generateCSS(presellData);
+      
+      // Create full HTML file
+      const fullHtml = `<!DOCTYPE html>
 <html lang="${presellData.language}">
 <head>
   <meta charset="UTF-8">
@@ -37,30 +40,70 @@ const Index = () => {
 <body>
 ${html}
 </body>
-</html>`,
-      ],
-      { type: 'text/html' }
-    );
-    
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'presell.html';
-    a.click();
-    
-    toast({
-      title: 'Download iniciado!',
-      description: 'Sua presell está sendo baixada.',
-    });
+</html>`;
+
+      // Add files to ZIP
+      zip.file('index.html', fullHtml);
+      zip.file('style.css', css);
+      
+      // Create public folder
+      const publicFolder = zip.folder('public');
+      
+      // Add images to public folder
+      if (presellData.logoImage && publicFolder) {
+        const logoData = presellData.logoImage.split(',')[1];
+        publicFolder.file('logo.png', logoData, { base64: true });
+      }
+      
+      if (presellData.mainImage && publicFolder) {
+        const mainImageData = presellData.mainImage.split(',')[1];
+        publicFolder.file('main-image.png', mainImageData, { base64: true });
+      }
+      
+      if (presellData.favicon && publicFolder) {
+        const faviconData = presellData.favicon.split(',')[1];
+        publicFolder.file('favicon.png', faviconData, { base64: true });
+      }
+      
+      // Add element images
+      presellData.elements.forEach((el, index) => {
+        if (el.type === 'image' && el.imageUrl && publicFolder) {
+          const imageData = el.imageUrl.split(',')[1];
+          publicFolder.file(`element-${index}.png`, imageData, { base64: true });
+        }
+      });
+      
+      // Generate ZIP
+      const content = await zip.generateAsync({ type: 'blob' });
+      
+      // Download ZIP
+      const url = URL.createObjectURL(content);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'presell.zip';
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Download iniciado!',
+        description: 'Sua presell está sendo baixada em formato ZIP.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Erro no download',
+        description: 'Ocorreu um erro ao gerar o arquivo ZIP.',
+        variant: 'destructive',
+      });
+    }
   };
 
-  const generateHTML = (data: PresellData): string => {
+  const generateHTML = (data: PresellData, t: typeof translations.pt): string => {
     return `
   <div class="container">
     ${data.logoImage ? `<div class="logo"><img src="public/logo.png" alt="Logo"></div>` : ''}
     
     <div class="content">
-      ${data.mainImage ? `<a href="${data.affiliateLink}" target="_blank"><img src="public/main-image.png" alt="Produto" class="main-image"></a>` : ''}
+      ${data.mainImage ? `<a href="${data.globalImageAffiliateLink || data.affiliateLink}" target="_blank"><img src="public/main-image.png" alt="Produto" class="main-image"></a>` : ''}
       
       <h1 class="main-title">${data.mainTitle}</h1>
       <h2 class="subtitle">${data.subtitle}</h2>
@@ -68,21 +111,22 @@ ${html}
       
       ${data.launchDetails ? `<div class="launch-badge">${data.launchDetails}</div>` : ''}
       
-      <a href="${data.affiliateLink}" class="cta-button" target="_blank">${data.ctaText}</a>
+      <a href="${data.globalCtaAffiliateLink || data.affiliateLink}" class="cta-button" target="_blank">${data.ctaText}</a>
       
-      ${data.elements.map((el) => {
+      ${data.elements.map((el, index) => {
         if (el.type === 'title') return `<h2 style="font-size:${el.fontSize};color:${el.color}">${el.content}</h2>`;
         if (el.type === 'subtitle') return `<h3 style="font-size:${el.fontSize};color:${el.color}">${el.content}</h3>`;
         if (el.type === 'paragraph') return `<p style="font-size:${el.fontSize};color:${el.color}">${el.content}</p>`;
-        if (el.type === 'cta') return `<a href="${el.link || data.affiliateLink}" class="cta-button" target="_blank">${el.content}</a>`;
+        if (el.type === 'image' && el.imageUrl) return `<a href="${data.globalImageAffiliateLink || data.affiliateLink}" target="_blank"><img src="public/element-${index}.png" alt="Elemento" class="element-image"></a>`;
+        if (el.type === 'cta') return `<a href="${el.link || data.globalCtaAffiliateLink || data.affiliateLink}" class="cta-button" target="_blank" style="font-size:${data.fontSizes.ctaButton}">${el.content}</a>`;
         return '';
       }).join('')}
     </div>
     
     <footer>
-      <a href="${data.termsLink}" target="_blank">Termos de Uso</a>
+      <a href="${data.termsLink}" target="_blank">${t.terms}</a>
       <span>|</span>
-      <a href="${data.privacyLink}" target="_blank">Política de Privacidade</a>
+      <a href="${data.privacyLink}" target="_blank">${t.privacy}</a>
     </footer>
   </div>
     `;
@@ -110,21 +154,31 @@ body {
   transition: transform 0.3s;
 }
 .main-image:hover { transform: scale(1.05); }
+.element-image { 
+  width: 100%; 
+  max-width: 700px; 
+  border-radius: 1rem; 
+  margin: 2rem auto; 
+  display: block;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: transform 0.3s;
+}
+.element-image:hover { transform: scale(1.05); }
 .main-title { 
   font-family: ${data.fonts.title}, sans-serif;
-  font-size: 3rem; 
+  font-size: ${data.fontSizes.mainTitle}; 
   font-weight: bold; 
   margin-bottom: 1rem; 
   color: ${data.colors.text};
 }
 .subtitle { 
-  font-size: 2rem; 
+  font-size: ${data.fontSizes.subtitle}; 
   color: ${data.colors.accent}; 
   margin-bottom: 1.5rem; 
   font-weight: 600;
 }
 .description { 
-  font-size: 1.25rem; 
+  font-size: ${data.fontSizes.description}; 
   margin-bottom: 2rem; 
   max-width: 800px; 
   margin-left: auto; 
@@ -145,7 +199,7 @@ body {
   color: ${data.colors.buttonText}; 
   padding: 1.25rem 3rem; 
   border-radius: 0.5rem; 
-  font-size: 1.25rem; 
+  font-size: ${data.fontSizes.ctaButton}; 
   font-weight: bold; 
   text-decoration: none; 
   margin: 1rem 0;
@@ -164,9 +218,9 @@ footer {
 footer a { color: inherit; text-decoration: none; }
 footer a:hover { text-decoration: underline; }
 @media (max-width: 768px) {
-  .main-title { font-size: 2rem; }
-  .subtitle { font-size: 1.5rem; }
-  .description { font-size: 1rem; }
+  .main-title { font-size: calc(${data.fontSizes.mainTitle} * 0.6); }
+  .subtitle { font-size: calc(${data.fontSizes.subtitle} * 0.7); }
+  .description { font-size: calc(${data.fontSizes.description} * 0.8); }
 }
     `;
   };
