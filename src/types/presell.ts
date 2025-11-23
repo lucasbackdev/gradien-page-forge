@@ -25,6 +25,8 @@ export interface PresellData {
   affiliateLink: string;
   termsLink: string;
   privacyLink: string;
+  globalImageAffiliateLink: string;
+  globalCtaAffiliateLink: string;
   
   // Colors
   colors: {
@@ -39,6 +41,14 @@ export interface PresellData {
   fonts: {
     title: string;
     body: string;
+  };
+  
+  // Font sizes
+  fontSizes: {
+    mainTitle: string;
+    subtitle: string;
+    description: string;
+    ctaButton: string;
   };
   
   // Dynamic elements
@@ -62,6 +72,8 @@ export const defaultPresellData: PresellData = {
   affiliateLink: 'https://exemplo.com/produto',
   termsLink: 'https://exemplo.com/termos',
   privacyLink: 'https://exemplo.com/privacidade',
+  globalImageAffiliateLink: '',
+  globalCtaAffiliateLink: '',
   colors: {
     background: '#ffffff',
     text: '#1a1a1a',
@@ -73,7 +85,32 @@ export const defaultPresellData: PresellData = {
     title: 'Inter',
     body: 'Inter',
   },
+  fontSizes: {
+    mainTitle: '48px',
+    subtitle: '32px',
+    description: '20px',
+    ctaButton: '20px',
+  },
   elements: [],
   launchDetails: 'Lançamento exclusivo - Vagas limitadas!',
   language: 'pt',
+};
+
+export const translations = {
+  pt: {
+    terms: 'Termos de Uso',
+    privacy: 'Política de Privacidade',
+  },
+  es: {
+    terms: 'Términos de Uso',
+    privacy: 'Política de Privacidad',
+  },
+  en: {
+    terms: 'Terms of Use',
+    privacy: 'Privacy Policy',
+  },
+  de: {
+    terms: 'Nutzungsbedingungen',
+    privacy: 'Datenschutzrichtlinie',
+  },
 };
