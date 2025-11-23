@@ -18,6 +18,19 @@ const Index = () => {
     }
   }, [darkMode]);
 
+  // Update texts when language changes
+  useEffect(() => {
+    const t = translations[presellData.language];
+    setPresellData(prev => ({
+      ...prev,
+      mainTitle: t.mainTitle,
+      subtitle: t.subtitle,
+      description: t.description,
+      ctaText: t.ctaText,
+      launchDetails: t.launchDetails,
+    }));
+  }, [presellData.language]);
+
   const handleDownload = async () => {
     try {
       const zip = new JSZip();
