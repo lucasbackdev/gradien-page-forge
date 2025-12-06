@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { TopBar } from '@/components/TopBar';
 import { EditorPanel } from '@/components/EditorPanel';
 import { PreviewPanel } from '@/components/PreviewPanel';
-import { PresellData, defaultPresellData, translations } from '@/types/presell';
+import { PresellData, PresellElement, defaultPresellData, translations } from '@/types/presell';
 import { toast } from '@/hooks/use-toast';
 import JSZip from 'jszip';
 
@@ -31,6 +31,10 @@ const Index = () => {
     }));
   }, [presellData.language]);
 
+  const handleUpdateElements = (elements: PresellElement[]) => {
+    setPresellData(prev => ({ ...prev, elements }));
+  };
+
   const handleDownload = async () => {
     try {
       const zip = new JSZip();
@@ -46,7 +50,7 @@ const Index = () => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${presellData.mainTitle}</title>
+  <title>${presellData.pageTitle || presellData.mainTitle}</title>
   ${presellData.favicon ? `<link rel="icon" href="public/favicon.png">` : ''}
   <style>${css}</style>
 </head>
@@ -116,7 +120,7 @@ ${html}
     ${data.logoImage ? `<div class="logo"><img src="public/logo.png" alt="Logo"></div>` : ''}
     
     <div class="content">
-      ${data.mainImage ? `<a href="${data.globalImageAffiliateLink || data.affiliateLink}" target="_blank"><img src="public/main-image.png" alt="Produto" class="main-image"></a>` : ''}
+      ${data.mainImage ? `<a href="${data.globalImageAffiliateLink || data.affiliateLink}"><img src="public/main-image.png" alt="Produto" class="main-image"></a>` : ''}
       
       <h1 class="main-title">${data.mainTitle}</h1>
       <h2 class="subtitle">${data.subtitle}</h2>
@@ -124,22 +128,22 @@ ${html}
       
       ${data.launchDetails ? `<div class="launch-badge">${data.launchDetails}</div>` : ''}
       
-      <a href="${data.globalCtaAffiliateLink || data.affiliateLink}" class="cta-button" target="_blank">${data.ctaText}</a>
+      <a href="${data.globalCtaAffiliateLink || data.affiliateLink}" class="cta-button">${data.ctaText}</a>
       
       ${data.elements.map((el, index) => {
         if (el.type === 'title') return `<h2 style="font-size:${el.fontSize};color:${el.color}">${el.content}</h2>`;
         if (el.type === 'subtitle') return `<h3 style="font-size:${el.fontSize};color:${el.color}">${el.content}</h3>`;
         if (el.type === 'paragraph') return `<p style="font-size:${el.fontSize};color:${el.color}">${el.content}</p>`;
-        if (el.type === 'image' && el.imageUrl) return `<a href="${data.globalImageAffiliateLink || data.affiliateLink}" target="_blank"><img src="public/element-${index}.png" alt="Elemento" class="element-image"></a>`;
-        if (el.type === 'cta') return `<a href="${el.link || data.globalCtaAffiliateLink || data.affiliateLink}" class="cta-button" target="_blank" style="font-size:${data.fontSizes.ctaButton}">${el.content}</a>`;
+        if (el.type === 'image' && el.imageUrl) return `<a href="${data.globalImageAffiliateLink || data.affiliateLink}"><img src="public/element-${index}.png" alt="Elemento" class="element-image"></a>`;
+        if (el.type === 'cta') return `<a href="${el.link || data.globalCtaAffiliateLink || data.affiliateLink}" class="cta-button" style="font-size:${data.fontSizes.ctaButton}">${el.content}</a>`;
         return '';
       }).join('')}
     </div>
     
     <footer>
-      <a href="${data.termsLink}" target="_blank">${t.terms}</a>
+      <a href="${data.termsLink}">${t.terms}</a>
       <span>|</span>
-      <a href="${data.privacyLink}" target="_blank">${t.privacy}</a>
+      <a href="${data.privacyLink}">${t.privacy}</a>
     </footer>
   </div>
     `;
@@ -258,7 +262,10 @@ footer a:hover { text-decoration: underline; }
 
         {/* Preview Panel */}
         <div className="w-1/2 bg-muted">
-          <PreviewPanel data={presellData} />
+          <PreviewPanel 
+            data={presellData} 
+            onUpdateElements={handleUpdateElements}
+          />
         </div>
       </div>
     </div>

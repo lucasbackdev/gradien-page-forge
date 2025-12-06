@@ -109,6 +109,16 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
 
         <TabsContent value="texts" className="space-y-4">
           <Card className="p-4">
+            <Label>Título da Aba (Browser)</Label>
+            <Input
+              value={data.pageTitle}
+              onChange={(e) => onChange({ ...data, pageTitle: e.target.value })}
+              className="mt-2"
+              placeholder="Título que aparece na aba do navegador"
+            />
+          </Card>
+
+          <Card className="p-4">
             <Label>Título Principal</Label>
             <Input
               value={data.mainTitle}
@@ -361,6 +371,10 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
               <Plus className="w-4 h-4 mr-1" /> Botão CTA
             </Button>
           </div>
+
+          <p className="text-sm text-muted-foreground mb-4">
+            Arraste os elementos no preview para reordená-los. Arraste até a lixeira para excluir.
+          </p>
 
           {data.elements.map((element) => (
             <Card key={element.id} className="p-4 space-y-3">

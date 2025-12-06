@@ -21,6 +21,9 @@ export interface PresellData {
   description: string;
   ctaText: string;
   
+  // Page title (browser tab)
+  pageTitle: string;
+  
   // Links
   affiliateLink: string;
   termsLink: string;
@@ -69,9 +72,10 @@ export const defaultPresellData: PresellData = {
   subtitle: 'A Solução que Você Estava Esperando',
   description: 'Este produto incrível vai transformar sua experiência e trazer resultados extraordinários para você.',
   ctaText: 'QUERO CONHECER AGORA',
-  affiliateLink: 'https://exemplo.com/produto',
-  termsLink: 'https://exemplo.com/termos',
-  privacyLink: 'https://exemplo.com/privacidade',
+  pageTitle: 'Presell - Produto Revolucionário',
+  affiliateLink: '',
+  termsLink: '',
+  privacyLink: '',
   globalImageAffiliateLink: '',
   globalCtaAffiliateLink: '',
   colors: {
