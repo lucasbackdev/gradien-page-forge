@@ -5,8 +5,22 @@ export interface PresellElement {
   fontSize?: string;
   fontFamily?: string;
   color?: string;
+  gradientColors?: {
+    enabled: boolean;
+    color1: string;
+    color2: string;
+    color3: string;
+  };
   imageUrl?: string;
   link?: string;
+}
+
+export interface ButtonStyle {
+  borderRadius: 'square' | 'rounded' | 'pill';
+  shadow: boolean;
+  neonGlow: boolean;
+  floating: boolean;
+  hoverEffect: boolean;
 }
 
 export interface PresellData {
@@ -31,14 +45,37 @@ export interface PresellData {
   globalImageAffiliateLink: string;
   globalCtaAffiliateLink: string;
   
+  // WhatsApp button
+  whatsappEnabled: boolean;
+  whatsappLink: string;
+  
   // Colors
   colors: {
     background: string;
+    backgroundGradient: {
+      enabled: boolean;
+      color1: string;
+      color2: string;
+    };
     text: string;
+    textGradient: {
+      enabled: boolean;
+      color1: string;
+      color2: string;
+      color3: string;
+    };
     button: string;
+    buttonGradient: {
+      enabled: boolean;
+      color1: string;
+      color2: string;
+    };
     buttonText: string;
     accent: string;
   };
+  
+  // Button style
+  buttonStyle: ButtonStyle;
   
   // Fonts
   fonts: {
@@ -68,22 +105,47 @@ export const defaultPresellData: PresellData = {
   logoImage: '',
   mainImage: '',
   favicon: '',
-  mainTitle: 'Descubra o Produto Revolucionário',
-  subtitle: 'A Solução que Você Estava Esperando',
-  description: 'Este produto incrível vai transformar sua experiência e trazer resultados extraordinários para você.',
-  ctaText: 'QUERO CONHECER AGORA',
-  pageTitle: 'Presell - Produto Revolucionário',
+  mainTitle: '',
+  subtitle: '',
+  description: '',
+  ctaText: '',
+  pageTitle: '',
   affiliateLink: '',
   termsLink: '',
   privacyLink: '',
   globalImageAffiliateLink: '',
   globalCtaAffiliateLink: '',
+  whatsappEnabled: false,
+  whatsappLink: '',
   colors: {
-    background: '#ffffff',
-    text: '#1a1a1a',
+    background: '#0f0f0f',
+    backgroundGradient: {
+      enabled: false,
+      color1: '#0f0f0f',
+      color2: '#1a1a2e',
+    },
+    text: '#ffffff',
+    textGradient: {
+      enabled: false,
+      color1: '#ffffff',
+      color2: '#a0a0a0',
+      color3: '#606060',
+    },
     button: '#FF6A00',
+    buttonGradient: {
+      enabled: false,
+      color1: '#FF6A00',
+      color2: '#FF2D55',
+    },
     buttonText: '#ffffff',
     accent: '#FF2D55',
+  },
+  buttonStyle: {
+    borderRadius: 'rounded',
+    shadow: true,
+    neonGlow: false,
+    floating: false,
+    hoverEffect: true,
   },
   fonts: {
     title: 'Poppins',
@@ -96,7 +158,7 @@ export const defaultPresellData: PresellData = {
     ctaButton: '20px',
   },
   elements: [],
-  launchDetails: 'Lançamento exclusivo - Vagas limitadas!',
+  launchDetails: '',
   language: 'pt',
 };
 

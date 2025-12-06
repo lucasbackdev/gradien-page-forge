@@ -25,7 +25,9 @@ export const TopBar = ({
 }: TopBarProps) => {
   return (
     <header className="h-16 bg-background border-b border-border shadow-sm flex items-center justify-between px-6">
-      <h1 className="text-2xl font-bold text-gradient">Presell GAds</h1>
+      <div className="flex items-center gap-3">
+        <img src="/logo.png" alt="Presell Gads" className="h-10 object-contain" />
+      </div>
       
       <div className="flex items-center gap-3">
         <Select value={language} onValueChange={onLanguageChange}>
