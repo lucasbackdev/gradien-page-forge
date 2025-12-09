@@ -1,6 +1,6 @@
 export interface PresellElement {
   id: string;
-  type: 'title' | 'subtitle' | 'paragraph' | 'image' | 'cta';
+  type: 'title' | 'subtitle' | 'paragraph' | 'image' | 'cta' | 'video';
   content: string;
   fontSize?: string;
   fontFamily?: string;
@@ -12,7 +12,10 @@ export interface PresellElement {
     color3: string;
   };
   imageUrl?: string;
+  videoUrl?: string;
   link?: string;
+  // Size control for images/videos (percentage)
+  mediaWidth?: number;
   // Button specific
   buttonColor?: string;
   buttonTextColor?: string;
@@ -34,7 +37,6 @@ export interface ButtonStyle {
 export interface PresellData {
   // Images
   logoImage: string;
-  mainImage: string;
   favicon: string;
   
   // Page title (browser tab)
@@ -115,7 +117,6 @@ export interface PresellData {
 
 export const defaultPresellData: PresellData = {
   logoImage: '',
-  mainImage: '',
   favicon: '',
   pageTitle: '',
   affiliateLink: '',

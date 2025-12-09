@@ -8,7 +8,7 @@ interface PreviewPanelProps {
 }
 
 export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
-  const t = translations[data.language];
+  const t = translations[data.language || 'pt'];
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [showTrash, setShowTrash] = useState(false);
   const trashRef = useRef<HTMLDivElement>(null);
@@ -177,20 +177,34 @@ export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
             {element.content}
           </p>
         );
+      case 'video':
+        return (
+          <div key={element.id} {...dragProps} className={`mb-4 flex justify-center ${dragProps.className}`}>
+            {element.videoUrl && (
+              <video
+                src={element.videoUrl}
+                controls
+                className="rounded-2xl shadow-lg mx-auto"
+                style={{ width: `${element.mediaWidth || 100}%`, maxWidth: '100%' }}
+              />
+            )}
+          </div>
+        );
       case 'image':
         return (
-          <div key={element.id} {...dragProps} className={`mb-4 ${dragProps.className}`}>
+          <div key={element.id} {...dragProps} className={`mb-4 flex justify-center ${dragProps.className}`}>
             {element.imageUrl && (
               <a 
                 href={data.globalImageAffiliateLink || data.affiliateLink || '#'} 
                 onClick={(e) => {
                   if (!data.globalImageAffiliateLink && !data.affiliateLink) e.preventDefault();
                 }}
+                style={{ width: `${element.mediaWidth || 100}%`, maxWidth: '100%' }}
               >
                 <img
                   src={element.imageUrl}
                   alt="Elemento"
-                  className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg hover:scale-105 transition-transform"
+                  className="w-full rounded-2xl shadow-lg hover:scale-105 transition-transform"
                 />
               </a>
             )}
@@ -249,24 +263,6 @@ export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
           {data.logoImage && (
             <div className="mb-8">
               <img src={data.logoImage} alt="Logo" className="h-16 object-contain" />
-            </div>
-          )}
-
-          {/* Main Image */}
-          {data.mainImage && (
-            <div className="text-center mb-8">
-              <a 
-                href={data.globalImageAffiliateLink || data.affiliateLink || '#'} 
-                onClick={(e) => {
-                  if (!data.globalImageAffiliateLink && !data.affiliateLink) e.preventDefault();
-                }}
-              >
-                <img
-                  src={data.mainImage}
-                  alt="Produto"
-                  className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg hover:scale-105 transition-transform"
-                />
-              </a>
             </div>
           )}
 

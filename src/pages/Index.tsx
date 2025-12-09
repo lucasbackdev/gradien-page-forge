@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { TopBar } from '@/components/TopBar';
 import { EditorPanel } from '@/components/EditorPanel';
 import { PreviewPanel } from '@/components/PreviewPanel';
-import { PresellData, PresellElement, defaultPresellData, translations, translateText } from '@/types/presell';
+import { PresellData, PresellElement, defaultPresellData, translations } from '@/types/presell';
 import { toast } from '@/hooks/use-toast';
 import JSZip from 'jszip';
 
@@ -18,33 +18,6 @@ const Index = () => {
     }
   }, [darkMode]);
 
-  // Translate elements when language changes
-  useEffect(() => {
-    const translateElements = async () => {
-      const translatedElements = await Promise.all(
-        presellData.elements.map(async (element) => {
-          if (element.type !== 'image') {
-            const translatedContent = await translateText(element.content, presellData.language);
-            return { ...element, content: translatedContent };
-          }
-          return element;
-        })
-      );
-      
-      // Only update if there are elements and translations changed
-      if (presellData.elements.length > 0) {
-        const hasChanges = translatedElements.some((el, i) => 
-          el.content !== presellData.elements[i].content
-        );
-        if (hasChanges) {
-          setPresellData(prev => ({ ...prev, elements: translatedElements }));
-        }
-      }
-    };
-
-    translateElements();
-  }, [presellData.language]);
-
   const handleUpdateElements = (elements: PresellElement[]) => {
     setPresellData(prev => ({ ...prev, elements }));
   };
@@ -52,7 +25,7 @@ const Index = () => {
   const handleDownload = async () => {
     try {
       const zip = new JSZip();
-      const t = translations[presellData.language];
+      const t = translations[presellData.language || 'pt'];
       
       const html = generateHTML(presellData, t);
       const css = generateCSS(presellData);
@@ -81,10 +54,7 @@ ${html}
         publicFolder.file('logo.png', logoData, { base64: true });
       }
       
-      if (presellData.mainImage && publicFolder) {
-        const mainImageData = presellData.mainImage.split(',')[1];
-        publicFolder.file('main-image.png', mainImageData, { base64: true });
-      }
+      
       
       if (presellData.favicon && publicFolder) {
         const faviconData = presellData.favicon.split(',')[1];
@@ -95,6 +65,10 @@ ${html}
         if (el.type === 'image' && el.imageUrl && publicFolder) {
           const imageData = el.imageUrl.split(',')[1];
           publicFolder.file(`element-${index}.png`, imageData, { base64: true });
+        }
+        if (el.type === 'video' && el.videoUrl && publicFolder) {
+          const videoData = el.videoUrl.split(',')[1];
+          publicFolder.file(`video-${index}.mp4`, videoData, { base64: true });
         }
       });
       
@@ -133,8 +107,6 @@ ${html}
     ${data.logoImage ? `<div class="logo"><img src="public/logo.png" alt="Logo"></div>` : ''}
     
     <div class="content">
-      ${data.mainImage ? `<a href="${data.globalImageAffiliateLink || data.affiliateLink}"><img src="public/main-image.png" alt="Produto" class="main-image"></a>` : ''}
-      
       ${data.elements.map((el, index) => {
         const getElementStyle = () => {
           if (el.gradientColors?.enabled) {
@@ -157,7 +129,8 @@ ${html}
         if (el.type === 'title') return `<h2 style="${getElementStyle()}">${el.content}</h2>`;
         if (el.type === 'subtitle') return `<h3 style="${getElementStyle()}">${el.content}</h3>`;
         if (el.type === 'paragraph') return `<p style="${getElementStyle()}">${el.content}</p>`;
-        if (el.type === 'image' && el.imageUrl) return `<a href="${data.globalImageAffiliateLink || data.affiliateLink}"><img src="public/element-${index}.png" alt="Elemento" class="element-image"></a>`;
+        if (el.type === 'image' && el.imageUrl) return `<a href="${data.globalImageAffiliateLink || data.affiliateLink}" style="width:${el.mediaWidth || 100}%;max-width:100%;display:block;margin:0 auto"><img src="public/element-${index}.png" alt="Elemento" class="element-image" style="width:100%"></a>`;
+        if (el.type === 'video' && el.videoUrl) return `<video src="public/video-${index}.mp4" controls class="element-video" style="width:${el.mediaWidth || 100}%;max-width:100%"></video>`;
         if (el.type === 'cta') return `<a href="${el.link || data.globalCtaAffiliateLink || data.affiliateLink}" class="${getButtonClasses()}" style="${getButtonStyle()}">${el.content}</a>`;
         return '';
       }).join('')}
@@ -247,6 +220,12 @@ body {
   transition: transform 0.3s;
 }
 .element-image:hover { transform: scale(1.05); }
+.element-video { 
+  border-radius: 1rem; 
+  margin: 2rem auto; 
+  display: block;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
 h2, h3, p { margin-bottom: 1rem; }
 .cta-button { 
   display: inline-block; 
@@ -306,10 +285,6 @@ footer a:hover { text-decoration: underline; }
       <TopBar
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
-        language={presellData.language}
-        onLanguageChange={(lang) =>
-          setPresellData({ ...presellData, language: lang as any })
-        }
         onDownload={handleDownload}
       />
 
