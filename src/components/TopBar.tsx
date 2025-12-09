@@ -1,26 +1,15 @@
-import { Moon, Sun, Download, Languages } from 'lucide-react';
+import { Moon, Sun, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 interface TopBarProps {
   darkMode: boolean;
   onToggleDarkMode: () => void;
-  language: string;
-  onLanguageChange: (lang: string) => void;
   onDownload: () => void;
 }
 
 export const TopBar = ({
   darkMode,
   onToggleDarkMode,
-  language,
-  onLanguageChange,
   onDownload,
 }: TopBarProps) => {
   return (
@@ -30,19 +19,6 @@ export const TopBar = ({
       </div>
       
       <div className="flex items-center gap-3">
-        <Select value={language} onValueChange={onLanguageChange}>
-          <SelectTrigger className="w-[140px]">
-            <Languages className="w-4 h-4 mr-2" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="pt">Português</SelectItem>
-            <SelectItem value="es">Español</SelectItem>
-            <SelectItem value="en">English</SelectItem>
-            <SelectItem value="de">Deutsch</SelectItem>
-          </SelectContent>
-        </Select>
-
         <Button
           variant="outline"
           size="icon"
