@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import { TopBar } from '@/components/TopBar';
 import { EditorPanel } from '@/components/EditorPanel';
 import { PreviewPanel } from '@/components/PreviewPanel';
-import { PresellData, PresellElement, defaultPresellData, translations } from '@/types/presell';
+import { PresellData, PresellElement, defaultPresellData, translations, translateText } from '@/types/presell';
 import { toast } from '@/hooks/use-toast';
 import JSZip from 'jszip';
 
 const Index = () => {
   const [presellData, setPresellData] = useState<PresellData>(defaultPresellData);
-  const [darkMode, setDarkMode] = useState(true); // Dark mode by default
+  const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
     if (darkMode) {
@@ -18,17 +18,31 @@ const Index = () => {
     }
   }, [darkMode]);
 
-  // Update texts when language changes
+  // Translate elements when language changes
   useEffect(() => {
-    const t = translations[presellData.language];
-    setPresellData(prev => ({
-      ...prev,
-      mainTitle: prev.mainTitle || t.mainTitle,
-      subtitle: prev.subtitle || t.subtitle,
-      description: prev.description || t.description,
-      ctaText: prev.ctaText || t.ctaText,
-      launchDetails: prev.launchDetails || t.launchDetails,
-    }));
+    const translateElements = async () => {
+      const translatedElements = await Promise.all(
+        presellData.elements.map(async (element) => {
+          if (element.type !== 'image') {
+            const translatedContent = await translateText(element.content, presellData.language);
+            return { ...element, content: translatedContent };
+          }
+          return element;
+        })
+      );
+      
+      // Only update if there are elements and translations changed
+      if (presellData.elements.length > 0) {
+        const hasChanges = translatedElements.some((el, i) => 
+          el.content !== presellData.elements[i].content
+        );
+        if (hasChanges) {
+          setPresellData(prev => ({ ...prev, elements: translatedElements }));
+        }
+      }
+    };
+
+    translateElements();
   }, [presellData.language]);
 
   const handleUpdateElements = (elements: PresellElement[]) => {
@@ -48,7 +62,7 @@ const Index = () => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${presellData.pageTitle || presellData.mainTitle || 'Presell'}</title>
+  <title>${presellData.pageTitle || 'Presell'}</title>
   ${presellData.favicon ? `<link rel="icon" href="public/favicon.png">` : ''}
   <style>${css}</style>
 </head>
@@ -121,27 +135,30 @@ ${html}
     <div class="content">
       ${data.mainImage ? `<a href="${data.globalImageAffiliateLink || data.affiliateLink}"><img src="public/main-image.png" alt="Produto" class="main-image"></a>` : ''}
       
-      ${data.mainTitle ? `<h1 class="main-title">${data.mainTitle}</h1>` : ''}
-      ${data.subtitle ? `<h2 class="subtitle">${data.subtitle}</h2>` : ''}
-      ${data.description ? `<p class="description">${data.description}</p>` : ''}
-      
-      ${data.launchDetails ? `<div class="launch-badge">${data.launchDetails}</div>` : ''}
-      
-      ${data.ctaText ? `<a href="${data.globalCtaAffiliateLink || data.affiliateLink}" class="${getButtonClasses()}">${data.ctaText}</a>` : ''}
-      
       ${data.elements.map((el, index) => {
         const getElementStyle = () => {
           if (el.gradientColors?.enabled) {
-            return `background: linear-gradient(135deg, ${el.gradientColors.color1}, ${el.gradientColors.color2}, ${el.gradientColors.color3}); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size:${el.fontSize}`;
+            return `background: linear-gradient(135deg, ${el.gradientColors.color1}, ${el.gradientColors.color2}, ${el.gradientColors.color3}); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block; font-size:${el.fontSize}`;
           }
           return `font-size:${el.fontSize};color:${el.color}`;
+        };
+
+        const getButtonStyle = () => {
+          let style = '';
+          if (el.buttonGradient?.enabled) {
+            style += `background: linear-gradient(135deg, ${el.buttonGradient.color1}, ${el.buttonGradient.color2});`;
+          } else {
+            style += `background-color: ${el.buttonColor || data.colors.button};`;
+          }
+          style += `color: ${el.buttonTextColor || data.colors.buttonText};`;
+          return style;
         };
 
         if (el.type === 'title') return `<h2 style="${getElementStyle()}">${el.content}</h2>`;
         if (el.type === 'subtitle') return `<h3 style="${getElementStyle()}">${el.content}</h3>`;
         if (el.type === 'paragraph') return `<p style="${getElementStyle()}">${el.content}</p>`;
         if (el.type === 'image' && el.imageUrl) return `<a href="${data.globalImageAffiliateLink || data.affiliateLink}"><img src="public/element-${index}.png" alt="Elemento" class="element-image"></a>`;
-        if (el.type === 'cta') return `<a href="${el.link || data.globalCtaAffiliateLink || data.affiliateLink}" class="${getButtonClasses()}">${el.content}</a>`;
+        if (el.type === 'cta') return `<a href="${el.link || data.globalCtaAffiliateLink || data.affiliateLink}" class="${getButtonClasses()}" style="${getButtonStyle()}">${el.content}</a>`;
         return '';
       }).join('')}
     </div>
@@ -167,29 +184,16 @@ ${html}
 
   const generateCSS = (data: PresellData): string => {
     const getBackground = () => {
+      if (data.colors.backgroundGradient4?.enabled) {
+        return `linear-gradient(135deg, ${data.colors.backgroundGradient4.color1}, ${data.colors.backgroundGradient4.color2}, ${data.colors.backgroundGradient4.color3}, ${data.colors.backgroundGradient4.color4})`;
+      }
+      if (data.colors.backgroundGradient3?.enabled) {
+        return `linear-gradient(135deg, ${data.colors.backgroundGradient3.color1}, ${data.colors.backgroundGradient3.color2}, ${data.colors.backgroundGradient3.color3})`;
+      }
       if (data.colors.backgroundGradient.enabled) {
         return `linear-gradient(135deg, ${data.colors.backgroundGradient.color1}, ${data.colors.backgroundGradient.color2})`;
       }
       return data.colors.background;
-    };
-
-    const getTextColor = () => {
-      if (data.colors.textGradient.enabled) {
-        return `
-          background: linear-gradient(135deg, ${data.colors.textGradient.color1}, ${data.colors.textGradient.color2}, ${data.colors.textGradient.color3});
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        `;
-      }
-      return `color: ${data.colors.text};`;
-    };
-
-    const getButtonBackground = () => {
-      if (data.colors.buttonGradient.enabled) {
-        return `linear-gradient(135deg, ${data.colors.buttonGradient.color1}, ${data.colors.buttonGradient.color2})`;
-      }
-      return data.colors.button;
     };
 
     const getBorderRadius = () => {
@@ -203,10 +207,7 @@ ${html}
 
     const getButtonShadow = () => {
       if (data.buttonStyle.neonGlow) {
-        const glowColor = data.colors.buttonGradient.enabled 
-          ? data.colors.buttonGradient.color1 
-          : data.colors.button;
-        return `0 0 20px ${glowColor}, 0 0 40px ${glowColor}, 0 0 60px ${glowColor}`;
+        return `0 0 20px ${data.colors.button}, 0 0 40px ${data.colors.button}, 0 0 60px ${data.colors.button}`;
       }
       if (data.buttonStyle.shadow) {
         return '0 4px 15px rgba(0,0,0,0.3)';
@@ -219,7 +220,7 @@ ${html}
 body { 
   font-family: ${data.fonts.body}, sans-serif; 
   background: ${getBackground()}; 
-  ${getTextColor()}
+  color: ${data.colors.text};
   line-height: 1.6;
   min-height: 100vh;
 }
@@ -246,39 +247,9 @@ body {
   transition: transform 0.3s;
 }
 .element-image:hover { transform: scale(1.05); }
-.main-title { 
-  font-family: ${data.fonts.title}, sans-serif;
-  font-size: ${data.fontSizes.mainTitle}; 
-  font-weight: bold; 
-  margin-bottom: 1rem; 
-  ${getTextColor()}
-}
-.subtitle { 
-  font-size: ${data.fontSizes.subtitle}; 
-  color: ${data.colors.accent}; 
-  margin-bottom: 1.5rem; 
-  font-weight: 600;
-}
-.description { 
-  font-size: ${data.fontSizes.description}; 
-  margin-bottom: 2rem; 
-  max-width: 800px; 
-  margin-left: auto; 
-  margin-right: auto;
-}
-.launch-badge { 
-  display: inline-block; 
-  background: ${data.colors.accent}; 
-  color: white; 
-  padding: 0.75rem 1.5rem; 
-  border-radius: 2rem; 
-  font-weight: 600; 
-  margin-bottom: 2rem;
-}
+h2, h3, p { margin-bottom: 1rem; }
 .cta-button { 
   display: inline-block; 
-  background: ${getButtonBackground()}; 
-  color: ${data.colors.buttonText}; 
   padding: 1.25rem 3rem; 
   border-radius: ${getBorderRadius()}; 
   font-size: ${data.fontSizes.ctaButton}; 
@@ -325,9 +296,6 @@ footer {
 footer a { color: inherit; text-decoration: none; }
 footer a:hover { text-decoration: underline; }
 @media (max-width: 768px) {
-  .main-title { font-size: calc(${data.fontSizes.mainTitle} * 0.6); }
-  .subtitle { font-size: calc(${data.fontSizes.subtitle} * 0.7); }
-  .description { font-size: calc(${data.fontSizes.description} * 0.8); }
   .whatsapp-button { bottom: 1rem; right: 1rem; }
 }
     `;

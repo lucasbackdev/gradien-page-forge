@@ -13,6 +13,14 @@ export interface PresellElement {
   };
   imageUrl?: string;
   link?: string;
+  // Button specific
+  buttonColor?: string;
+  buttonTextColor?: string;
+  buttonGradient?: {
+    enabled: boolean;
+    color1: string;
+    color2: string;
+  };
 }
 
 export interface ButtonStyle {
@@ -28,12 +36,6 @@ export interface PresellData {
   logoImage: string;
   mainImage: string;
   favicon: string;
-  
-  // Basic texts
-  mainTitle: string;
-  subtitle: string;
-  description: string;
-  ctaText: string;
   
   // Page title (browser tab)
   pageTitle: string;
@@ -56,6 +58,19 @@ export interface PresellData {
       enabled: boolean;
       color1: string;
       color2: string;
+    };
+    backgroundGradient3?: {
+      enabled: boolean;
+      color1: string;
+      color2: string;
+      color3: string;
+    };
+    backgroundGradient4?: {
+      enabled: boolean;
+      color1: string;
+      color2: string;
+      color3: string;
+      color4: string;
     };
     text: string;
     textGradient: {
@@ -94,9 +109,6 @@ export interface PresellData {
   // Dynamic elements
   elements: PresellElement[];
   
-  // Launch details
-  launchDetails: string;
-  
   // Language
   language: 'pt' | 'es' | 'en' | 'de';
 }
@@ -105,10 +117,6 @@ export const defaultPresellData: PresellData = {
   logoImage: '',
   mainImage: '',
   favicon: '',
-  mainTitle: '',
-  subtitle: '',
-  description: '',
-  ctaText: '',
   pageTitle: '',
   affiliateLink: '',
   termsLink: '',
@@ -123,6 +131,19 @@ export const defaultPresellData: PresellData = {
       enabled: false,
       color1: '#0f0f0f',
       color2: '#1a1a2e',
+    },
+    backgroundGradient3: {
+      enabled: false,
+      color1: '#0f0f0f',
+      color2: '#1a1a2e',
+      color3: '#16213e',
+    },
+    backgroundGradient4: {
+      enabled: false,
+      color1: '#0f0f0f',
+      color2: '#1a1a2e',
+      color3: '#16213e',
+      color4: '#0f3460',
     },
     text: '#ffffff',
     textGradient: {
@@ -158,44 +179,23 @@ export const defaultPresellData: PresellData = {
     ctaButton: '20px',
   },
   elements: [],
-  launchDetails: '',
   language: 'pt',
 };
 
 export const translations = {
   pt: {
-    mainTitle: 'Descubra o Produto Revolucionário',
-    subtitle: 'A Solução que Você Estava Esperando',
-    description: 'Este produto incrível vai transformar sua experiência e trazer resultados extraordinários para você.',
-    ctaText: 'QUERO CONHECER AGORA',
-    launchDetails: 'Lançamento exclusivo - Vagas limitadas!',
     terms: 'Termos de Uso',
     privacy: 'Política de Privacidade',
   },
   es: {
-    mainTitle: 'Descubre el Producto Revolucionario',
-    subtitle: 'La Solución que Estabas Esperando',
-    description: 'Este producto increíble transformará tu experiencia y traerá resultados extraordinarios para ti.',
-    ctaText: 'QUIERO CONOCER AHORA',
-    launchDetails: '¡Lanzamiento exclusivo - Plazas limitadas!',
     terms: 'Términos de Uso',
     privacy: 'Política de Privacidad',
   },
   en: {
-    mainTitle: 'Discover the Revolutionary Product',
-    subtitle: 'The Solution You Were Waiting For',
-    description: 'This incredible product will transform your experience and bring extraordinary results for you.',
-    ctaText: 'I WANT TO KNOW NOW',
-    launchDetails: 'Exclusive launch - Limited spots!',
     terms: 'Terms of Use',
     privacy: 'Privacy Policy',
   },
   de: {
-    mainTitle: 'Entdecken Sie das Revolutionäre Produkt',
-    subtitle: 'Die Lösung, auf die Sie Gewartet Haben',
-    description: 'Dieses unglaubliche Produkt wird Ihre Erfahrung transformieren und außergewöhnliche Ergebnisse für Sie bringen.',
-    ctaText: 'ICH MÖCHTE JETZT WISSEN',
-    launchDetails: 'Exklusiver Start - Begrenzte Plätze!',
     terms: 'Nutzungsbedingungen',
     privacy: 'Datenschutzrichtlinie',
   },
@@ -213,3 +213,41 @@ export const availableFonts = [
   { name: 'Merriweather', value: 'Merriweather' },
   { name: 'Nunito', value: 'Nunito' },
 ];
+
+// Translation function for user content
+export const translateText = async (text: string, targetLang: string): Promise<string> => {
+  // Simple translation mapping for common words/phrases
+  // In a real app, you'd use an API like Google Translate
+  const commonTranslations: Record<string, Record<string, string>> = {
+    'Novo Título': {
+      pt: 'Novo Título',
+      es: 'Nuevo Título',
+      en: 'New Title',
+      de: 'Neuer Titel',
+    },
+    'Novo Subtítulo': {
+      pt: 'Novo Subtítulo',
+      es: 'Nuevo Subtítulo',
+      en: 'New Subtitle',
+      de: 'Neuer Untertitel',
+    },
+    'Novo parágrafo': {
+      pt: 'Novo parágrafo',
+      es: 'Nuevo párrafo',
+      en: 'New paragraph',
+      de: 'Neuer Absatz',
+    },
+    'Clique Aqui': {
+      pt: 'Clique Aqui',
+      es: 'Haga Clic Aquí',
+      en: 'Click Here',
+      de: 'Klicken Sie Hier',
+    },
+  };
+
+  if (commonTranslations[text] && commonTranslations[text][targetLang]) {
+    return commonTranslations[text][targetLang];
+  }
+
+  return text;
+};

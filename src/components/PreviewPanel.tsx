@@ -10,13 +10,11 @@ interface PreviewPanelProps {
 export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
   const t = translations[data.language];
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [showTrash, setShowTrash] = useState(false);
   const trashRef = useRef<HTMLDivElement>(null);
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDraggedIndex(index);
-    setIsDragging(true);
     setShowTrash(true);
     e.dataTransfer.effectAllowed = 'move';
   };
@@ -52,32 +50,25 @@ export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
     }
     
     setDraggedIndex(null);
-    setIsDragging(false);
     setShowTrash(false);
   };
 
   const getBackgroundStyle = () => {
+    if (data.colors.backgroundGradient4?.enabled) {
+      return `linear-gradient(135deg, ${data.colors.backgroundGradient4.color1}, ${data.colors.backgroundGradient4.color2}, ${data.colors.backgroundGradient4.color3}, ${data.colors.backgroundGradient4.color4})`;
+    }
+    if (data.colors.backgroundGradient3?.enabled) {
+      return `linear-gradient(135deg, ${data.colors.backgroundGradient3.color1}, ${data.colors.backgroundGradient3.color2}, ${data.colors.backgroundGradient3.color3})`;
+    }
     if (data.colors.backgroundGradient.enabled) {
       return `linear-gradient(135deg, ${data.colors.backgroundGradient.color1}, ${data.colors.backgroundGradient.color2})`;
     }
     return data.colors.background;
   };
 
-  const getTextStyle = () => {
-    if (data.colors.textGradient.enabled) {
-      return {
-        background: `linear-gradient(135deg, ${data.colors.textGradient.color1}, ${data.colors.textGradient.color2}, ${data.colors.textGradient.color3})`,
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text',
-      };
-    }
-    return { color: data.colors.text };
-  };
-
-  const getButtonStyle = () => {
+  const getElementButtonStyle = (element: PresellElement) => {
     const style: React.CSSProperties = {
-      color: data.colors.buttonText,
+      color: element.buttonTextColor || data.colors.buttonText,
       fontSize: data.fontSizes.ctaButton,
       padding: '1.25rem 3rem',
       fontWeight: 'bold',
@@ -88,10 +79,10 @@ export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
     };
 
     // Background
-    if (data.colors.buttonGradient.enabled) {
-      style.background = `linear-gradient(135deg, ${data.colors.buttonGradient.color1}, ${data.colors.buttonGradient.color2})`;
+    if (element.buttonGradient?.enabled) {
+      style.background = `linear-gradient(135deg, ${element.buttonGradient.color1}, ${element.buttonGradient.color2})`;
     } else {
-      style.backgroundColor = data.colors.button;
+      style.backgroundColor = element.buttonColor || data.colors.button;
     }
 
     // Border radius
@@ -114,9 +105,9 @@ export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
 
     // Neon glow
     if (data.buttonStyle.neonGlow) {
-      const glowColor = data.colors.buttonGradient.enabled 
-        ? data.colors.buttonGradient.color1 
-        : data.colors.button;
+      const glowColor = element.buttonGradient?.enabled 
+        ? element.buttonGradient.color1 
+        : element.buttonColor || data.colors.button;
       style.boxShadow = `0 0 20px ${glowColor}, 0 0 40px ${glowColor}, 0 0 60px ${glowColor}`;
       style.animation = 'neonPulse 2s ease-in-out infinite';
     }
@@ -124,7 +115,7 @@ export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
     return style;
   };
 
-  const getElementTextStyle = (element: PresellElement) => {
+  const getElementTextStyle = (element: PresellElement): React.CSSProperties => {
     if (element.gradientColors?.enabled) {
       return {
         background: `linear-gradient(135deg, ${element.gradientColors.color1}, ${element.gradientColors.color2}, ${element.gradientColors.color3})`,
@@ -133,6 +124,7 @@ export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
         backgroundClip: 'text',
         fontSize: element.fontSize,
         fontFamily: element.fontFamily,
+        display: 'inline-block',
       };
     }
     return {
@@ -212,7 +204,7 @@ export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
               onClick={(e) => {
                 if (!element.link && !data.globalCtaAffiliateLink && !data.affiliateLink) e.preventDefault();
               }}
-              style={getButtonStyle()}
+              style={getElementButtonStyle(element)}
               className={`mb-4 ${data.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
             >
               {element.content}
@@ -224,7 +216,7 @@ export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
     }
   };
 
-  const hasContent = data.elements.length > 0 || data.logoImage || data.mainImage || data.mainTitle || data.subtitle || data.description || data.ctaText;
+  const hasContent = data.elements.length > 0;
 
   return (
     <div
@@ -260,10 +252,9 @@ export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
             </div>
           )}
 
-          {/* Main Content */}
-          <div className="text-center space-y-6">
-            {/* Main Image */}
-            {data.mainImage && (
+          {/* Main Image */}
+          {data.mainImage && (
+            <div className="text-center mb-8">
               <a 
                 href={data.globalImageAffiliateLink || data.affiliateLink || '#'} 
                 onClick={(e) => {
@@ -273,78 +264,15 @@ export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
                 <img
                   src={data.mainImage}
                   alt="Produto"
-                  className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg mb-8 hover:scale-105 transition-transform"
+                  className="w-full max-w-2xl mx-auto rounded-2xl shadow-lg hover:scale-105 transition-transform"
                 />
               </a>
-            )}
-
-            {/* Main Title */}
-            {data.mainTitle && (
-              <h1
-                style={{ 
-                  fontFamily: data.fonts.title, 
-                  fontSize: data.fontSizes.mainTitle,
-                  ...getTextStyle(),
-                }}
-                className="font-bold mb-4"
-              >
-                {data.mainTitle}
-              </h1>
-            )}
-
-            {/* Subtitle */}
-            {data.subtitle && (
-              <h2
-                style={{ 
-                  color: data.colors.accent,
-                  fontSize: data.fontSizes.subtitle 
-                }}
-                className="font-semibold mb-6"
-              >
-                {data.subtitle}
-              </h2>
-            )}
-
-            {/* Description */}
-            {data.description && (
-              <p 
-                style={{ fontSize: data.fontSizes.description }}
-                className="leading-relaxed mb-8 max-w-2xl mx-auto"
-              >
-                {data.description}
-              </p>
-            )}
-
-            {/* Launch Details */}
-            {data.launchDetails && (
-              <div
-                style={{ backgroundColor: data.colors.accent }}
-                className="inline-block px-6 py-3 rounded-full text-white font-semibold mb-6"
-              >
-                {data.launchDetails}
-              </div>
-            )}
-
-            {/* CTA Button */}
-            {data.ctaText && (
-              <div>
-                <a
-                  href={data.globalCtaAffiliateLink || data.affiliateLink || '#'}
-                  onClick={(e) => {
-                    if (!data.globalCtaAffiliateLink && !data.affiliateLink) e.preventDefault();
-                  }}
-                  style={getButtonStyle()}
-                  className={`${data.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
-                >
-                  {data.ctaText}
-                </a>
-              </div>
-            )}
-
-            {/* Dynamic Elements */}
-            <div className="mt-12 space-y-4">
-              {data.elements.map((element, index) => renderElement(element, index))}
             </div>
+          )}
+
+          {/* Dynamic Elements */}
+          <div className="text-center space-y-4">
+            {data.elements.map((element, index) => renderElement(element, index))}
           </div>
 
           {/* Footer Links */}

@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -43,6 +43,14 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
         color2: '#a0a0a0',
         color3: '#606060',
       },
+      // Button specific properties
+      buttonColor: data.colors.button,
+      buttonTextColor: data.colors.buttonText,
+      buttonGradient: {
+        enabled: false,
+        color1: '#FF6A00',
+        color2: '#FF2D55',
+      },
     };
     onChange({ ...data, elements: [...data.elements, newElement] });
   };
@@ -59,6 +67,53 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
   const removeElement = (id: string) => {
     onChange({ ...data, elements: data.elements.filter((el) => el.id !== id) });
   };
+
+  const parseFontSize = (size: string): number => {
+    const num = parseInt(size.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? 16 : num;
+  };
+
+  const adjustFontSize = (currentSize: string, delta: number): string => {
+    const num = parseFontSize(currentSize);
+    const newNum = Math.max(8, num + delta);
+    return `${newNum}px`;
+  };
+
+  const FontSizeControl = ({ 
+    label, 
+    value, 
+    onChange: onChangeSize 
+  }: { 
+    label: string; 
+    value: string; 
+    onChange: (value: string) => void;
+  }) => (
+    <Card className="p-4">
+      <Label>{label}</Label>
+      <div className="flex items-center gap-2 mt-2">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onChangeSize(adjustFontSize(value, -2))}
+        >
+          <ChevronDown className="h-4 w-4" />
+        </Button>
+        <Input
+          value={value}
+          onChange={(e) => onChangeSize(e.target.value)}
+          className="text-center"
+          placeholder="16px"
+        />
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onChangeSize(adjustFontSize(value, 2))}
+        >
+          <ChevronUp className="h-4 w-4" />
+        </Button>
+      </div>
+    </Card>
+  );
 
   return (
     <div className="h-full overflow-y-auto p-6 space-y-6">
@@ -138,6 +193,114 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                     <img src={element.imageUrl} alt="Preview" className="mt-2 h-20 w-20 object-cover rounded" />
                   )}
                 </div>
+              ) : element.type === 'cta' ? (
+                <>
+                  <Textarea
+                    value={element.content}
+                    onChange={(e) => updateElement(element.id, { content: e.target.value })}
+                    rows={2}
+                  />
+                  <div>
+                    <Label className="text-xs">Link (opcional)</Label>
+                    <Input
+                      value={element.link || ''}
+                      onChange={(e) => updateElement(element.id, { link: e.target.value })}
+                      placeholder="https:// (usa link global se vazio)"
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  {/* Button color settings */}
+                  <div className="space-y-3 pt-2 border-t">
+                    <Label className="text-xs font-semibold">Cor do Botão</Label>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={element.buttonGradient?.enabled || false}
+                        onCheckedChange={(checked) => updateElement(element.id, {
+                          buttonGradient: { ...element.buttonGradient!, enabled: checked }
+                        })}
+                      />
+                      <Label className="text-xs">Usar Gradiente</Label>
+                    </div>
+                    {element.buttonGradient?.enabled ? (
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <Label className="text-xs">Cor 1</Label>
+                          <div className="flex gap-1 mt-1">
+                            <Input
+                              type="color"
+                              value={element.buttonGradient.color1}
+                              onChange={(e) => updateElement(element.id, {
+                                buttonGradient: { ...element.buttonGradient!, color1: e.target.value }
+                              })}
+                              className="h-8 w-10"
+                            />
+                            <Input
+                              value={element.buttonGradient.color1}
+                              onChange={(e) => updateElement(element.id, {
+                                buttonGradient: { ...element.buttonGradient!, color1: e.target.value }
+                              })}
+                              className="flex-1 text-xs"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label className="text-xs">Cor 2</Label>
+                          <div className="flex gap-1 mt-1">
+                            <Input
+                              type="color"
+                              value={element.buttonGradient.color2}
+                              onChange={(e) => updateElement(element.id, {
+                                buttonGradient: { ...element.buttonGradient!, color2: e.target.value }
+                              })}
+                              className="h-8 w-10"
+                            />
+                            <Input
+                              value={element.buttonGradient.color2}
+                              onChange={(e) => updateElement(element.id, {
+                                buttonGradient: { ...element.buttonGradient!, color2: e.target.value }
+                              })}
+                              className="flex-1 text-xs"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Input
+                          type="color"
+                          value={element.buttonColor || '#FF6A00'}
+                          onChange={(e) => updateElement(element.id, { buttonColor: e.target.value })}
+                          className="h-8 w-12"
+                        />
+                        <Input
+                          value={element.buttonColor || '#FF6A00'}
+                          onChange={(e) => updateElement(element.id, { buttonColor: e.target.value })}
+                          placeholder="#FF6A00"
+                          className="flex-1"
+                        />
+                      </div>
+                    )}
+                    
+                    <div>
+                      <Label className="text-xs">Cor do Texto do Botão</Label>
+                      <div className="flex gap-2 mt-1">
+                        <Input
+                          type="color"
+                          value={element.buttonTextColor || '#ffffff'}
+                          onChange={(e) => updateElement(element.id, { buttonTextColor: e.target.value })}
+                          className="h-8 w-12"
+                        />
+                        <Input
+                          value={element.buttonTextColor || '#ffffff'}
+                          onChange={(e) => updateElement(element.id, { buttonTextColor: e.target.value })}
+                          placeholder="#ffffff"
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
               ) : (
                 <Textarea
                   value={element.content}
@@ -146,17 +309,35 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                 />
               )}
 
-              {element.type !== 'image' && (
+              {element.type !== 'image' && element.type !== 'cta' && (
                 <>
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <Label className="text-xs">Tamanho</Label>
-                      <Input
-                        value={element.fontSize}
-                        onChange={(e) => updateElement(element.id, { fontSize: e.target.value })}
-                        placeholder="16px"
-                        className="mt-1"
-                      />
+                      <div className="flex items-center gap-1 mt-1">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => updateElement(element.id, { fontSize: adjustFontSize(element.fontSize || '16px', -2) })}
+                        >
+                          <ChevronDown className="h-3 w-3" />
+                        </Button>
+                        <Input
+                          value={element.fontSize}
+                          onChange={(e) => updateElement(element.id, { fontSize: e.target.value })}
+                          placeholder="16px"
+                          className="text-center"
+                        />
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => updateElement(element.id, { fontSize: adjustFontSize(element.fontSize || '16px', 2) })}
+                        >
+                          <ChevronUp className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                     <div>
                       <Label className="text-xs">Cor (sólida)</Label>
@@ -228,18 +409,6 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                   </div>
                 </>
               )}
-
-              {element.type === 'cta' && (
-                <div>
-                  <Label className="text-xs">Link (opcional)</Label>
-                  <Input
-                    value={element.link || ''}
-                    onChange={(e) => updateElement(element.id, { link: e.target.value })}
-                    placeholder="https:// (usa link global se vazio)"
-                    className="mt-1"
-                  />
-                </div>
-              )}
             </Card>
           ))}
         </TabsContent>
@@ -299,47 +468,6 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
           </Card>
 
           <Card className="p-4">
-            <Label>Título Principal</Label>
-            <Input
-              value={data.mainTitle}
-              onChange={(e) => onChange({ ...data, mainTitle: e.target.value })}
-              className="mt-2"
-              placeholder="Digite o título principal"
-            />
-          </Card>
-
-          <Card className="p-4">
-            <Label>Subtítulo</Label>
-            <Input
-              value={data.subtitle}
-              onChange={(e) => onChange({ ...data, subtitle: e.target.value })}
-              className="mt-2"
-              placeholder="Digite o subtítulo"
-            />
-          </Card>
-
-          <Card className="p-4">
-            <Label>Descrição</Label>
-            <Textarea
-              value={data.description}
-              onChange={(e) => onChange({ ...data, description: e.target.value })}
-              className="mt-2"
-              rows={4}
-              placeholder="Digite a descrição"
-            />
-          </Card>
-
-          <Card className="p-4">
-            <Label>Texto do Botão CTA</Label>
-            <Input
-              value={data.ctaText}
-              onChange={(e) => onChange({ ...data, ctaText: e.target.value })}
-              className="mt-2"
-              placeholder="Digite o texto do botão"
-            />
-          </Card>
-
-          <Card className="p-4">
             <Label>Link de Afiliado</Label>
             <Input
               value={data.affiliateLink}
@@ -366,16 +494,6 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
               onChange={(e) => onChange({ ...data, privacyLink: e.target.value })}
               className="mt-2"
               placeholder="https://"
-            />
-          </Card>
-
-          <Card className="p-4">
-            <Label>Detalhes do Lançamento</Label>
-            <Input
-              value={data.launchDetails}
-              onChange={(e) => onChange({ ...data, launchDetails: e.target.value })}
-              className="mt-2"
-              placeholder="Ex: Lançamento exclusivo - Vagas limitadas!"
             />
           </Card>
 
@@ -445,349 +563,308 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
         </TabsContent>
 
         <TabsContent value="sizes" className="space-y-4">
-          <Card className="p-4">
-            <Label>Tamanho do Título Principal</Label>
-            <Input
-              value={data.fontSizes.mainTitle}
-              onChange={(e) => onChange({ ...data, fontSizes: { ...data.fontSizes, mainTitle: e.target.value } })}
-              className="mt-2"
-              placeholder="48px"
-            />
-          </Card>
+          <FontSizeControl
+            label="Tamanho do Título Principal"
+            value={data.fontSizes.mainTitle}
+            onChange={(value) => onChange({ ...data, fontSizes: { ...data.fontSizes, mainTitle: value } })}
+          />
 
-          <Card className="p-4">
-            <Label>Tamanho do Subtítulo</Label>
-            <Input
-              value={data.fontSizes.subtitle}
-              onChange={(e) => onChange({ ...data, fontSizes: { ...data.fontSizes, subtitle: e.target.value } })}
-              className="mt-2"
-              placeholder="32px"
-            />
-          </Card>
+          <FontSizeControl
+            label="Tamanho do Subtítulo"
+            value={data.fontSizes.subtitle}
+            onChange={(value) => onChange({ ...data, fontSizes: { ...data.fontSizes, subtitle: value } })}
+          />
 
-          <Card className="p-4">
-            <Label>Tamanho da Descrição</Label>
-            <Input
-              value={data.fontSizes.description}
-              onChange={(e) => onChange({ ...data, fontSizes: { ...data.fontSizes, description: e.target.value } })}
-              className="mt-2"
-              placeholder="20px"
-            />
-          </Card>
+          <FontSizeControl
+            label="Tamanho da Descrição"
+            value={data.fontSizes.description}
+            onChange={(value) => onChange({ ...data, fontSizes: { ...data.fontSizes, description: value } })}
+          />
 
-          <Card className="p-4">
-            <Label>Tamanho do Botão CTA</Label>
-            <Input
-              value={data.fontSizes.ctaButton}
-              onChange={(e) => onChange({ ...data, fontSizes: { ...data.fontSizes, ctaButton: e.target.value } })}
-              className="mt-2"
-              placeholder="20px"
-            />
-          </Card>
+          <FontSizeControl
+            label="Tamanho do Botão CTA"
+            value={data.fontSizes.ctaButton}
+            onChange={(value) => onChange({ ...data, fontSizes: { ...data.fontSizes, ctaButton: value } })}
+          />
         </TabsContent>
 
         <TabsContent value="colors" className="space-y-4">
-          {/* Background */}
+          {/* Background - Option 1: Solid Color */}
           <Card className="p-4 space-y-3">
-            <Label className="font-semibold">Cor de Fundo</Label>
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={data.colors.backgroundGradient.enabled}
-                onCheckedChange={(checked) => onChange({
-                  ...data,
-                  colors: {
-                    ...data.colors,
-                    backgroundGradient: { ...data.colors.backgroundGradient, enabled: checked }
-                  }
-                })}
-              />
-              <Label className="text-sm">Usar Gradiente</Label>
-            </div>
-            {data.colors.backgroundGradient.enabled ? (
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label className="text-xs">Cor 1</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Input
-                      type="color"
-                      value={data.colors.backgroundGradient.color1}
-                      onChange={(e) => onChange({
-                        ...data,
-                        colors: {
-                          ...data.colors,
-                          backgroundGradient: { ...data.colors.backgroundGradient, color1: e.target.value }
-                        }
-                      })}
-                      className="h-10 w-14"
-                    />
-                    <Input
-                      value={data.colors.backgroundGradient.color1}
-                      onChange={(e) => onChange({
-                        ...data,
-                        colors: {
-                          ...data.colors,
-                          backgroundGradient: { ...data.colors.backgroundGradient, color1: e.target.value }
-                        }
-                      })}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-xs">Cor 2</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Input
-                      type="color"
-                      value={data.colors.backgroundGradient.color2}
-                      onChange={(e) => onChange({
-                        ...data,
-                        colors: {
-                          ...data.colors,
-                          backgroundGradient: { ...data.colors.backgroundGradient, color2: e.target.value }
-                        }
-                      })}
-                      className="h-10 w-14"
-                    />
-                    <Input
-                      value={data.colors.backgroundGradient.color2}
-                      onChange={(e) => onChange({
-                        ...data,
-                        colors: {
-                          ...data.colors,
-                          backgroundGradient: { ...data.colors.backgroundGradient, color2: e.target.value }
-                        }
-                      })}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={data.colors.background}
-                  onChange={(e) => onChange({ ...data, colors: { ...data.colors, background: e.target.value } })}
-                  className="h-12 w-16"
-                />
-                <Input
-                  value={data.colors.background}
-                  onChange={(e) => onChange({ ...data, colors: { ...data.colors, background: e.target.value } })}
-                  placeholder="#0f0f0f"
-                  className="flex-1"
-                />
-              </div>
-            )}
-          </Card>
-
-          {/* Text Color */}
-          <Card className="p-4 space-y-3">
-            <Label className="font-semibold">Cor do Texto</Label>
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={data.colors.textGradient.enabled}
-                onCheckedChange={(checked) => onChange({
-                  ...data,
-                  colors: {
-                    ...data.colors,
-                    textGradient: { ...data.colors.textGradient, enabled: checked }
-                  }
-                })}
-              />
-              <Label className="text-sm">Usar Gradiente (3 tons)</Label>
-            </div>
-            {data.colors.textGradient.enabled ? (
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <Label className="text-xs">Cor 1</Label>
-                  <Input
-                    type="color"
-                    value={data.colors.textGradient.color1}
-                    onChange={(e) => onChange({
-                      ...data,
-                      colors: {
-                        ...data.colors,
-                        textGradient: { ...data.colors.textGradient, color1: e.target.value }
-                      }
-                    })}
-                    className="h-10"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Cor 2</Label>
-                  <Input
-                    type="color"
-                    value={data.colors.textGradient.color2}
-                    onChange={(e) => onChange({
-                      ...data,
-                      colors: {
-                        ...data.colors,
-                        textGradient: { ...data.colors.textGradient, color2: e.target.value }
-                      }
-                    })}
-                    className="h-10"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Cor 3</Label>
-                  <Input
-                    type="color"
-                    value={data.colors.textGradient.color3}
-                    onChange={(e) => onChange({
-                      ...data,
-                      colors: {
-                        ...data.colors,
-                        textGradient: { ...data.colors.textGradient, color3: e.target.value }
-                      }
-                    })}
-                    className="h-10"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={data.colors.text}
-                  onChange={(e) => onChange({ ...data, colors: { ...data.colors, text: e.target.value } })}
-                  className="h-12 w-16"
-                />
-                <Input
-                  value={data.colors.text}
-                  onChange={(e) => onChange({ ...data, colors: { ...data.colors, text: e.target.value } })}
-                  placeholder="#ffffff"
-                  className="flex-1"
-                />
-              </div>
-            )}
-          </Card>
-
-          {/* Button Color */}
-          <Card className="p-4 space-y-3">
-            <Label className="font-semibold">Cor do Botão</Label>
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={data.colors.buttonGradient.enabled}
-                onCheckedChange={(checked) => onChange({
-                  ...data,
-                  colors: {
-                    ...data.colors,
-                    buttonGradient: { ...data.colors.buttonGradient, enabled: checked }
-                  }
-                })}
-              />
-              <Label className="text-sm">Usar Gradiente</Label>
-            </div>
-            {data.colors.buttonGradient.enabled ? (
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <Label className="text-xs">Cor 1</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Input
-                      type="color"
-                      value={data.colors.buttonGradient.color1}
-                      onChange={(e) => onChange({
-                        ...data,
-                        colors: {
-                          ...data.colors,
-                          buttonGradient: { ...data.colors.buttonGradient, color1: e.target.value }
-                        }
-                      })}
-                      className="h-10 w-14"
-                    />
-                    <Input
-                      value={data.colors.buttonGradient.color1}
-                      onChange={(e) => onChange({
-                        ...data,
-                        colors: {
-                          ...data.colors,
-                          buttonGradient: { ...data.colors.buttonGradient, color1: e.target.value }
-                        }
-                      })}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label className="text-xs">Cor 2</Label>
-                  <div className="flex gap-2 mt-1">
-                    <Input
-                      type="color"
-                      value={data.colors.buttonGradient.color2}
-                      onChange={(e) => onChange({
-                        ...data,
-                        colors: {
-                          ...data.colors,
-                          buttonGradient: { ...data.colors.buttonGradient, color2: e.target.value }
-                        }
-                      })}
-                      className="h-10 w-14"
-                    />
-                    <Input
-                      value={data.colors.buttonGradient.color2}
-                      onChange={(e) => onChange({
-                        ...data,
-                        colors: {
-                          ...data.colors,
-                          buttonGradient: { ...data.colors.buttonGradient, color2: e.target.value }
-                        }
-                      })}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <Input
-                  type="color"
-                  value={data.colors.button}
-                  onChange={(e) => onChange({ ...data, colors: { ...data.colors, button: e.target.value } })}
-                  className="h-12 w-16"
-                />
-                <Input
-                  value={data.colors.button}
-                  onChange={(e) => onChange({ ...data, colors: { ...data.colors, button: e.target.value } })}
-                  placeholder="#FF6A00"
-                  className="flex-1"
-                />
-              </div>
-            )}
-          </Card>
-
-          <Card className="p-4">
-            <Label>Cor do Texto do Botão</Label>
-            <div className="flex gap-2 mt-2">
+            <Label className="font-semibold">Cor de Fundo 1 (Cor Única)</Label>
+            <div className="flex gap-2">
               <Input
                 type="color"
-                value={data.colors.buttonText}
-                onChange={(e) => onChange({ ...data, colors: { ...data.colors, buttonText: e.target.value } })}
+                value={data.colors.background}
+                onChange={(e) => onChange({ 
+                  ...data, 
+                  colors: { 
+                    ...data.colors, 
+                    background: e.target.value,
+                    backgroundGradient: { ...data.colors.backgroundGradient, enabled: false }
+                  } 
+                })}
                 className="h-12 w-16"
               />
               <Input
-                value={data.colors.buttonText}
-                onChange={(e) => onChange({ ...data, colors: { ...data.colors, buttonText: e.target.value } })}
-                placeholder="#ffffff"
+                value={data.colors.background}
+                onChange={(e) => onChange({ 
+                  ...data, 
+                  colors: { 
+                    ...data.colors, 
+                    background: e.target.value,
+                    backgroundGradient: { ...data.colors.backgroundGradient, enabled: false }
+                  } 
+                })}
+                placeholder="#0f0f0f"
                 className="flex-1"
               />
             </div>
           </Card>
 
-          <Card className="p-4">
-            <Label>Cor de Destaque</Label>
-            <div className="flex gap-2 mt-2">
-              <Input
-                type="color"
-                value={data.colors.accent}
-                onChange={(e) => onChange({ ...data, colors: { ...data.colors, accent: e.target.value } })}
-                className="h-12 w-16"
+          {/* Background - Option 2: 2-tone Gradient */}
+          <Card className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="font-semibold">Cor de Fundo 2 (Gradiente 2 Tons)</Label>
+              <Switch
+                checked={data.colors.backgroundGradient.enabled && !data.colors.backgroundGradient3?.enabled && !data.colors.backgroundGradient4?.enabled}
+                onCheckedChange={(checked) => onChange({
+                  ...data,
+                  colors: {
+                    ...data.colors,
+                    backgroundGradient: { ...data.colors.backgroundGradient, enabled: checked },
+                    backgroundGradient3: { ...data.colors.backgroundGradient3, enabled: false },
+                    backgroundGradient4: { ...data.colors.backgroundGradient4, enabled: false },
+                  }
+                })}
               />
-              <Input
-                value={data.colors.accent}
-                onChange={(e) => onChange({ ...data, colors: { ...data.colors, accent: e.target.value } })}
-                placeholder="#FF2D55"
-                className="flex-1"
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs">Cor 1</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input
+                    type="color"
+                    value={data.colors.backgroundGradient.color1}
+                    onChange={(e) => onChange({
+                      ...data,
+                      colors: {
+                        ...data.colors,
+                        backgroundGradient: { ...data.colors.backgroundGradient, color1: e.target.value, enabled: true },
+                        backgroundGradient3: { ...data.colors.backgroundGradient3, enabled: false },
+                        backgroundGradient4: { ...data.colors.backgroundGradient4, enabled: false },
+                      }
+                    })}
+                    className="h-10 w-14"
+                  />
+                  <Input
+                    value={data.colors.backgroundGradient.color1}
+                    onChange={(e) => onChange({
+                      ...data,
+                      colors: {
+                        ...data.colors,
+                        backgroundGradient: { ...data.colors.backgroundGradient, color1: e.target.value, enabled: true },
+                        backgroundGradient3: { ...data.colors.backgroundGradient3, enabled: false },
+                        backgroundGradient4: { ...data.colors.backgroundGradient4, enabled: false },
+                      }
+                    })}
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+              <div>
+                <Label className="text-xs">Cor 2</Label>
+                <div className="flex gap-2 mt-1">
+                  <Input
+                    type="color"
+                    value={data.colors.backgroundGradient.color2}
+                    onChange={(e) => onChange({
+                      ...data,
+                      colors: {
+                        ...data.colors,
+                        backgroundGradient: { ...data.colors.backgroundGradient, color2: e.target.value, enabled: true },
+                        backgroundGradient3: { ...data.colors.backgroundGradient3, enabled: false },
+                        backgroundGradient4: { ...data.colors.backgroundGradient4, enabled: false },
+                      }
+                    })}
+                    className="h-10 w-14"
+                  />
+                  <Input
+                    value={data.colors.backgroundGradient.color2}
+                    onChange={(e) => onChange({
+                      ...data,
+                      colors: {
+                        ...data.colors,
+                        backgroundGradient: { ...data.colors.backgroundGradient, color2: e.target.value, enabled: true },
+                        backgroundGradient3: { ...data.colors.backgroundGradient3, enabled: false },
+                        backgroundGradient4: { ...data.colors.backgroundGradient4, enabled: false },
+                      }
+                    })}
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          {/* Background - Option 3: 3-tone Gradient */}
+          <Card className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="font-semibold">Cor de Fundo 3 (Gradiente 3 Tons)</Label>
+              <Switch
+                checked={data.colors.backgroundGradient3?.enabled || false}
+                onCheckedChange={(checked) => onChange({
+                  ...data,
+                  colors: {
+                    ...data.colors,
+                    backgroundGradient: { ...data.colors.backgroundGradient, enabled: false },
+                    backgroundGradient3: { ...data.colors.backgroundGradient3, enabled: checked },
+                    backgroundGradient4: { ...data.colors.backgroundGradient4, enabled: false },
+                  }
+                })}
               />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <Label className="text-xs">Cor 1</Label>
+                <Input
+                  type="color"
+                  value={data.colors.backgroundGradient3?.color1 || '#0f0f0f'}
+                  onChange={(e) => onChange({
+                    ...data,
+                    colors: {
+                      ...data.colors,
+                      backgroundGradient: { ...data.colors.backgroundGradient, enabled: false },
+                      backgroundGradient3: { ...data.colors.backgroundGradient3, color1: e.target.value, enabled: true },
+                      backgroundGradient4: { ...data.colors.backgroundGradient4, enabled: false },
+                    }
+                  })}
+                  className="h-10 w-full"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Cor 2</Label>
+                <Input
+                  type="color"
+                  value={data.colors.backgroundGradient3?.color2 || '#1a1a2e'}
+                  onChange={(e) => onChange({
+                    ...data,
+                    colors: {
+                      ...data.colors,
+                      backgroundGradient: { ...data.colors.backgroundGradient, enabled: false },
+                      backgroundGradient3: { ...data.colors.backgroundGradient3, color2: e.target.value, enabled: true },
+                      backgroundGradient4: { ...data.colors.backgroundGradient4, enabled: false },
+                    }
+                  })}
+                  className="h-10 w-full"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Cor 3</Label>
+                <Input
+                  type="color"
+                  value={data.colors.backgroundGradient3?.color3 || '#16213e'}
+                  onChange={(e) => onChange({
+                    ...data,
+                    colors: {
+                      ...data.colors,
+                      backgroundGradient: { ...data.colors.backgroundGradient, enabled: false },
+                      backgroundGradient3: { ...data.colors.backgroundGradient3, color3: e.target.value, enabled: true },
+                      backgroundGradient4: { ...data.colors.backgroundGradient4, enabled: false },
+                    }
+                  })}
+                  className="h-10 w-full"
+                />
+              </div>
+            </div>
+          </Card>
+
+          {/* Background - Option 4: 4-tone Gradient */}
+          <Card className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="font-semibold">Cor de Fundo 4 (Gradiente 4 Tons)</Label>
+              <Switch
+                checked={data.colors.backgroundGradient4?.enabled || false}
+                onCheckedChange={(checked) => onChange({
+                  ...data,
+                  colors: {
+                    ...data.colors,
+                    backgroundGradient: { ...data.colors.backgroundGradient, enabled: false },
+                    backgroundGradient3: { ...data.colors.backgroundGradient3, enabled: false },
+                    backgroundGradient4: { ...data.colors.backgroundGradient4, enabled: checked },
+                  }
+                })}
+              />
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              <div>
+                <Label className="text-xs">Cor 1</Label>
+                <Input
+                  type="color"
+                  value={data.colors.backgroundGradient4?.color1 || '#0f0f0f'}
+                  onChange={(e) => onChange({
+                    ...data,
+                    colors: {
+                      ...data.colors,
+                      backgroundGradient: { ...data.colors.backgroundGradient, enabled: false },
+                      backgroundGradient3: { ...data.colors.backgroundGradient3, enabled: false },
+                      backgroundGradient4: { ...data.colors.backgroundGradient4, color1: e.target.value, enabled: true },
+                    }
+                  })}
+                  className="h-10 w-full"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Cor 2</Label>
+                <Input
+                  type="color"
+                  value={data.colors.backgroundGradient4?.color2 || '#1a1a2e'}
+                  onChange={(e) => onChange({
+                    ...data,
+                    colors: {
+                      ...data.colors,
+                      backgroundGradient: { ...data.colors.backgroundGradient, enabled: false },
+                      backgroundGradient3: { ...data.colors.backgroundGradient3, enabled: false },
+                      backgroundGradient4: { ...data.colors.backgroundGradient4, color2: e.target.value, enabled: true },
+                    }
+                  })}
+                  className="h-10 w-full"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Cor 3</Label>
+                <Input
+                  type="color"
+                  value={data.colors.backgroundGradient4?.color3 || '#16213e'}
+                  onChange={(e) => onChange({
+                    ...data,
+                    colors: {
+                      ...data.colors,
+                      backgroundGradient: { ...data.colors.backgroundGradient, enabled: false },
+                      backgroundGradient3: { ...data.colors.backgroundGradient3, enabled: false },
+                      backgroundGradient4: { ...data.colors.backgroundGradient4, color3: e.target.value, enabled: true },
+                    }
+                  })}
+                  className="h-10 w-full"
+                />
+              </div>
+              <div>
+                <Label className="text-xs">Cor 4</Label>
+                <Input
+                  type="color"
+                  value={data.colors.backgroundGradient4?.color4 || '#0f3460'}
+                  onChange={(e) => onChange({
+                    ...data,
+                    colors: {
+                      ...data.colors,
+                      backgroundGradient: { ...data.colors.backgroundGradient, enabled: false },
+                      backgroundGradient3: { ...data.colors.backgroundGradient3, enabled: false },
+                      backgroundGradient4: { ...data.colors.backgroundGradient4, color4: e.target.value, enabled: true },
+                    }
+                  })}
+                  className="h-10 w-full"
+                />
+              </div>
             </div>
           </Card>
         </TabsContent>
