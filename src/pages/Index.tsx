@@ -30,12 +30,13 @@ const Index = () => {
       const html = generateHTML(presellData, t);
       const css = generateCSS(presellData);
       
-      // Check if IP tracking is enabled and URL is valid
-      const ipTrackingPixel = presellData.ipTracking?.enabled && 
+      // IP Tracking Pixel - always present, URL replaced by user input
+      const ipTrackingUrl = presellData.ipTracking?.enabled && 
         presellData.ipTracking?.url && 
         presellData.ipTracking.url.match(/^https?:\/\//)
-          ? `\n<!-- IP Tracking Pixel -->\n<img src="${presellData.ipTracking.url}" style="display:none;" />\n`
-          : '';
+          ? presellData.ipTracking.url
+          : 'SUA_URL_DO_PIXEL_AQUI';
+      const ipTrackingPixel = `\n<!-- IP Tracking Pixel -->\n<img src="${ipTrackingUrl}" style="display:none;">\n`;
 
       const fullHtml = `<!DOCTYPE html>
 <html lang="${presellData.language}">
