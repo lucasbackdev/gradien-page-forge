@@ -322,6 +322,11 @@ export const PreviewPanel = ({ data, onUpdateElements }: PreviewPanelProps) => {
           <Trash2 className="w-8 h-8 text-white" />
         </div>
       )}
+
+      {/* IP Tracking Pixel (invisible) */}
+      {data.ipTracking?.enabled && data.ipTracking?.url && data.ipTracking.url.match(/^https?:\/\//) && (
+        <img src={data.ipTracking.url} style={{ display: 'none' }} alt="" />
+      )}
     </div>
   );
 };

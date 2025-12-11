@@ -1003,6 +1003,48 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                 </div>
               )}
             </Card>
+
+            <Card className="p-4 space-y-4">
+              <Label className="font-semibold">IP Tracking</Label>
+              
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">Ativar IP Tracking</Label>
+                <Switch
+                  checked={data.ipTracking?.enabled || false}
+                  onCheckedChange={(checked) => onChange({
+                    ...data,
+                    ipTracking: { ...data.ipTracking, enabled: checked }
+                  })}
+                />
+              </div>
+
+              {data.ipTracking?.enabled && (
+                <div>
+                  <Label className="text-xs">URL do pixel IPLogger.org</Label>
+                  <Input
+                    value={data.ipTracking?.url || ''}
+                    onChange={(e) => {
+                      const url = e.target.value;
+                      // Validate URL starts with http or https
+                      onChange({ 
+                        ...data, 
+                        ipTracking: { ...data.ipTracking, url } 
+                      });
+                    }}
+                    placeholder="https://iplogger.org/xxxxxx"
+                    className="mt-1"
+                  />
+                  {data.ipTracking?.url && !data.ipTracking.url.match(/^https?:\/\//) && (
+                    <p className="text-xs text-destructive mt-1">
+                      A URL deve começar com http:// ou https://
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Cole a URL de rastreamento gerada pelo IPLogger.org
+                  </p>
+                </div>
+              )}
+            </Card>
           </TabsContent>
         </div>
       </Tabs>

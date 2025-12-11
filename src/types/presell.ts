@@ -47,6 +47,12 @@ export interface PresellData {
   termsLink: string;
   privacyLink: string;
   globalImageAffiliateLink: string;
+  
+  // IP Tracking
+  ipTracking: {
+    enabled: boolean;
+    url: string;
+  };
   globalCtaAffiliateLink: string;
   
   // WhatsApp button
@@ -124,6 +130,10 @@ export const defaultPresellData: PresellData = {
   privacyLink: '',
   globalImageAffiliateLink: '',
   globalCtaAffiliateLink: '',
+  ipTracking: {
+    enabled: false,
+    url: '',
+  },
   whatsappEnabled: false,
   whatsappLink: '',
   colors: {
