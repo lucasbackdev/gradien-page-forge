@@ -2,13 +2,17 @@ import { useState, useEffect } from 'react';
 import { TopBar } from '@/components/TopBar';
 import { EditorPanel } from '@/components/EditorPanel';
 import { PreviewPanel } from '@/components/PreviewPanel';
+import { SectionPreview } from '@/components/SectionPreview';
+import { ResponsivePreview, ViewportSize, getViewportWidth } from '@/components/ResponsivePreview';
 import { PresellData, PresellElement, defaultPresellData, translations } from '@/types/presell';
+import { PresellSection } from '@/types/sections';
 import { toast } from '@/hooks/use-toast';
 import JSZip from 'jszip';
 
 const Index = () => {
   const [presellData, setPresellData] = useState<PresellData>(defaultPresellData);
   const [darkMode, setDarkMode] = useState(true);
+  const [viewportSize, setViewportSize] = useState<ViewportSize>('desktop');
 
   useEffect(() => {
     if (darkMode) {
@@ -188,7 +192,10 @@ ${ipTrackingPixel}</body>
 
     const getButtonShadow = () => {
       if (data.buttonStyle.neonGlow) {
-        return `0 0 20px ${data.colors.button}, 0 0 40px ${data.colors.button}, 0 0 60px ${data.colors.button}`;
+        const glowColor = data.colors.buttonGradient.enabled 
+          ? data.colors.buttonGradient.color1 
+          : data.colors.button;
+        return `0 0 20px ${glowColor}, 0 0 40px ${glowColor}, 0 0 60px ${glowColor}`;
       }
       if (data.buttonStyle.shadow) {
         return '0 4px 15px rgba(0,0,0,0.3)';
@@ -303,11 +310,35 @@ footer a:hover { text-decoration: underline; }
         </div>
 
         {/* Preview Panel */}
-        <div className="w-1/2">
-          <PreviewPanel 
-            data={presellData} 
-            onUpdateElements={handleUpdateElements}
-          />
+        <div className="w-1/2 flex flex-col">
+          <div className="p-2 border-b border-border flex justify-center bg-muted/50">
+            <ResponsivePreview currentSize={viewportSize} onSizeChange={setViewportSize} />
+          </div>
+          <div className="flex-1 overflow-auto flex justify-center bg-muted/30 p-4">
+            <div 
+              className="bg-background overflow-auto transition-all duration-300"
+              style={{ 
+                width: getViewportWidth(viewportSize),
+                maxWidth: '100%',
+                boxShadow: viewportSize !== 'desktop' ? '0 0 20px rgba(0,0,0,0.3)' : 'none',
+                borderRadius: viewportSize !== 'desktop' ? '8px' : '0',
+              }}
+            >
+              {presellData.sections.length > 0 ? (
+                <SectionPreview
+                  sections={presellData.sections}
+                  presellData={presellData}
+                  floatingHeader={presellData.floatingHeader}
+                  onReorderSections={(sections) => setPresellData(prev => ({ ...prev, sections }))}
+                />
+              ) : (
+                <PreviewPanel 
+                  data={presellData} 
+                  onUpdateElements={handleUpdateElements}
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -1,0 +1,221 @@
+export type SectionType = 
+  | 'header'
+  | 'hero'
+  | 'about'
+  | 'services'
+  | 'products'
+  | 'benefits'
+  | 'testimonials'
+  | 'portfolio'
+  | 'faq'
+  | 'team'
+  | 'blog'
+  | 'pricing'
+  | 'cta'
+  | 'contact'
+  | 'newsletter'
+  | 'map'
+  | 'footer';
+
+export type LayoutDirection = 'vertical' | 'horizontal';
+export type GradientDirection = 'diagonal' | 'horizontal' | 'vertical' | 'radial';
+
+export interface SectionElement {
+  id: string;
+  type: 'text' | 'image' | 'button' | 'video';
+  content: string;
+  imageUrl?: string;
+  videoUrl?: string;
+  link?: string;
+  fontSize?: string;
+  color?: string;
+  fontWeight?: string;
+}
+
+export interface PresellSection {
+  id: string;
+  type: SectionType;
+  name: string;
+  layout: LayoutDirection;
+  backgroundColor?: string;
+  backgroundGradient?: {
+    enabled: boolean;
+    direction: GradientDirection;
+    color1: string;
+    color2: string;
+    color3?: string;
+  };
+  backgroundImage?: string;
+  textColor?: string;
+  elements: SectionElement[];
+  padding?: string;
+}
+
+export interface FloatingHeader {
+  enabled: boolean;
+  backgroundColor: string;
+  backgroundOpacity: number;
+  blur: boolean;
+  borderRadius: string;
+  logoPosition: 'left' | 'center';
+}
+
+export const sectionTemplates: Record<SectionType, { name: string; icon: string; defaultElements: SectionElement[] }> = {
+  header: {
+    name: 'Header',
+    icon: '🔝',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Logo', fontSize: '24px', fontWeight: 'bold', color: '#ffffff' },
+    ],
+  },
+  hero: {
+    name: 'Hero',
+    icon: '🦸',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Título Principal', fontSize: '48px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'text', content: 'Subtítulo descritivo do seu produto ou serviço', fontSize: '20px', color: '#cccccc' },
+      { id: '3', type: 'button', content: 'Começar Agora', link: '#', color: '#ffffff' },
+    ],
+  },
+  about: {
+    name: 'Sobre',
+    icon: 'ℹ️',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Sobre Nós', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'text', content: 'Descrição sobre a empresa ou produto. Conte sua história e valores.', fontSize: '18px', color: '#cccccc' },
+    ],
+  },
+  services: {
+    name: 'Serviços',
+    icon: '⚙️',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Nossos Serviços', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'text', content: 'Serviço 1 - Descrição do serviço oferecido', fontSize: '18px', color: '#cccccc' },
+      { id: '3', type: 'text', content: 'Serviço 2 - Descrição do serviço oferecido', fontSize: '18px', color: '#cccccc' },
+      { id: '4', type: 'text', content: 'Serviço 3 - Descrição do serviço oferecido', fontSize: '18px', color: '#cccccc' },
+    ],
+  },
+  products: {
+    name: 'Produtos',
+    icon: '📦',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Nossos Produtos', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'image', content: 'Produto', imageUrl: '' },
+      { id: '3', type: 'text', content: 'Nome do Produto - R$ 99,90', fontSize: '20px', color: '#ffffff' },
+    ],
+  },
+  benefits: {
+    name: 'Benefícios',
+    icon: '✅',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Benefícios', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'text', content: '✓ Benefício 1', fontSize: '18px', color: '#00ff88' },
+      { id: '3', type: 'text', content: '✓ Benefício 2', fontSize: '18px', color: '#00ff88' },
+      { id: '4', type: 'text', content: '✓ Benefício 3', fontSize: '18px', color: '#00ff88' },
+    ],
+  },
+  testimonials: {
+    name: 'Depoimentos',
+    icon: '💬',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'O que nossos clientes dizem', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'text', content: '"Excelente produto! Recomendo a todos." - Maria Silva', fontSize: '18px', color: '#cccccc' },
+      { id: '3', type: 'text', content: '"Mudou minha vida! 5 estrelas." - João Santos', fontSize: '18px', color: '#cccccc' },
+    ],
+  },
+  portfolio: {
+    name: 'Portfólio',
+    icon: '🖼️',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Nosso Portfólio', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'image', content: 'Projeto 1', imageUrl: '' },
+      { id: '3', type: 'image', content: 'Projeto 2', imageUrl: '' },
+    ],
+  },
+  faq: {
+    name: 'FAQ',
+    icon: '❓',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Perguntas Frequentes', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'text', content: 'Pergunta 1? - Resposta da pergunta 1.', fontSize: '18px', color: '#cccccc' },
+      { id: '3', type: 'text', content: 'Pergunta 2? - Resposta da pergunta 2.', fontSize: '18px', color: '#cccccc' },
+    ],
+  },
+  team: {
+    name: 'Equipe',
+    icon: '👥',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Nossa Equipe', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'image', content: 'Membro 1', imageUrl: '' },
+      { id: '3', type: 'text', content: 'Nome - Cargo', fontSize: '18px', color: '#cccccc' },
+    ],
+  },
+  blog: {
+    name: 'Blog',
+    icon: '📝',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Blog', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'text', content: 'Título do Post 1 - Resumo do conteúdo...', fontSize: '18px', color: '#cccccc' },
+      { id: '3', type: 'text', content: 'Título do Post 2 - Resumo do conteúdo...', fontSize: '18px', color: '#cccccc' },
+    ],
+  },
+  pricing: {
+    name: 'Preços',
+    icon: '💰',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Planos e Preços', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'text', content: 'Plano Básico - R$ 49/mês', fontSize: '24px', color: '#ffffff' },
+      { id: '3', type: 'text', content: 'Plano Pro - R$ 99/mês', fontSize: '24px', color: '#00ff88' },
+      { id: '4', type: 'button', content: 'Escolher Plano', link: '#' },
+    ],
+  },
+  cta: {
+    name: 'CTA',
+    icon: '🎯',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Pronto para começar?', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'text', content: 'Não perca essa oportunidade única!', fontSize: '20px', color: '#cccccc' },
+      { id: '3', type: 'button', content: 'Quero Começar Agora!', link: '#' },
+    ],
+  },
+  contact: {
+    name: 'Contato',
+    icon: '📧',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Entre em Contato', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'text', content: 'Email: contato@empresa.com', fontSize: '18px', color: '#cccccc' },
+      { id: '3', type: 'text', content: 'Telefone: (11) 99999-9999', fontSize: '18px', color: '#cccccc' },
+    ],
+  },
+  newsletter: {
+    name: 'Newsletter',
+    icon: '📰',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Inscreva-se na nossa Newsletter', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'text', content: 'Receba novidades e ofertas exclusivas!', fontSize: '18px', color: '#cccccc' },
+      { id: '3', type: 'button', content: 'Inscrever-se', link: '#' },
+    ],
+  },
+  map: {
+    name: 'Mapa',
+    icon: '📍',
+    defaultElements: [
+      { id: '1', type: 'text', content: 'Nossa Localização', fontSize: '36px', fontWeight: 'bold', color: '#ffffff' },
+      { id: '2', type: 'text', content: 'Rua Exemplo, 123 - Cidade, Estado', fontSize: '18px', color: '#cccccc' },
+    ],
+  },
+  footer: {
+    name: 'Footer',
+    icon: '📋',
+    defaultElements: [
+      { id: '1', type: 'text', content: '© 2024 Sua Empresa. Todos os direitos reservados.', fontSize: '14px', color: '#888888' },
+      { id: '2', type: 'text', content: 'Termos de Uso | Política de Privacidade', fontSize: '14px', color: '#888888' },
+    ],
+  },
+};
+
+export const sectionTypesList: SectionType[] = [
+  'header', 'hero', 'about', 'services', 'products', 'benefits', 
+  'testimonials', 'portfolio', 'faq', 'team', 'blog', 'pricing', 
+  'cta', 'contact', 'newsletter', 'map', 'footer'
+];
