@@ -1,4 +1,5 @@
 import { PresellData, PresellElement, availableFonts } from '@/types/presell';
+import { PresellSection } from '@/types/sections';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,6 +16,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SectionEditor } from './SectionEditor';
+import { FloatingHeaderEditor } from './FloatingHeaderEditor';
 
 interface EditorPanelProps {
   data: PresellData;
@@ -119,9 +122,10 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
 
   return (
     <div className="h-full overflow-y-auto">
-      <Tabs defaultValue="elements" className="w-full h-full flex flex-col">
+      <Tabs defaultValue="sections" className="w-full h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background p-4 pb-2 border-b">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="sections">Seções</TabsTrigger>
             <TabsTrigger value="elements">Elementos</TabsTrigger>
             <TabsTrigger value="images">Imagens</TabsTrigger>
             <TabsTrigger value="texts">Textos</TabsTrigger>
@@ -132,6 +136,17 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 pt-2">
+          <TabsContent value="sections" className="space-y-4 mt-0">
+            <FloatingHeaderEditor
+              header={data.floatingHeader}
+              onChange={(floatingHeader) => onChange({ ...data, floatingHeader })}
+            />
+            <SectionEditor
+              sections={data.sections}
+              onUpdateSections={(sections) => onChange({ ...data, sections })}
+            />
+          </TabsContent>
+
           <TabsContent value="elements" className="space-y-4 mt-0">
             <div className="sticky top-0 z-10 bg-background py-3 -mx-4 px-4 border-b">
               <div className="flex flex-wrap gap-2">

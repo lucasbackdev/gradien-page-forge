@@ -1,3 +1,5 @@
+import { PresellSection, FloatingHeader } from './sections';
+
 export interface PresellElement {
   id: string;
   type: 'title' | 'subtitle' | 'paragraph' | 'image' | 'cta' | 'video';
@@ -117,6 +119,10 @@ export interface PresellData {
   // Dynamic elements
   elements: PresellElement[];
   
+  // Sections
+  sections: PresellSection[];
+  floatingHeader: FloatingHeader;
+  
   // Language
   language: 'pt' | 'es' | 'en' | 'de';
 }
@@ -190,6 +196,15 @@ export const defaultPresellData: PresellData = {
     ctaButton: '20px',
   },
   elements: [],
+  sections: [],
+  floatingHeader: {
+    enabled: false,
+    backgroundColor: '#1a1a2e',
+    backgroundOpacity: 80,
+    blur: true,
+    borderRadius: '16px',
+    logoPosition: 'left',
+  },
   language: 'pt',
 };
 
