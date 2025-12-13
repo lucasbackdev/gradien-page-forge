@@ -20,8 +20,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from '@/components/ui/dialog';
-import { Plus, Trash2, GripVertical, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video } from 'lucide-react';
+import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface SectionEditorProps {
@@ -97,25 +98,6 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
     }));
   };
 
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-    e.dataTransfer.setData('sectionIndex', index.toString());
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
-    e.preventDefault();
-    const sourceIndex = parseInt(e.dataTransfer.getData('sectionIndex'));
-    if (sourceIndex === targetIndex) return;
-    
-    const newSections = [...sections];
-    const [movedSection] = newSections.splice(sourceIndex, 1);
-    newSections.splice(targetIndex, 0, movedSection);
-    onUpdateSections(newSections);
-  };
-
   return (
     <div className="space-y-4">
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -127,6 +109,9 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
         <DialogContent className="max-w-2xl max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>Escolha um modelo de seção</DialogTitle>
+            <DialogDescription>
+              Selecione o tipo de seção que você deseja adicionar à sua página
+            </DialogDescription>
           </DialogHeader>
           <ScrollArea className="h-[60vh] pr-4">
             <div className="grid grid-cols-3 gap-3">
@@ -155,19 +140,15 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
         </Card>
       )}
 
+      <p className="text-sm text-muted-foreground">
+        Arraste as seções no preview para reordená-las. Arraste elementos até a lixeira para excluir.
+      </p>
+
       <div className="space-y-3">
-        {sections.map((section, index) => (
-          <Card
-            key={section.id}
-            className="p-4 cursor-move"
-            draggable
-            onDragStart={(e) => handleDragStart(e, index)}
-            onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, index)}
-          >
+        {sections.map((section) => (
+          <Card key={section.id} className="p-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab" />
                 <span className="text-lg">{sectionTemplates[section.type].icon}</span>
                 <Input
                   value={section.name}
@@ -316,16 +297,84 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                       className="mt-1"
                     />
                     {section.backgroundImage && (
-                      <div className="mt-2 flex items-center gap-2">
-                        <img src={section.backgroundImage} className="h-12 w-20 object-cover rounded" alt="bg" />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-destructive"
-                          onClick={() => updateSection(section.id, { backgroundImage: undefined })}
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
+                      <div className="mt-2 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <img src={section.backgroundImage} className="h-12 w-20 object-cover rounded" alt="bg" />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive"
+                            onClick={() => updateSection(section.id, { backgroundImage: undefined })}
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                        
+                        {/* Background overlay gradient */}
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={section.backgroundOverlay?.enabled || false}
+                              onCheckedChange={(checked) => updateSection(section.id, {
+                                backgroundOverlay: { 
+                                  ...section.backgroundOverlay, 
+                                  enabled: checked,
+                                  color1: section.backgroundOverlay?.color1 || 'rgba(0,0,0,0.7)',
+                                  color2: section.backgroundOverlay?.color2 || 'rgba(0,0,0,0)',
+                                  direction: section.backgroundOverlay?.direction || 'vertical',
+                                }
+                              })}
+                            />
+                            <Label className="text-xs">Gradiente de Suavização</Label>
+                          </div>
+                          
+                          {section.backgroundOverlay?.enabled && (
+                            <div className="space-y-2 pl-4">
+                              <div>
+                                <Label className="text-xs">Direção</Label>
+                                <Select
+                                  value={section.backgroundOverlay.direction || 'vertical'}
+                                  onValueChange={(value: 'vertical' | 'horizontal' | 'diagonal') => updateSection(section.id, {
+                                    backgroundOverlay: { ...section.backgroundOverlay!, direction: value }
+                                  })}
+                                >
+                                  <SelectTrigger className="mt-1 h-8">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="vertical">Vertical</SelectItem>
+                                    <SelectItem value="horizontal">Horizontal</SelectItem>
+                                    <SelectItem value="diagonal">Diagonal</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <Label className="text-xs">Cor Inicial</Label>
+                                  <Input
+                                    type="color"
+                                    value={section.backgroundOverlay.color1?.replace(/rgba?\([^)]+\)/, '#000000') || '#000000'}
+                                    onChange={(e) => updateSection(section.id, {
+                                      backgroundOverlay: { ...section.backgroundOverlay!, color1: e.target.value + 'cc' }
+                                    })}
+                                    className="h-8 mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <Label className="text-xs">Cor Final</Label>
+                                  <Input
+                                    type="color"
+                                    value={section.backgroundOverlay.color2?.replace(/rgba?\([^)]+\)/, '#000000') || '#000000'}
+                                    onChange={(e) => updateSection(section.id, {
+                                      backgroundOverlay: { ...section.backgroundOverlay!, color2: e.target.value + '00' }
+                                    })}
+                                    className="h-8 mt-1"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -442,29 +491,138 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                             </div>
                           ) : null}
 
-                          {(element.type === 'text' || element.type === 'button') && (
-                            <div className="flex gap-2">
-                              <Input
-                                type="color"
-                                value={element.color || '#ffffff'}
-                                onChange={(e) => updateSectionElement(section.id, element.id, { color: e.target.value })}
-                                className="h-8 w-12"
-                              />
-                              <Input
-                                value={element.fontSize || '16px'}
-                                onChange={(e) => updateSectionElement(section.id, element.id, { fontSize: e.target.value })}
-                                placeholder="16px"
-                                className="w-20 h-8"
-                              />
-                              {element.type === 'button' && (
+                          {element.type === 'text' && (
+                            <div className="space-y-2">
+                              <div className="flex gap-2">
                                 <Input
-                                  value={element.link || ''}
-                                  onChange={(e) => updateSectionElement(section.id, element.id, { link: e.target.value })}
-                                  placeholder="Link do botão"
-                                  className="flex-1 h-8"
+                                  type="color"
+                                  value={element.color || '#ffffff'}
+                                  onChange={(e) => updateSectionElement(section.id, element.id, { color: e.target.value })}
+                                  className="h-8 w-12"
                                 />
+                                <Input
+                                  value={element.fontSize || '16px'}
+                                  onChange={(e) => updateSectionElement(section.id, element.id, { fontSize: e.target.value })}
+                                  placeholder="16px"
+                                  className="w-20 h-8"
+                                />
+                              </div>
+                              
+                              {/* Text gradient option */}
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={element.gradientText?.enabled || false}
+                                  onCheckedChange={(checked) => updateSectionElement(section.id, element.id, {
+                                    gradientText: { 
+                                      ...element.gradientText, 
+                                      enabled: checked,
+                                      colors: element.gradientText?.colors || ['#ffffff', '#a0a0a0'],
+                                    }
+                                  })}
+                                />
+                                <Label className="text-xs">Gradiente no Texto</Label>
+                              </div>
+                              
+                              {element.gradientText?.enabled && (
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2">
+                                    <Label className="text-xs">Tons:</Label>
+                                    <Select
+                                      value={String(element.gradientText.colors?.length || 2)}
+                                      onValueChange={(value) => {
+                                        const count = parseInt(value);
+                                        const currentColors = element.gradientText?.colors || ['#ffffff', '#a0a0a0'];
+                                        const newColors = [...currentColors];
+                                        while (newColors.length < count) {
+                                          newColors.push('#808080');
+                                        }
+                                        while (newColors.length > count) {
+                                          newColors.pop();
+                                        }
+                                        updateSectionElement(section.id, element.id, {
+                                          gradientText: { ...element.gradientText!, colors: newColors }
+                                        });
+                                      }}
+                                    >
+                                      <SelectTrigger className="h-8 w-16">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="2">2</SelectItem>
+                                        <SelectItem value="3">3</SelectItem>
+                                        <SelectItem value="4">4</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="flex gap-1">
+                                    {element.gradientText.colors?.map((color, idx) => (
+                                      <Input
+                                        key={idx}
+                                        type="color"
+                                        value={color}
+                                        onChange={(e) => {
+                                          const newColors = [...(element.gradientText?.colors || [])];
+                                          newColors[idx] = e.target.value;
+                                          updateSectionElement(section.id, element.id, {
+                                            gradientText: { ...element.gradientText!, colors: newColors }
+                                          });
+                                        }}
+                                        className="h-8 w-10"
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Highlight words */}
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={element.highlightWords?.enabled || false}
+                                  onCheckedChange={(checked) => updateSectionElement(section.id, element.id, {
+                                    highlightWords: { 
+                                      ...element.highlightWords, 
+                                      enabled: checked,
+                                      words: element.highlightWords?.words || '',
+                                      color: element.highlightWords?.color || '#FF6A00',
+                                    }
+                                  })}
+                                />
+                                <Label className="text-xs">Destacar Palavras</Label>
+                              </div>
+                              
+                              {element.highlightWords?.enabled && (
+                                <div className="space-y-2">
+                                  <Input
+                                    value={element.highlightWords.words || ''}
+                                    onChange={(e) => updateSectionElement(section.id, element.id, {
+                                      highlightWords: { ...element.highlightWords!, words: e.target.value }
+                                    })}
+                                    placeholder="Palavras separadas por vírgula"
+                                    className="h-8 text-xs"
+                                  />
+                                  <div className="flex items-center gap-2">
+                                    <Label className="text-xs">Cor:</Label>
+                                    <Input
+                                      type="color"
+                                      value={element.highlightWords.color || '#FF6A00'}
+                                      onChange={(e) => updateSectionElement(section.id, element.id, {
+                                        highlightWords: { ...element.highlightWords!, color: e.target.value }
+                                      })}
+                                      className="h-8 w-12"
+                                    />
+                                  </div>
+                                </div>
                               )}
                             </div>
+                          )}
+
+                          {element.type === 'button' && (
+                            <Input
+                              value={element.link || ''}
+                              onChange={(e) => updateSectionElement(section.id, element.id, { link: e.target.value })}
+                              placeholder="Link do botão"
+                              className="h-8"
+                            />
                           )}
                         </div>
                         <Button
