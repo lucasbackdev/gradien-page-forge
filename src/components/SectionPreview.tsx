@@ -1,15 +1,30 @@
-import { PresellSection, GradientDirection } from '@/types/sections';
+import { useState, useRef } from 'react';
+import { PresellSection, GradientDirection, SectionElement } from '@/types/sections';
 import { PresellData } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
+import { Trash2, ChevronUp, ChevronDown, Menu, X } from 'lucide-react';
 
 interface SectionPreviewProps {
   sections: PresellSection[];
   presellData: PresellData;
   floatingHeader: FloatingHeader;
   onReorderSections: (sections: PresellSection[]) => void;
+  onUpdateSectionElements: (sectionId: string, elements: SectionElement[]) => void;
 }
 
-export const SectionPreview = ({ sections, presellData, floatingHeader, onReorderSections }: SectionPreviewProps) => {
+export const SectionPreview = ({ 
+  sections, 
+  presellData, 
+  floatingHeader, 
+  onReorderSections,
+  onUpdateSectionElements 
+}: SectionPreviewProps) => {
+  const [draggedSectionIndex, setDraggedSectionIndex] = useState<number | null>(null);
+  const [draggedElementInfo, setDraggedElementInfo] = useState<{ sectionId: string; elementIndex: number } | null>(null);
+  const [showTrash, setShowTrash] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const trashRef = useRef<HTMLDivElement>(null);
+
   const getGradientStyle = (gradient: PresellSection['backgroundGradient']) => {
     if (!gradient?.enabled) return undefined;
     
@@ -27,6 +42,16 @@ export const SectionPreview = ({ sections, presellData, floatingHeader, onReorde
       default:
         return `linear-gradient(135deg, ${colors})`;
     }
+  };
+
+  const getOverlayStyle = (overlay: PresellSection['backgroundOverlay']) => {
+    if (!overlay?.enabled) return undefined;
+    
+    const direction = overlay.direction === 'horizontal' ? '90deg' 
+      : overlay.direction === 'diagonal' ? '135deg' 
+      : '180deg';
+    
+    return `linear-gradient(${direction}, ${overlay.color1}, ${overlay.color2})`;
   };
 
   const getSectionStyle = (section: PresellSection): React.CSSProperties => {
@@ -49,37 +74,215 @@ export const SectionPreview = ({ sections, presellData, floatingHeader, onReorde
     return style;
   };
 
-  const renderElement = (element: PresellSection['elements'][0], sectionLayout: 'vertical' | 'horizontal') => {
-    const baseStyle: React.CSSProperties = {
+  const getButtonStyle = (): React.CSSProperties => {
+    const style: React.CSSProperties = {
+      color: presellData.colors.buttonText,
+      padding: '1rem 2rem',
+      fontWeight: 'bold',
+      textDecoration: 'none',
+      display: 'inline-block',
+      transition: 'all 0.3s ease',
+      cursor: 'pointer',
+    };
+
+    if (presellData.colors.buttonGradient.enabled) {
+      style.background = `linear-gradient(135deg, ${presellData.colors.buttonGradient.color1}, ${presellData.colors.buttonGradient.color2})`;
+    } else {
+      style.backgroundColor = presellData.colors.button;
+    }
+
+    switch (presellData.buttonStyle.borderRadius) {
+      case 'square':
+        style.borderRadius = '0';
+        break;
+      case 'rounded':
+        style.borderRadius = '0.5rem';
+        break;
+      case 'pill':
+        style.borderRadius = '9999px';
+        break;
+    }
+
+    if (presellData.buttonStyle.shadow) {
+      style.boxShadow = '0 4px 15px rgba(0,0,0,0.3)';
+    }
+
+    if (presellData.buttonStyle.neonGlow) {
+      const glowColor = presellData.colors.buttonGradient.enabled 
+        ? presellData.colors.buttonGradient.color1 
+        : presellData.colors.button;
+      style.boxShadow = `0 0 20px ${glowColor}, 0 0 40px ${glowColor}, 0 0 60px ${glowColor}`;
+    }
+
+    return style;
+  };
+
+  const renderTextWithHighlight = (content: string, element: SectionElement) => {
+    if (!element.highlightWords?.enabled || !element.highlightWords.words) {
+      return content;
+    }
+
+    const words = element.highlightWords.words.split(',').map(w => w.trim()).filter(Boolean);
+    if (words.length === 0) return content;
+
+    let result = content;
+    words.forEach(word => {
+      const regex = new RegExp(`(${word})`, 'gi');
+      result = result.replace(regex, `<span style="color: ${element.highlightWords!.color}">\$1</span>`);
+    });
+
+    return <span dangerouslySetInnerHTML={{ __html: result }} />;
+  };
+
+  const getTextStyle = (element: SectionElement): React.CSSProperties => {
+    if (element.gradientText?.enabled && element.gradientText.colors?.length) {
+      return {
+        background: `linear-gradient(135deg, ${element.gradientText.colors.join(', ')})`,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        fontSize: element.fontSize,
+        display: 'inline-block',
+      };
+    }
+    return {
       color: element.color,
       fontSize: element.fontSize,
-      fontWeight: element.fontWeight as any,
     };
+  };
+
+  const handleSectionDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedSectionIndex(index);
+    setShowTrash(true);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleSectionDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedSectionIndex === null || draggedSectionIndex === index) return;
+    
+    const newSections = [...sections];
+    const [movedSection] = newSections.splice(draggedSectionIndex, 1);
+    newSections.splice(index, 0, movedSection);
+    
+    setDraggedSectionIndex(index);
+    onReorderSections(newSections);
+  };
+
+  const handleSectionDragEnd = (e: React.DragEvent) => {
+    if (trashRef.current && draggedSectionIndex !== null) {
+      const trashRect = trashRef.current.getBoundingClientRect();
+      const { clientX, clientY } = e;
+      
+      if (
+        clientX >= trashRect.left &&
+        clientX <= trashRect.right &&
+        clientY >= trashRect.top &&
+        clientY <= trashRect.bottom
+      ) {
+        const newSections = sections.filter((_, i) => i !== draggedSectionIndex);
+        onReorderSections(newSections);
+      }
+    }
+    
+    setDraggedSectionIndex(null);
+    setShowTrash(false);
+  };
+
+  const handleElementDragStart = (e: React.DragEvent, sectionId: string, elementIndex: number) => {
+    e.stopPropagation();
+    setDraggedElementInfo({ sectionId, elementIndex });
+    setShowTrash(true);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleElementDragOver = (e: React.DragEvent, sectionId: string, elementIndex: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!draggedElementInfo || draggedElementInfo.sectionId !== sectionId || draggedElementInfo.elementIndex === elementIndex) return;
+    
+    const section = sections.find(s => s.id === sectionId);
+    if (!section) return;
+
+    const newElements = [...section.elements];
+    const [movedElement] = newElements.splice(draggedElementInfo.elementIndex, 1);
+    newElements.splice(elementIndex, 0, movedElement);
+    
+    setDraggedElementInfo({ sectionId, elementIndex });
+    onUpdateSectionElements(sectionId, newElements);
+  };
+
+  const handleElementDragEnd = (e: React.DragEvent) => {
+    if (trashRef.current && draggedElementInfo) {
+      const trashRect = trashRef.current.getBoundingClientRect();
+      const { clientX, clientY } = e;
+      
+      if (
+        clientX >= trashRect.left &&
+        clientX <= trashRect.right &&
+        clientY >= trashRect.top &&
+        clientY <= trashRect.bottom
+      ) {
+        const section = sections.find(s => s.id === draggedElementInfo.sectionId);
+        if (section) {
+          const newElements = section.elements.filter((_, i) => i !== draggedElementInfo.elementIndex);
+          onUpdateSectionElements(draggedElementInfo.sectionId, newElements);
+        }
+      }
+    }
+    
+    setDraggedElementInfo(null);
+    setShowTrash(false);
+  };
+
+  const moveSectionUp = (index: number) => {
+    if (index === 0) return;
+    const newSections = [...sections];
+    [newSections[index - 1], newSections[index]] = [newSections[index], newSections[index - 1]];
+    onReorderSections(newSections);
+  };
+
+  const moveSectionDown = (index: number) => {
+    if (index === sections.length - 1) return;
+    const newSections = [...sections];
+    [newSections[index], newSections[index + 1]] = [newSections[index + 1], newSections[index]];
+    onReorderSections(newSections);
+  };
+
+  const renderElement = (element: SectionElement, sectionId: string, elementIndex: number, sectionLayout: 'vertical' | 'horizontal') => {
+    const isDragging = draggedElementInfo?.sectionId === sectionId && draggedElementInfo?.elementIndex === elementIndex;
+    
+    const dragProps = {
+      draggable: true,
+      onDragStart: (e: React.DragEvent) => handleElementDragStart(e, sectionId, elementIndex),
+      onDragOver: (e: React.DragEvent) => handleElementDragOver(e, sectionId, elementIndex),
+      onDragEnd: handleElementDragEnd,
+    };
+
+    const baseClass = `cursor-move transition-all ${isDragging ? 'opacity-50 scale-95' : 'hover:ring-2 hover:ring-primary/50 hover:ring-offset-2'}`;
 
     switch (element.type) {
       case 'text':
         return (
-          <div key={element.id} style={baseStyle} className="mb-4">
-            {element.content}
+          <div 
+            key={element.id} 
+            {...dragProps}
+            style={getTextStyle(element)} 
+            className={`mb-4 ${baseClass}`}
+          >
+            {renderTextWithHighlight(element.content || '', element)}
           </div>
         );
       case 'button':
         return (
           <a
             key={element.id}
+            {...dragProps}
             href={element.link || presellData.affiliateLink || '#'}
-            className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:scale-105 hover:opacity-90 mb-4"
-            style={{
-              background: presellData.colors.buttonGradient.enabled
-                ? `linear-gradient(135deg, ${presellData.colors.buttonGradient.color1}, ${presellData.colors.buttonGradient.color2})`
-                : presellData.colors.button,
-              color: presellData.colors.buttonText,
-              fontSize: element.fontSize,
-              boxShadow: presellData.buttonStyle.neonGlow
-                ? `0 0 20px ${presellData.colors.button}, 0 0 40px ${presellData.colors.button}`
-                : presellData.buttonStyle.shadow
-                  ? '0 4px 15px rgba(0,0,0,0.3)'
-                  : 'none',
+            className={`mb-4 ${baseClass} ${presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
+            style={getButtonStyle()}
+            onClick={(e) => {
+              if (!element.link && !presellData.affiliateLink) e.preventDefault();
             }}
           >
             {element.content}
@@ -89,9 +292,10 @@ export const SectionPreview = ({ sections, presellData, floatingHeader, onReorde
         return element.imageUrl ? (
           <img
             key={element.id}
+            {...dragProps}
             src={element.imageUrl}
             alt={element.content || 'Imagem'}
-            className="max-w-full rounded-lg shadow-lg mb-4"
+            className={`max-w-full rounded-lg shadow-lg mb-4 ${baseClass}`}
             style={{ maxHeight: '400px', objectFit: 'cover' }}
           />
         ) : null;
@@ -99,9 +303,10 @@ export const SectionPreview = ({ sections, presellData, floatingHeader, onReorde
         return element.videoUrl ? (
           <video
             key={element.id}
+            {...dragProps}
             src={element.videoUrl}
             controls
-            className="max-w-full rounded-lg shadow-lg mb-4"
+            className={`max-w-full rounded-lg shadow-lg mb-4 ${baseClass}`}
             style={{ maxHeight: '400px' }}
           />
         ) : null;
@@ -111,39 +316,69 @@ export const SectionPreview = ({ sections, presellData, floatingHeader, onReorde
   };
 
   return (
-    <div className="relative">
+    <div className="relative min-h-full">
+      <style>
+        {`
+          @keyframes neonPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+          }
+        `}
+      </style>
+
       {/* Floating Header */}
       {floatingHeader.enabled && sections.length > 0 && (
         <header
-          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-6 py-3 flex items-center justify-between gap-8"
+          className="sticky top-4 left-1/2 z-50 px-6 py-3 mx-auto w-fit"
           style={{
             backgroundColor: `${floatingHeader.backgroundColor}${Math.round(floatingHeader.backgroundOpacity * 2.55).toString(16).padStart(2, '0')}`,
             backdropFilter: floatingHeader.blur ? 'blur(12px)' : 'none',
             borderRadius: floatingHeader.borderRadius,
             minWidth: '60%',
             maxWidth: '90%',
+            marginTop: '1rem',
+            marginBottom: '-4rem',
           }}
         >
-          {presellData.logoImage && (
-            <img src={presellData.logoImage} alt="Logo" className="h-8 object-contain" />
+          <div className="flex items-center justify-between gap-8">
+            {presellData.logoImage && (
+              <img src={presellData.logoImage} alt="Logo" className="h-8 object-contain" />
+            )}
+            <nav className="hidden md:flex items-center gap-4">
+              {sections.map((section) => (
+                <a
+                  key={section.id}
+                  href={`#section-${section.id}`}
+                  className="text-sm text-white/80 hover:text-white transition-colors"
+                >
+                  {section.name}
+                </a>
+              ))}
+            </nav>
+            {/* Mobile menu button */}
+            <button 
+              className="md:hidden text-white p-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+          
+          {/* Mobile menu */}
+          {mobileMenuOpen && (
+            <nav className="md:hidden mt-4 flex flex-col gap-2 border-t border-white/20 pt-4">
+              {sections.map((section) => (
+                <a
+                  key={section.id}
+                  href={`#section-${section.id}`}
+                  className="text-sm text-white/80 hover:text-white transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {section.name}
+                </a>
+              ))}
+            </nav>
           )}
-          <nav className="hidden md:flex items-center gap-4">
-            {sections.map((section) => (
-              <a
-                key={section.id}
-                href={`#section-${section.id}`}
-                className="text-sm text-white/80 hover:text-white transition-colors"
-              >
-                {section.name}
-              </a>
-            ))}
-          </nav>
-          {/* Mobile menu button - would need JS for toggle in exported HTML */}
-          <button className="md:hidden text-white">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
         </header>
       )}
 
@@ -153,14 +388,49 @@ export const SectionPreview = ({ sections, presellData, floatingHeader, onReorde
           key={section.id}
           id={`section-${section.id}`}
           style={getSectionStyle(section)}
-          className={floatingHeader.enabled && index === 0 ? 'pt-24' : ''}
+          className={`relative group ${floatingHeader.enabled && index === 0 ? 'pt-24' : ''} ${draggedSectionIndex === index ? 'opacity-50' : ''}`}
+          draggable
+          onDragStart={(e) => handleSectionDragStart(e, index)}
+          onDragOver={(e) => handleSectionDragOver(e, index)}
+          onDragEnd={handleSectionDragEnd}
         >
-          {section.backgroundImage && (
+          {/* Background overlay for images */}
+          {section.backgroundImage && section.backgroundOverlay?.enabled && (
+            <div 
+              className="absolute inset-0" 
+              style={{ 
+                background: getOverlayStyle(section.backgroundOverlay),
+                zIndex: 0 
+              }}
+            />
+          )}
+          {section.backgroundImage && !section.backgroundOverlay?.enabled && (
             <div 
               className="absolute inset-0 bg-black/50" 
               style={{ zIndex: 0 }}
             />
           )}
+
+          {/* Section reorder controls */}
+          <div className="absolute top-2 right-2 z-20 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={() => moveSectionUp(index)}
+              disabled={index === 0}
+              className="p-2 bg-black/50 rounded hover:bg-black/70 disabled:opacity-30 text-white"
+              title="Mover para cima"
+            >
+              <ChevronUp className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => moveSectionDown(index)}
+              disabled={index === sections.length - 1}
+              className="p-2 bg-black/50 rounded hover:bg-black/70 disabled:opacity-30 text-white"
+              title="Mover para baixo"
+            >
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
+
           <div 
             className={`max-w-6xl mx-auto relative z-10 ${
               section.layout === 'horizontal' 
@@ -168,7 +438,7 @@ export const SectionPreview = ({ sections, presellData, floatingHeader, onReorde
                 : 'flex flex-col items-center text-center'
             }`}
           >
-            {section.elements.map((element) => renderElement(element, section.layout))}
+            {section.elements.map((element, elementIndex) => renderElement(element, section.id, elementIndex, section.layout))}
           </div>
         </section>
       ))}
@@ -177,8 +447,21 @@ export const SectionPreview = ({ sections, presellData, floatingHeader, onReorde
         <div className="min-h-[50vh] flex items-center justify-center text-muted-foreground">
           <div className="text-center">
             <p className="text-xl mb-2">Nenhuma seção adicionada</p>
-            <p className="text-sm">Adicione seções na aba "Seções" para começar</p>
+            <p className="text-sm">Adicione seções na aba "Criar Site" para começar</p>
           </div>
+        </div>
+      )}
+
+      {/* Floating Trash */}
+      {showTrash && (
+        <div
+          ref={trashRef}
+          className="fixed bottom-8 left-8 z-50 p-6 bg-red-500 rounded-full shadow-2xl animate-pulse"
+          style={{
+            boxShadow: '0 0 30px rgba(239, 68, 68, 0.8), 0 0 60px rgba(239, 68, 68, 0.5)',
+          }}
+        >
+          <Trash2 className="w-8 h-8 text-white" />
         </div>
       )}
     </div>
