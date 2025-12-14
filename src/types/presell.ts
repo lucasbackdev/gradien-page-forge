@@ -203,7 +203,7 @@ export const defaultPresellData: PresellData = {
     backgroundOpacity: 80,
     blur: true,
     borderRadius: '16px',
-    logoPosition: 'left',
+    shadow: true,
   },
   language: 'pt',
 };

@@ -20,16 +20,41 @@ export type SectionType =
 export type LayoutDirection = 'vertical' | 'horizontal';
 export type GradientDirection = 'diagonal' | 'horizontal' | 'vertical' | 'radial';
 
+export type TextType = 'title' | 'subtitle' | 'description';
+
+export interface HighlightWords {
+  enabled: boolean;
+  words: string;
+  color: string;
+}
+
+export interface GradientText {
+  enabled: boolean;
+  colors: string[];
+}
+
+export interface BackgroundOverlay {
+  enabled: boolean;
+  direction: 'vertical' | 'horizontal' | 'diagonal';
+  color1: string;
+  color2: string;
+}
+
 export interface SectionElement {
   id: string;
   type: 'text' | 'image' | 'button' | 'video';
   content: string;
+  textType?: TextType;
+  bold?: boolean;
   imageUrl?: string;
   videoUrl?: string;
   link?: string;
   fontSize?: string;
   color?: string;
   fontWeight?: string;
+  highlightWords?: HighlightWords;
+  gradientText?: GradientText;
+  animation?: boolean;
 }
 
 export interface PresellSection {
@@ -46,6 +71,7 @@ export interface PresellSection {
     color3?: string;
   };
   backgroundImage?: string;
+  backgroundOverlay?: BackgroundOverlay;
   textColor?: string;
   elements: SectionElement[];
   padding?: string;
@@ -57,7 +83,8 @@ export interface FloatingHeader {
   backgroundOpacity: number;
   blur: boolean;
   borderRadius: string;
-  logoPosition: 'left' | 'center';
+  logoImage?: string;
+  shadow: boolean;
 }
 
 export const sectionTemplates: Record<SectionType, { name: string; icon: string; defaultElements: SectionElement[] }> = {
