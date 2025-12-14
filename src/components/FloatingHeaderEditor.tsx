@@ -11,6 +11,14 @@ interface FloatingHeaderEditorProps {
 }
 
 export const FloatingHeaderEditor = ({ header, onChange }: FloatingHeaderEditorProps) => {
+  const handleLogoUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      onChange({ ...header, logoImage: e.target?.result as string });
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <Card className="p-4 space-y-4">
       <div className="flex items-center justify-between">
@@ -23,6 +31,21 @@ export const FloatingHeaderEditor = ({ header, onChange }: FloatingHeaderEditorP
 
       {header.enabled && (
         <div className="space-y-4 pt-2 border-t">
+          <div>
+            <Label className="text-sm">Logo do Header</Label>
+            <div className="flex items-center gap-3 mt-1">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0])}
+                className="flex-1"
+              />
+              {header.logoImage && (
+                <img src={header.logoImage} alt="Logo" className="h-8 object-contain" />
+              )}
+            </div>
+          </div>
+
           <div>
             <Label className="text-sm">Cor de Fundo</Label>
             <div className="flex gap-2 mt-1">
@@ -58,6 +81,14 @@ export const FloatingHeaderEditor = ({ header, onChange }: FloatingHeaderEditorP
               onCheckedChange={(blur) => onChange({ ...header, blur })}
             />
             <Label className="text-sm">Efeito Blur (Glassmorphism)</Label>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={header.shadow}
+              onCheckedChange={(shadow) => onChange({ ...header, shadow })}
+            />
+            <Label className="text-sm">Sombra</Label>
           </div>
 
           <div>

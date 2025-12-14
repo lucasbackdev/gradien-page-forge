@@ -37,55 +37,15 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
     <div className="h-full overflow-y-auto">
       <Tabs defaultValue="sections" className="w-full h-full flex flex-col">
         <div className="sticky top-0 z-10 bg-background p-4 pb-2 border-b">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="sections">Criar Site</TabsTrigger>
-            <TabsTrigger value="images">Imagens</TabsTrigger>
-            <TabsTrigger value="texts">Textos</TabsTrigger>
+            <TabsTrigger value="links">Links</TabsTrigger>
             <TabsTrigger value="buttons">Botões</TabsTrigger>
           </TabsList>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 pt-2">
           <TabsContent value="sections" className="space-y-4 mt-0">
-            <FloatingHeaderEditor
-              header={data.floatingHeader}
-              onChange={(floatingHeader) => onChange({ ...data, floatingHeader })}
-            />
-            <SectionEditor
-              sections={data.sections}
-              onUpdateSections={(sections) => onChange({ ...data, sections })}
-            />
-          </TabsContent>
-
-          <TabsContent value="images" className="space-y-4 mt-0">
-            <Card className="p-4">
-              <Label>Logo do Produto</Label>
-              <div className="mt-2 flex items-center gap-3">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => e.target.files?.[0] && handleImageUpload('logoImage', e.target.files[0])}
-                  className="flex-1"
-                />
-                {data.logoImage && (
-                  <img src={data.logoImage} alt="Logo" className="h-12 w-12 object-cover rounded" />
-                )}
-              </div>
-            </Card>
-
-            <Card className="p-4">
-              <Label>Favicon</Label>
-              <div className="mt-2">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => e.target.files?.[0] && handleImageUpload('favicon', e.target.files[0])}
-                />
-              </div>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="texts" className="space-y-4 mt-0">
             <Card className="p-4">
               <Label>Título da Aba (Browser)</Label>
               <Input
@@ -96,6 +56,70 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
               />
             </Card>
 
+            <Card className="p-4">
+              <Label>Favicon</Label>
+              <div className="mt-2 flex items-center gap-3">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => e.target.files?.[0] && handleImageUpload('favicon', e.target.files[0])}
+                  className="flex-1"
+                />
+                {data.favicon && (
+                  <img src={data.favicon} alt="Favicon" className="h-8 w-8 object-cover rounded" />
+                )}
+              </div>
+            </Card>
+
+            <Card className="p-4">
+              <Label>Fonte dos Títulos</Label>
+              <Select 
+                value={data.fonts.title} 
+                onValueChange={(value) => onChange({ ...data, fonts: { ...data.fonts, title: value } })}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableFonts.map((font) => (
+                    <SelectItem key={font.value} value={font.value}>
+                      {font.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Card>
+
+            <Card className="p-4">
+              <Label>Fonte do Corpo</Label>
+              <Select 
+                value={data.fonts.body} 
+                onValueChange={(value) => onChange({ ...data, fonts: { ...data.fonts, body: value } })}
+              >
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableFonts.map((font) => (
+                    <SelectItem key={font.value} value={font.value}>
+                      {font.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Card>
+
+            <FloatingHeaderEditor
+              header={data.floatingHeader}
+              onChange={(floatingHeader) => onChange({ ...data, floatingHeader })}
+            />
+            <SectionEditor
+              sections={data.sections}
+              onUpdateSections={(sections) => onChange({ ...data, sections })}
+            />
+          </TabsContent>
+
+          <TabsContent value="links" className="space-y-4 mt-0">
             <Card className="p-4">
               <Label>Link de Afiliado</Label>
               <Input
@@ -150,44 +174,6 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
               <p className="text-xs text-muted-foreground mt-1">
                 Aplicado a todos os botões CTA
               </p>
-            </Card>
-
-            <Card className="p-4">
-              <Label>Fonte dos Títulos</Label>
-              <Select 
-                value={data.fonts.title} 
-                onValueChange={(value) => onChange({ ...data, fonts: { ...data.fonts, title: value } })}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableFonts.map((font) => (
-                    <SelectItem key={font.value} value={font.value}>
-                      {font.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Card>
-
-            <Card className="p-4">
-              <Label>Fonte do Corpo</Label>
-              <Select 
-                value={data.fonts.body} 
-                onValueChange={(value) => onChange({ ...data, fonts: { ...data.fonts, body: value } })}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableFonts.map((font) => (
-                    <SelectItem key={font.value} value={font.value}>
-                      {font.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </Card>
           </TabsContent>
 

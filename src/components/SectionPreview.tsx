@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { PresellSection, GradientDirection, SectionElement } from '@/types/sections';
+import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay } from '@/types/sections';
 import { PresellData } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X } from 'lucide-react';
@@ -44,7 +44,7 @@ export const SectionPreview = ({
     }
   };
 
-  const getOverlayStyle = (overlay: PresellSection['backgroundOverlay']) => {
+  const getOverlayStyle = (overlay?: BackgroundOverlay) => {
     if (!overlay?.enabled) return undefined;
     
     const direction = overlay.direction === 'horizontal' ? '90deg' 
@@ -135,19 +135,24 @@ export const SectionPreview = ({
   };
 
   const getTextStyle = (element: SectionElement): React.CSSProperties => {
+    const baseStyle: React.CSSProperties = {
+      fontSize: element.fontSize,
+      fontWeight: element.bold ? 'bold' : element.fontWeight,
+    };
+
     if (element.gradientText?.enabled && element.gradientText.colors?.length) {
       return {
+        ...baseStyle,
         background: `linear-gradient(135deg, ${element.gradientText.colors.join(', ')})`,
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
         backgroundClip: 'text',
-        fontSize: element.fontSize,
         display: 'inline-block',
       };
     }
     return {
+      ...baseStyle,
       color: element.color,
-      fontSize: element.fontSize,
     };
   };
 
@@ -249,6 +254,15 @@ export const SectionPreview = ({
     onReorderSections(newSections);
   };
 
+  const handleSmoothScroll = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
+    e.preventDefault();
+    const element = document.getElementById(`section-${sectionId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setMobileMenuOpen(false);
+  };
+
   const renderElement = (element: SectionElement, sectionId: string, elementIndex: number, sectionLayout: 'vertical' | 'horizontal') => {
     const isDragging = draggedElementInfo?.sectionId === sectionId && draggedElementInfo?.elementIndex === elementIndex;
     
@@ -260,6 +274,7 @@ export const SectionPreview = ({
     };
 
     const baseClass = `cursor-move transition-all ${isDragging ? 'opacity-50 scale-95' : 'hover:ring-2 hover:ring-primary/50 hover:ring-offset-2'}`;
+    const animationClass = element.animation ? 'animate-fade-in' : '';
 
     switch (element.type) {
       case 'text':
@@ -268,7 +283,7 @@ export const SectionPreview = ({
             key={element.id} 
             {...dragProps}
             style={getTextStyle(element)} 
-            className={`mb-4 ${baseClass}`}
+            className={`mb-4 ${baseClass} ${animationClass}`}
           >
             {renderTextWithHighlight(element.content || '', element)}
           </div>
@@ -279,7 +294,7 @@ export const SectionPreview = ({
             key={element.id}
             {...dragProps}
             href={element.link || presellData.affiliateLink || '#'}
-            className={`mb-4 ${baseClass} ${presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
+            className={`mb-4 ${baseClass} ${animationClass} ${presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
             style={getButtonStyle()}
             onClick={(e) => {
               if (!element.link && !presellData.affiliateLink) e.preventDefault();
@@ -295,7 +310,7 @@ export const SectionPreview = ({
             {...dragProps}
             src={element.imageUrl}
             alt={element.content || 'Imagem'}
-            className={`max-w-full rounded-lg shadow-lg mb-4 ${baseClass}`}
+            className={`max-w-full rounded-lg shadow-lg mb-4 ${baseClass} ${animationClass}`}
             style={{ maxHeight: '400px', objectFit: 'cover' }}
           />
         ) : null;
@@ -306,7 +321,7 @@ export const SectionPreview = ({
             {...dragProps}
             src={element.videoUrl}
             controls
-            className={`max-w-full rounded-lg shadow-lg mb-4 ${baseClass}`}
+            className={`max-w-full rounded-lg shadow-lg mb-4 ${baseClass} ${animationClass}`}
             style={{ maxHeight: '400px' }}
           />
         ) : null;
@@ -323,32 +338,41 @@ export const SectionPreview = ({
             0%, 100% { opacity: 1; }
             50% { opacity: 0.8; }
           }
+          html {
+            scroll-behavior: smooth;
+          }
         `}
       </style>
 
       {/* Floating Header */}
       {floatingHeader.enabled && sections.length > 0 && (
         <header
-          className="sticky top-4 left-1/2 z-50 px-6 py-3 mx-auto w-fit"
+          className="sticky top-4 z-50 px-6 py-3 mx-auto"
           style={{
             backgroundColor: `${floatingHeader.backgroundColor}${Math.round(floatingHeader.backgroundOpacity * 2.55).toString(16).padStart(2, '0')}`,
             backdropFilter: floatingHeader.blur ? 'blur(12px)' : 'none',
             borderRadius: floatingHeader.borderRadius,
+            width: 'fit-content',
             minWidth: '60%',
             maxWidth: '90%',
             marginTop: '1rem',
             marginBottom: '-4rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            position: 'sticky',
+            boxShadow: floatingHeader.shadow ? '0 8px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2)' : 'none',
           }}
         >
           <div className="flex items-center justify-between gap-8">
-            {presellData.logoImage && (
-              <img src={presellData.logoImage} alt="Logo" className="h-8 object-contain" />
+            {floatingHeader.logoImage && (
+              <img src={floatingHeader.logoImage} alt="Logo" className="h-8 object-contain flex-shrink-0" />
             )}
-            <nav className="hidden md:flex items-center gap-4">
+            <nav className="hidden md:flex items-center justify-center gap-4 flex-1">
               {sections.map((section) => (
                 <a
                   key={section.id}
                   href={`#section-${section.id}`}
+                  onClick={(e) => handleSmoothScroll(e, section.id)}
                   className="text-sm text-white/80 hover:text-white transition-colors"
                 >
                   {section.name}
@@ -371,8 +395,8 @@ export const SectionPreview = ({
                 <a
                   key={section.id}
                   href={`#section-${section.id}`}
+                  onClick={(e) => handleSmoothScroll(e, section.id)}
                   className="text-sm text-white/80 hover:text-white transition-colors py-2"
-                  onClick={() => setMobileMenuOpen(false)}
                 >
                   {section.name}
                 </a>
