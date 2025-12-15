@@ -92,10 +92,10 @@ document.addEventListener('DOMContentLoaded', function() {
       
       const publicFolder = zip.folder('public');
       
-      if (presellData.logoImage && publicFolder) {
-        const logoData = presellData.logoImage.split(',')[1];
+      if (presellData.floatingHeader.logoImage && publicFolder) {
+        const logoData = presellData.floatingHeader.logoImage.split(',')[1];
         if (logoData) {
-          publicFolder.file('logo.png', logoData, { base64: true });
+          publicFolder.file('header-logo.png', logoData, { base64: true });
         }
       }
       
@@ -160,12 +160,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Floating Header
     if (data.floatingHeader.enabled && data.sections.length > 0) {
+      const headerPosition = data.floatingHeader.position || 'center';
+      const positionStyle = headerPosition === 'left' ? 'margin-left: 1rem; margin-right: auto;' 
+        : headerPosition === 'right' ? 'margin-left: auto; margin-right: 1rem;' 
+        : 'margin-left: auto; margin-right: auto;';
+      
       html += `
-<header class="floating-header">
+<header class="floating-header" style="${positionStyle}">
   <div class="header-content">
-    ${data.logoImage ? '<img src="public/logo.png" alt="Logo" class="header-logo">' : ''}
+    ${data.floatingHeader.logoImage ? '<img src="public/header-logo.png" alt="Logo" class="header-logo">' : ''}
     <nav class="desktop-nav">
-      ${data.sections.map(s => `<a href="#section-${s.id}">${s.name}</a>`).join('')}
+      ${data.sections.map(s => `<a href="#section-${s.id}" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'})">${s.name}</a>`).join('')}
     </nav>
     <button class="mobile-menu-btn">
       <svg class="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24">
@@ -174,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </button>
   </div>
   <nav class="mobile-nav hidden">
-    ${data.sections.map(s => `<a href="#section-${s.id}">${s.name}</a>`).join('')}
+    ${data.sections.map(s => `<a href="#section-${s.id}" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'}); this.closest('.mobile-nav').classList.add('hidden')">${s.name}</a>`).join('')}
   </nav>
 </header>`;
     }
@@ -292,8 +297,6 @@ body {
 .floating-header {
   position: sticky;
   top: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
   z-index: 1000;
   padding: 0.75rem 1.5rem;
   background-color: ${data.floatingHeader.backgroundColor}${Math.round(data.floatingHeader.backgroundOpacity * 2.55).toString(16).padStart(2, '0')};
@@ -301,7 +304,7 @@ body {
   border-radius: ${data.floatingHeader.borderRadius};
   min-width: 60%;
   max-width: 90%;
-  margin: 1rem auto -3rem;
+  ${data.floatingHeader.shadow ? 'box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2);' : ''}
 }
 
 .header-content {
