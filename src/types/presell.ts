@@ -204,6 +204,7 @@ export const defaultPresellData: PresellData = {
     blur: true,
     borderRadius: '16px',
     shadow: true,
+    position: 'center',
   },
   language: 'pt',
 };

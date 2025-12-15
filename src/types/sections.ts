@@ -77,6 +77,8 @@ export interface PresellSection {
   padding?: string;
 }
 
+export type HeaderPosition = 'left' | 'center' | 'right';
+
 export interface FloatingHeader {
   enabled: boolean;
   backgroundColor: string;
@@ -85,6 +87,7 @@ export interface FloatingHeader {
   borderRadius: string;
   logoImage?: string;
   shadow: boolean;
+  position: HeaderPosition;
 }
 
 export const sectionTemplates: Record<SectionType, { name: string; icon: string; defaultElements: SectionElement[] }> = {
