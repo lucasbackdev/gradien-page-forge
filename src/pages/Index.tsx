@@ -264,7 +264,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const direction = overlay.direction === 'horizontal' ? '90deg' 
       : overlay.direction === 'diagonal' ? '135deg' 
       : '180deg';
-    return `linear-gradient(${direction}, ${overlay.color1}, ${overlay.color2})`;
+    
+    const opacity1 = (overlay.opacity1 ?? 80) / 100;
+    const opacity2 = (overlay.opacity2 ?? 0) / 100;
+    
+    // Convert hex to rgba
+    const hexToRgba = (hex: string, alpha: number) => {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+    
+    const color1Rgba = hexToRgba(overlay.color1 || '#000000', opacity1);
+    const color2Rgba = hexToRgba(overlay.color2 || '#000000', opacity2);
+    
+    return `linear-gradient(${direction}, ${color1Rgba}, ${color2Rgba})`;
   };
 
   const generateSectionsCSS = (data: PresellData): string => {
