@@ -115,6 +115,18 @@ export const FloatingHeaderEditor = ({ header, onChange }: FloatingHeaderEditorP
             />
           </div>
 
+          <div>
+            <Label className="text-sm">Largura: {header.width || 60}%</Label>
+            <Slider
+              value={[header.width || 60]}
+              onValueChange={(value) => onChange({ ...header, width: value[0] })}
+              min={40}
+              max={100}
+              step={5}
+              className="mt-2"
+            />
+          </div>
+
           <div className="flex items-center gap-2">
             <Switch
               checked={header.blur}

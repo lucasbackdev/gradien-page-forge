@@ -88,6 +88,7 @@ export interface FloatingHeader {
   logoImage?: string;
   shadow: boolean;
   position: HeaderPosition;
+  width: number;
 }
 
 export const sectionTemplates: Record<SectionType, { name: string; icon: string; defaultElements: SectionElement[] }> = {
