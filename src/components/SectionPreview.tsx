@@ -304,25 +304,46 @@ export const SectionPreview = ({
           </a>
         );
       case 'image':
+        const imageGlowStyle = element.glowingBorder ? {
+          boxShadow: `0 0 10px ${element.glowBorderColor || '#FF6A00'}, 0 0 20px ${element.glowBorderColor || '#FF6A00'}, 0 0 30px ${element.glowBorderColor || '#FF6A00'}`,
+          border: `2px solid ${element.glowBorderColor || '#FF6A00'}`,
+          animation: 'glowPulse 2s ease-in-out infinite',
+        } : {};
         return element.imageUrl ? (
           <img
             key={element.id}
             {...dragProps}
             src={element.imageUrl}
             alt={element.content || 'Imagem'}
-            className={`max-w-full rounded-lg shadow-lg mb-4 ${baseClass} ${animationClass}`}
-            style={{ maxHeight: '400px', objectFit: 'cover' }}
+            className={`rounded-lg shadow-lg mb-4 ${baseClass} ${animationClass}`}
+            style={{ 
+              maxHeight: '400px', 
+              objectFit: 'cover',
+              width: `${element.mediaWidth || 100}%`,
+              maxWidth: '100%',
+              ...imageGlowStyle,
+            }}
           />
         ) : null;
       case 'video':
+        const videoGlowStyle = element.glowingBorder ? {
+          boxShadow: `0 0 10px ${element.glowBorderColor || '#FF6A00'}, 0 0 20px ${element.glowBorderColor || '#FF6A00'}, 0 0 30px ${element.glowBorderColor || '#FF6A00'}`,
+          border: `2px solid ${element.glowBorderColor || '#FF6A00'}`,
+          animation: 'glowPulse 2s ease-in-out infinite',
+        } : {};
         return element.videoUrl ? (
           <video
             key={element.id}
             {...dragProps}
             src={element.videoUrl}
             controls
-            className={`max-w-full rounded-lg shadow-lg mb-4 ${baseClass} ${animationClass}`}
-            style={{ maxHeight: '400px' }}
+            className={`rounded-lg shadow-lg mb-4 ${baseClass} ${animationClass}`}
+            style={{ 
+              maxHeight: '400px',
+              width: `${element.mediaWidth || 100}%`,
+              maxWidth: '100%',
+              ...videoGlowStyle,
+            }}
           />
         ) : null;
       default:
@@ -337,6 +358,16 @@ export const SectionPreview = ({
           @keyframes neonPulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.8; }
+          }
+          @keyframes glowPulse {
+            0%, 100% { 
+              filter: brightness(1);
+              opacity: 1;
+            }
+            50% { 
+              filter: brightness(1.2);
+              opacity: 0.9;
+            }
           }
           html {
             scroll-behavior: smooth;

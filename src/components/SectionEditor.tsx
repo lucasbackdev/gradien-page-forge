@@ -519,7 +519,7 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                             )}
 
                             {element.type === 'image' && (
-                              <div>
+                              <div className="space-y-3">
                                 <Input
                                   type="file"
                                   accept="image/*"
@@ -539,11 +539,46 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                 {element.imageUrl && (
                                   <img src={element.imageUrl} className="mt-2 h-16 object-cover rounded" alt="" />
                                 )}
+                                
+                                <div>
+                                  <Label className="text-xs">Tamanho: {element.mediaWidth || 100}%</Label>
+                                  <Slider
+                                    value={[element.mediaWidth || 100]}
+                                    onValueChange={(value) => updateSectionElement(section.id, element.id, { mediaWidth: value[0] })}
+                                    min={20}
+                                    max={100}
+                                    step={5}
+                                    className="mt-1"
+                                  />
+                                </div>
+                                
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={element.glowingBorder || false}
+                                    onCheckedChange={(checked) => updateSectionElement(section.id, element.id, { 
+                                      glowingBorder: checked,
+                                      glowBorderColor: element.glowBorderColor || '#FF6A00',
+                                    })}
+                                  />
+                                  <Label className="text-xs">Borda Brilhante Pulsante</Label>
+                                </div>
+                                
+                                {element.glowingBorder && (
+                                  <div className="flex items-center gap-2">
+                                    <Label className="text-xs">Cor:</Label>
+                                    <Input
+                                      type="color"
+                                      value={element.glowBorderColor || '#FF6A00'}
+                                      onChange={(e) => updateSectionElement(section.id, element.id, { glowBorderColor: e.target.value })}
+                                      className="h-8 w-12"
+                                    />
+                                  </div>
+                                )}
                               </div>
                             )}
 
                             {element.type === 'video' && (
-                              <div>
+                              <div className="space-y-3">
                                 <Input
                                   type="file"
                                   accept="video/*"
@@ -562,6 +597,41 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                 />
                                 {element.videoUrl && (
                                   <video src={element.videoUrl} className="mt-2 h-16 rounded" controls={false} muted />
+                                )}
+                                
+                                <div>
+                                  <Label className="text-xs">Tamanho: {element.mediaWidth || 100}%</Label>
+                                  <Slider
+                                    value={[element.mediaWidth || 100]}
+                                    onValueChange={(value) => updateSectionElement(section.id, element.id, { mediaWidth: value[0] })}
+                                    min={20}
+                                    max={100}
+                                    step={5}
+                                    className="mt-1"
+                                  />
+                                </div>
+                                
+                                <div className="flex items-center gap-2">
+                                  <Switch
+                                    checked={element.glowingBorder || false}
+                                    onCheckedChange={(checked) => updateSectionElement(section.id, element.id, { 
+                                      glowingBorder: checked,
+                                      glowBorderColor: element.glowBorderColor || '#FF6A00',
+                                    })}
+                                  />
+                                  <Label className="text-xs">Borda Brilhante Pulsante</Label>
+                                </div>
+                                
+                                {element.glowingBorder && (
+                                  <div className="flex items-center gap-2">
+                                    <Label className="text-xs">Cor:</Label>
+                                    <Input
+                                      type="color"
+                                      value={element.glowBorderColor || '#FF6A00'}
+                                      onChange={(e) => updateSectionElement(section.id, element.id, { glowBorderColor: e.target.value })}
+                                      className="h-8 w-12"
+                                    />
+                                  </div>
                                 )}
                               </div>
                             )}
