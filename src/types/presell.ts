@@ -205,6 +205,7 @@ export const defaultPresellData: PresellData = {
     borderRadius: '16px',
     shadow: true,
     position: 'center',
+    width: 60,
   },
   language: 'pt',
 };

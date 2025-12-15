@@ -302,8 +302,8 @@ body {
   background-color: ${data.floatingHeader.backgroundColor}${Math.round(data.floatingHeader.backgroundOpacity * 2.55).toString(16).padStart(2, '0')};
   ${data.floatingHeader.blur ? 'backdrop-filter: blur(12px);' : ''}
   border-radius: ${data.floatingHeader.borderRadius};
-  min-width: 60%;
-  max-width: 90%;
+  width: ${data.floatingHeader.width || 60}%;
+  max-width: 95%;
   ${data.floatingHeader.shadow ? 'box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2);' : ''}
 }
 
