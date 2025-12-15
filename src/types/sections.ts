@@ -38,6 +38,8 @@ export interface BackgroundOverlay {
   direction: 'vertical' | 'horizontal' | 'diagonal';
   color1: string;
   color2: string;
+  opacity1: number;
+  opacity2: number;
 }
 
 export interface SectionElement {

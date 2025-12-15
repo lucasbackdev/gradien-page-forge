@@ -343,8 +343,10 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                 onCheckedChange={(checked) => updateSection(section.id, {
                                   backgroundOverlay: { 
                                     enabled: checked,
-                                    color1: section.backgroundOverlay?.color1 || 'rgba(0,0,0,0.7)',
-                                    color2: section.backgroundOverlay?.color2 || 'rgba(0,0,0,0)',
+                                    color1: section.backgroundOverlay?.color1 || '#000000',
+                                    color2: section.backgroundOverlay?.color2 || '#000000',
+                                    opacity1: section.backgroundOverlay?.opacity1 ?? 80,
+                                    opacity2: section.backgroundOverlay?.opacity2 ?? 0,
                                     direction: section.backgroundOverlay?.direction || 'vertical',
                                   }
                                 })}
@@ -353,7 +355,7 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                             </div>
                             
                             {section.backgroundOverlay?.enabled && (
-                              <div className="space-y-2 pl-4">
+                              <div className="space-y-3 pl-4">
                                 <div>
                                   <Label className="text-xs">Direção</Label>
                                   <Select
@@ -372,27 +374,57 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                     </SelectContent>
                                   </Select>
                                 </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                  <div>
+                                
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2">
                                     <Label className="text-xs">Cor Inicial</Label>
                                     <Input
                                       type="color"
-                                      value={section.backgroundOverlay.color1?.replace(/rgba?\([^)]+\)/, '#000000') || '#000000'}
+                                      value={section.backgroundOverlay.color1 || '#000000'}
                                       onChange={(e) => updateSection(section.id, {
-                                        backgroundOverlay: { ...section.backgroundOverlay!, color1: e.target.value + 'cc' }
+                                        backgroundOverlay: { ...section.backgroundOverlay!, color1: e.target.value }
                                       })}
-                                      className="h-8 mt-1"
+                                      className="h-8 w-12"
                                     />
                                   </div>
                                   <div>
+                                    <Label className="text-xs">Intensidade Inicial: {section.backgroundOverlay.opacity1 ?? 80}%</Label>
+                                    <Slider
+                                      value={[section.backgroundOverlay.opacity1 ?? 80]}
+                                      onValueChange={(value) => updateSection(section.id, {
+                                        backgroundOverlay: { ...section.backgroundOverlay!, opacity1: value[0] }
+                                      })}
+                                      min={0}
+                                      max={100}
+                                      step={5}
+                                      className="mt-1"
+                                    />
+                                  </div>
+                                </div>
+                                
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2">
                                     <Label className="text-xs">Cor Final</Label>
                                     <Input
                                       type="color"
-                                      value={section.backgroundOverlay.color2?.replace(/rgba?\([^)]+\)/, '#000000') || '#000000'}
+                                      value={section.backgroundOverlay.color2 || '#000000'}
                                       onChange={(e) => updateSection(section.id, {
-                                        backgroundOverlay: { ...section.backgroundOverlay!, color2: e.target.value + '00' }
+                                        backgroundOverlay: { ...section.backgroundOverlay!, color2: e.target.value }
                                       })}
-                                      className="h-8 mt-1"
+                                      className="h-8 w-12"
+                                    />
+                                  </div>
+                                  <div>
+                                    <Label className="text-xs">Intensidade Final: {section.backgroundOverlay.opacity2 ?? 0}%</Label>
+                                    <Slider
+                                      value={[section.backgroundOverlay.opacity2 ?? 0]}
+                                      onValueChange={(value) => updateSection(section.id, {
+                                        backgroundOverlay: { ...section.backgroundOverlay!, opacity2: value[0] }
+                                      })}
+                                      min={0}
+                                      max={100}
+                                      step={5}
+                                      className="mt-1"
                                     />
                                   </div>
                                 </div>
