@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
+import { AlignLeft, AlignCenter, AlignRight } from 'lucide-react';
 
 interface FloatingHeaderEditorProps {
   header: FloatingHeader;
@@ -43,6 +44,45 @@ export const FloatingHeaderEditor = ({ header, onChange }: FloatingHeaderEditorP
               {header.logoImage && (
                 <img src={header.logoImage} alt="Logo" className="h-8 object-contain" />
               )}
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-sm">Posição do Header</Label>
+            <div className="flex gap-2 mt-1">
+              <button
+                onClick={() => onChange({ ...header, position: 'left' })}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm rounded border transition-colors ${
+                  header.position === 'left'
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-muted border-border hover:border-primary'
+                }`}
+              >
+                <AlignLeft className="w-4 h-4" />
+                Esquerda
+              </button>
+              <button
+                onClick={() => onChange({ ...header, position: 'center' })}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm rounded border transition-colors ${
+                  header.position === 'center'
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-muted border-border hover:border-primary'
+                }`}
+              >
+                <AlignCenter className="w-4 h-4" />
+                Centro
+              </button>
+              <button
+                onClick={() => onChange({ ...header, position: 'right' })}
+                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm rounded border transition-colors ${
+                  header.position === 'right'
+                    ? 'bg-primary text-primary-foreground border-primary'
+                    : 'bg-muted border-border hover:border-primary'
+                }`}
+              >
+                <AlignRight className="w-4 h-4" />
+                Direita
+              </button>
             </div>
           </div>
 

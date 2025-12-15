@@ -347,7 +347,7 @@ export const SectionPreview = ({
       {/* Floating Header */}
       {floatingHeader.enabled && sections.length > 0 && (
         <header
-          className="sticky top-4 z-50 px-6 py-3 mx-auto"
+          className="sticky top-4 z-50 px-6 py-3"
           style={{
             backgroundColor: `${floatingHeader.backgroundColor}${Math.round(floatingHeader.backgroundOpacity * 2.55).toString(16).padStart(2, '0')}`,
             backdropFilter: floatingHeader.blur ? 'blur(12px)' : 'none',
@@ -357,9 +357,9 @@ export const SectionPreview = ({
             maxWidth: '90%',
             marginTop: '1rem',
             marginBottom: '-4rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            position: 'sticky',
+            marginLeft: floatingHeader.position === 'left' ? '1rem' : floatingHeader.position === 'right' ? 'auto' : 'auto',
+            marginRight: floatingHeader.position === 'right' ? '1rem' : floatingHeader.position === 'left' ? 'auto' : 'auto',
+            ...(floatingHeader.position === 'center' && { marginLeft: 'auto', marginRight: 'auto' }),
             boxShadow: floatingHeader.shadow ? '0 8px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2)' : 'none',
           }}
         >
