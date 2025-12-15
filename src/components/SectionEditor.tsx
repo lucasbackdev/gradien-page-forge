@@ -557,21 +557,56 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                     checked={element.glowingBorder || false}
                                     onCheckedChange={(checked) => updateSectionElement(section.id, element.id, { 
                                       glowingBorder: checked,
-                                      glowBorderColor: element.glowBorderColor || '#FF6A00',
+                                      glowBorderColors: element.glowBorderColors || ['#FF6A00', '#FF2D55'],
                                     })}
                                   />
-                                  <Label className="text-xs">Borda Brilhante Pulsante</Label>
+                                  <Label className="text-xs">Borda Brilhante</Label>
                                 </div>
                                 
                                 {element.glowingBorder && (
-                                  <div className="flex items-center gap-2">
-                                    <Label className="text-xs">Cor:</Label>
-                                    <Input
-                                      type="color"
-                                      value={element.glowBorderColor || '#FF6A00'}
-                                      onChange={(e) => updateSectionElement(section.id, element.id, { glowBorderColor: e.target.value })}
-                                      className="h-8 w-12"
-                                    />
+                                  <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                      <Label className="text-xs">Cores:</Label>
+                                      <Select
+                                        value={String(element.glowBorderColors?.length || 2)}
+                                        onValueChange={(value) => {
+                                          const count = parseInt(value);
+                                          const currentColors = element.glowBorderColors || ['#FF6A00', '#FF2D55'];
+                                          const newColors = [...currentColors];
+                                          while (newColors.length < count) {
+                                            newColors.push('#8A2EFF');
+                                          }
+                                          while (newColors.length > count) {
+                                            newColors.pop();
+                                          }
+                                          updateSectionElement(section.id, element.id, { glowBorderColors: newColors });
+                                        }}
+                                      >
+                                        <SelectTrigger className="h-8 w-16">
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="2">2</SelectItem>
+                                          <SelectItem value="3">3</SelectItem>
+                                          <SelectItem value="4">4</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    <div className="flex gap-1">
+                                      {element.glowBorderColors?.map((color, idx) => (
+                                        <Input
+                                          key={idx}
+                                          type="color"
+                                          value={color}
+                                          onChange={(e) => {
+                                            const newColors = [...(element.glowBorderColors || [])];
+                                            newColors[idx] = e.target.value;
+                                            updateSectionElement(section.id, element.id, { glowBorderColors: newColors });
+                                          }}
+                                          className="h-8 w-10"
+                                        />
+                                      ))}
+                                    </div>
                                   </div>
                                 )}
                               </div>
@@ -605,7 +640,7 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                     value={[element.mediaWidth || 100]}
                                     onValueChange={(value) => updateSectionElement(section.id, element.id, { mediaWidth: value[0] })}
                                     min={20}
-                                    max={100}
+                                    max={150}
                                     step={5}
                                     className="mt-1"
                                   />
@@ -616,21 +651,56 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                     checked={element.glowingBorder || false}
                                     onCheckedChange={(checked) => updateSectionElement(section.id, element.id, { 
                                       glowingBorder: checked,
-                                      glowBorderColor: element.glowBorderColor || '#FF6A00',
+                                      glowBorderColors: element.glowBorderColors || ['#FF6A00', '#FF2D55'],
                                     })}
                                   />
-                                  <Label className="text-xs">Borda Brilhante Pulsante</Label>
+                                  <Label className="text-xs">Borda Brilhante</Label>
                                 </div>
                                 
                                 {element.glowingBorder && (
-                                  <div className="flex items-center gap-2">
-                                    <Label className="text-xs">Cor:</Label>
-                                    <Input
-                                      type="color"
-                                      value={element.glowBorderColor || '#FF6A00'}
-                                      onChange={(e) => updateSectionElement(section.id, element.id, { glowBorderColor: e.target.value })}
-                                      className="h-8 w-12"
-                                    />
+                                  <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                      <Label className="text-xs">Cores:</Label>
+                                      <Select
+                                        value={String(element.glowBorderColors?.length || 2)}
+                                        onValueChange={(value) => {
+                                          const count = parseInt(value);
+                                          const currentColors = element.glowBorderColors || ['#FF6A00', '#FF2D55'];
+                                          const newColors = [...currentColors];
+                                          while (newColors.length < count) {
+                                            newColors.push('#8A2EFF');
+                                          }
+                                          while (newColors.length > count) {
+                                            newColors.pop();
+                                          }
+                                          updateSectionElement(section.id, element.id, { glowBorderColors: newColors });
+                                        }}
+                                      >
+                                        <SelectTrigger className="h-8 w-16">
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="2">2</SelectItem>
+                                          <SelectItem value="3">3</SelectItem>
+                                          <SelectItem value="4">4</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    <div className="flex gap-1">
+                                      {element.glowBorderColors?.map((color, idx) => (
+                                        <Input
+                                          key={idx}
+                                          type="color"
+                                          value={color}
+                                          onChange={(e) => {
+                                            const newColors = [...(element.glowBorderColors || [])];
+                                            newColors[idx] = e.target.value;
+                                            updateSectionElement(section.id, element.id, { glowBorderColors: newColors });
+                                          }}
+                                          className="h-8 w-10"
+                                        />
+                                      ))}
+                                    </div>
                                   </div>
                                 )}
                               </div>

@@ -56,7 +56,7 @@ export interface SectionElement {
   gradientText?: GradientText;
   animation?: boolean;
   glowingBorder?: boolean;
-  glowBorderColor?: string;
+  glowBorderColors?: string[];
   mediaWidth?: number;
 }
 

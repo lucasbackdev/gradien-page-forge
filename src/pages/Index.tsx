@@ -218,16 +218,18 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       if (el.type === 'image' && el.imageUrl) {
         const glowClass = el.glowingBorder ? 'glow-border' : '';
+        const colors = el.glowBorderColors || ['#FF6A00', '#FF2D55'];
         const glowStyle = el.glowingBorder 
-          ? `--glow-color: ${el.glowBorderColor || '#FF6A00'}; box-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color), 0 0 30px var(--glow-color); border: 2px solid var(--glow-color);`
+          ? `box-shadow: 0 0 15px ${colors[0]}, 0 0 30px ${colors[1] || colors[0]}${colors[2] ? `, 0 0 45px ${colors[2]}` : ''}${colors[3] ? `, 0 0 60px ${colors[3]}` : ''}; border: 3px solid transparent; background-image: linear-gradient(#1a1a2e, #1a1a2e), linear-gradient(135deg, ${colors.join(', ')}); background-origin: border-box; background-clip: padding-box, border-box;`
           : '';
         const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
         return `<img src="public/section-${sectionIndex}-element-${elIndex}.png" alt="${el.content || 'Imagem'}" class="element-image ${glowClass}" style="${glowStyle} ${widthStyle}">`;
       }
       if (el.type === 'video' && el.videoUrl) {
         const glowClass = el.glowingBorder ? 'glow-border' : '';
+        const colors = el.glowBorderColors || ['#FF6A00', '#FF2D55'];
         const glowStyle = el.glowingBorder 
-          ? `--glow-color: ${el.glowBorderColor || '#FF6A00'}; box-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color), 0 0 30px var(--glow-color); border: 2px solid var(--glow-color);`
+          ? `box-shadow: 0 0 15px ${colors[0]}, 0 0 30px ${colors[1] || colors[0]}${colors[2] ? `, 0 0 45px ${colors[2]}` : ''}${colors[3] ? `, 0 0 60px ${colors[3]}` : ''}; border: 3px solid transparent; background-image: linear-gradient(#1a1a2e, #1a1a2e), linear-gradient(135deg, ${colors.join(', ')}); background-origin: border-box; background-clip: padding-box, border-box;`
           : '';
         const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
         return `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video ${glowClass}" style="${glowStyle} ${widthStyle}"></video>`;
@@ -444,26 +446,10 @@ ${data.buttonStyle.neonGlow ? `
 }
 
 .element-video {
-  max-width: 100%;
-  max-height: 400px;
+  max-width: 150%;
   border-radius: 0.5rem;
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   margin-bottom: 1rem;
-}
-
-@keyframes glowPulse {
-  0%, 100% { 
-    filter: brightness(1);
-    opacity: 1;
-  }
-  50% { 
-    filter: brightness(1.2);
-    opacity: 0.9;
-  }
-}
-
-.glow-border {
-  animation: glowPulse 2s ease-in-out infinite;
 }
 
 .whatsapp-button {
