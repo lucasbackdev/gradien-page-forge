@@ -304,10 +304,16 @@ export const SectionPreview = ({
           </a>
         );
       case 'image':
+        const imageColors = element.glowBorderColors || ['#FF6A00', '#FF2D55'];
+        const imageGradientGlow = imageColors.length > 2 
+          ? `linear-gradient(135deg, ${imageColors.join(', ')})`
+          : `linear-gradient(135deg, ${imageColors[0]}, ${imageColors[1] || imageColors[0]})`;
         const imageGlowStyle = element.glowingBorder ? {
-          boxShadow: `0 0 10px ${element.glowBorderColor || '#FF6A00'}, 0 0 20px ${element.glowBorderColor || '#FF6A00'}, 0 0 30px ${element.glowBorderColor || '#FF6A00'}`,
-          border: `2px solid ${element.glowBorderColor || '#FF6A00'}`,
-          animation: 'glowPulse 2s ease-in-out infinite',
+          boxShadow: `0 0 15px ${imageColors[0]}, 0 0 30px ${imageColors[1] || imageColors[0]}${imageColors[2] ? `, 0 0 45px ${imageColors[2]}` : ''}${imageColors[3] ? `, 0 0 60px ${imageColors[3]}` : ''}`,
+          border: `3px solid transparent`,
+          backgroundImage: `linear-gradient(#000, #000), ${imageGradientGlow}`,
+          backgroundOrigin: 'border-box',
+          backgroundClip: 'padding-box, border-box',
         } : {};
         return element.imageUrl ? (
           <img
@@ -317,7 +323,7 @@ export const SectionPreview = ({
             alt={element.content || 'Imagem'}
             className={`rounded-lg shadow-lg mb-4 ${baseClass} ${animationClass}`}
             style={{ 
-              maxHeight: '400px', 
+              maxHeight: '500px', 
               objectFit: 'cover',
               width: `${element.mediaWidth || 100}%`,
               maxWidth: '100%',
@@ -326,10 +332,16 @@ export const SectionPreview = ({
           />
         ) : null;
       case 'video':
+        const videoColors = element.glowBorderColors || ['#FF6A00', '#FF2D55'];
+        const videoGradientGlow = videoColors.length > 2 
+          ? `linear-gradient(135deg, ${videoColors.join(', ')})`
+          : `linear-gradient(135deg, ${videoColors[0]}, ${videoColors[1] || videoColors[0]})`;
         const videoGlowStyle = element.glowingBorder ? {
-          boxShadow: `0 0 10px ${element.glowBorderColor || '#FF6A00'}, 0 0 20px ${element.glowBorderColor || '#FF6A00'}, 0 0 30px ${element.glowBorderColor || '#FF6A00'}`,
-          border: `2px solid ${element.glowBorderColor || '#FF6A00'}`,
-          animation: 'glowPulse 2s ease-in-out infinite',
+          boxShadow: `0 0 15px ${videoColors[0]}, 0 0 30px ${videoColors[1] || videoColors[0]}${videoColors[2] ? `, 0 0 45px ${videoColors[2]}` : ''}${videoColors[3] ? `, 0 0 60px ${videoColors[3]}` : ''}`,
+          border: `3px solid transparent`,
+          backgroundImage: `linear-gradient(#000, #000), ${videoGradientGlow}`,
+          backgroundOrigin: 'border-box',
+          backgroundClip: 'padding-box, border-box',
         } : {};
         return element.videoUrl ? (
           <video
@@ -339,9 +351,8 @@ export const SectionPreview = ({
             controls
             className={`rounded-lg shadow-lg mb-4 ${baseClass} ${animationClass}`}
             style={{ 
-              maxHeight: '400px',
               width: `${element.mediaWidth || 100}%`,
-              maxWidth: '100%',
+              maxWidth: '150%',
               ...videoGlowStyle,
             }}
           />
@@ -358,16 +369,6 @@ export const SectionPreview = ({
           @keyframes neonPulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.8; }
-          }
-          @keyframes glowPulse {
-            0%, 100% { 
-              filter: brightness(1);
-              opacity: 1;
-            }
-            50% { 
-              filter: brightness(1.2);
-              opacity: 0.9;
-            }
           }
           html {
             scroll-behavior: smooth;
