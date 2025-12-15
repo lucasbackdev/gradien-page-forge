@@ -217,10 +217,20 @@ document.addEventListener('DOMContentLoaded', function() {
         return `<a href="${el.link || data.affiliateLink || '#'}" class="element-button">${el.content || 'Botão'}</a>`;
       }
       if (el.type === 'image' && el.imageUrl) {
-        return `<img src="public/section-${sectionIndex}-element-${elIndex}.png" alt="${el.content || 'Imagem'}" class="element-image">`;
+        const glowClass = el.glowingBorder ? 'glow-border' : '';
+        const glowStyle = el.glowingBorder 
+          ? `--glow-color: ${el.glowBorderColor || '#FF6A00'}; box-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color), 0 0 30px var(--glow-color); border: 2px solid var(--glow-color);`
+          : '';
+        const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
+        return `<img src="public/section-${sectionIndex}-element-${elIndex}.png" alt="${el.content || 'Imagem'}" class="element-image ${glowClass}" style="${glowStyle} ${widthStyle}">`;
       }
       if (el.type === 'video' && el.videoUrl) {
-        return `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video"></video>`;
+        const glowClass = el.glowingBorder ? 'glow-border' : '';
+        const glowStyle = el.glowingBorder 
+          ? `--glow-color: ${el.glowBorderColor || '#FF6A00'}; box-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color), 0 0 30px var(--glow-color); border: 2px solid var(--glow-color);`
+          : '';
+        const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
+        return `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video ${glowClass}" style="${glowStyle} ${widthStyle}"></video>`;
       }
       return '';
     }).join('')}
@@ -439,6 +449,21 @@ ${data.buttonStyle.neonGlow ? `
   border-radius: 0.5rem;
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   margin-bottom: 1rem;
+}
+
+@keyframes glowPulse {
+  0%, 100% { 
+    filter: brightness(1);
+    opacity: 1;
+  }
+  50% { 
+    filter: brightness(1.2);
+    opacity: 0.9;
+  }
+}
+
+.glow-border {
+  animation: glowPulse 2s ease-in-out infinite;
 }
 
 .whatsapp-button {

@@ -55,6 +55,9 @@ export interface SectionElement {
   highlightWords?: HighlightWords;
   gradientText?: GradientText;
   animation?: boolean;
+  glowingBorder?: boolean;
+  glowBorderColor?: string;
+  mediaWidth?: number;
 }
 
 export interface PresellSection {
