@@ -36,6 +36,12 @@ export interface ButtonStyle {
   hoverEffect: boolean;
 }
 
+export interface FooterStyle {
+  backgroundColor: string;
+  textColor: string;
+  showSections: boolean;
+}
+
 export interface PresellData {
   // Images
   logoImage: string;
@@ -123,6 +129,9 @@ export interface PresellData {
   sections: PresellSection[];
   floatingHeader: FloatingHeader;
   
+  // Footer
+  footerStyle: FooterStyle;
+  
   // Language
   language: 'pt' | 'es' | 'en' | 'de';
 }
@@ -206,6 +215,11 @@ export const defaultPresellData: PresellData = {
     shadow: true,
     position: 'center',
     width: 60,
+  },
+  footerStyle: {
+    backgroundColor: '#0a0a0a',
+    textColor: '#888888',
+    showSections: true,
   },
   language: 'pt',
 };

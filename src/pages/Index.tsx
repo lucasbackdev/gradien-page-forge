@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return `<div class="element-text" style="${textStyle} font-size: ${el.fontSize || '18px'}; font-weight: ${el.fontWeight || 'normal'}; margin-bottom: 1rem;">${content}</div>`;
       }
       if (el.type === 'button') {
-        return `<a href="${el.link || data.affiliateLink || '#'}" class="element-button">${el.content || 'Botão'}</a>`;
+        return `<a href="${data.affiliateLink || el.link || '#'}" class="element-button">${el.content || 'Botão'}</a>`;
       }
       if (el.type === 'image' && el.imageUrl) {
         const glowClass = el.glowingBorder ? 'glow-border' : '';
@@ -223,7 +223,10 @@ document.addEventListener('DOMContentLoaded', function() {
           ? `box-shadow: 0 0 15px ${colors[0]}, 0 0 30px ${colors[1] || colors[0]}${colors[2] ? `, 0 0 45px ${colors[2]}` : ''}${colors[3] ? `, 0 0 60px ${colors[3]}` : ''}; border: 3px solid transparent; background-image: linear-gradient(#1a1a2e, #1a1a2e), linear-gradient(135deg, ${colors.join(', ')}); background-origin: border-box; background-clip: padding-box, border-box;`
           : '';
         const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
-        return `<img src="public/section-${sectionIndex}-element-${elIndex}.png" alt="${el.content || 'Imagem'}" class="element-image ${glowClass}" style="${glowStyle} ${widthStyle}">`;
+        const imgTag = `<img src="public/section-${sectionIndex}-element-${elIndex}.png" alt="${el.content || 'Imagem'}" class="element-image ${glowClass}" style="${glowStyle} ${widthStyle}">`;
+        return data.affiliateLink 
+          ? `<a href="${data.affiliateLink}" class="image-link">${imgTag}</a>`
+          : imgTag;
       }
       if (el.type === 'video' && el.videoUrl) {
         const glowClass = el.glowingBorder ? 'glow-border' : '';
@@ -239,6 +242,30 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </section>`;
     });
+
+    // Footer
+    const t = translations[data.language || 'pt'];
+    const footerBg = data.footerStyle?.backgroundColor || '#0a0a0a';
+    const footerText = data.footerStyle?.textColor || '#888888';
+    
+    html += `
+<footer class="site-footer" style="background-color: ${footerBg}; color: ${footerText}; padding: 3rem 2rem 2rem;">
+  <div class="footer-content">
+    ${data.floatingHeader.logoImage ? '<img src="public/header-logo.png" alt="Logo" class="footer-logo">' : ''}
+    ${data.footerStyle?.showSections !== false && data.sections.length > 0 ? `
+    <nav class="footer-nav">
+      ${data.sections.map(s => `<a href="#section-${s.id}" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'})" style="color: ${footerText}">${s.name}</a>`).join('')}
+    </nav>
+    ` : ''}
+    <div class="footer-divider" style="border-color: ${footerText}"></div>
+    <div class="footer-legal">
+      ${data.termsLink ? `<a href="${data.termsLink}" target="_blank" rel="noopener noreferrer" style="color: ${footerText}">${t.terms}</a>` : ''}
+      ${data.termsLink && data.privacyLink ? '<span class="footer-separator">|</span>' : ''}
+      ${data.privacyLink ? `<a href="${data.privacyLink}" target="_blank" rel="noopener noreferrer" style="color: ${footerText}">${t.privacy}</a>` : ''}
+    </div>
+    <div class="footer-copyright">© ${new Date().getFullYear()} Todos os direitos reservados.</div>
+  </div>
+</footer>`;
 
     return html;
   };
@@ -460,11 +487,90 @@ ${data.buttonStyle.neonGlow ? `
   margin-bottom: 1rem;
 }
 
+.image-link {
+  display: block;
+  transition: opacity 0.3s;
+}
+
+.image-link:hover {
+  opacity: 0.9;
+}
+
 .element-video {
   max-width: 150%;
   border-radius: 0.5rem;
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   margin-bottom: 1rem;
+}
+
+.site-footer {
+  width: 100%;
+}
+
+.footer-content {
+  max-width: 72rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-logo {
+  height: 2.5rem;
+  object-fit: contain;
+  opacity: 0.7;
+  margin-bottom: 1.5rem;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.footer-nav a {
+  text-decoration: none;
+  font-size: 0.875rem;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.footer-nav a:hover {
+  opacity: 1;
+}
+
+.footer-divider {
+  border-top: 1px solid;
+  opacity: 0.2;
+  margin: 1.5rem 0;
+}
+
+.footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.footer-legal a {
+  text-decoration: none;
+  font-size: 0.875rem;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.footer-legal a:hover {
+  opacity: 1;
+}
+
+.footer-separator {
+  opacity: 0.3;
+}
+
+.footer-copyright {
+  font-size: 0.75rem;
+  opacity: 0.5;
 }
 
 .whatsapp-button {
@@ -511,19 +617,19 @@ ${data.buttonStyle.neonGlow ? `
       />
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Editor Panel */}
-        <div className="w-1/2 border-r border-border bg-card">
+        {/* Editor Panel - 20% */}
+        <div className="w-[20%] min-w-[280px] border-r border-border bg-card overflow-hidden">
           <EditorPanel data={presellData} onChange={setPresellData} />
         </div>
 
-        {/* Preview Panel */}
-        <div className="w-1/2 flex flex-col">
+        {/* Preview Panel - 80% */}
+        <div className="flex-1 flex flex-col">
           <div className="p-2 border-b border-border flex justify-center bg-muted/50">
             <ResponsivePreview currentSize={viewportSize} onSizeChange={setViewportSize} />
           </div>
           <div className="flex-1 overflow-auto flex justify-center bg-muted/30 p-4">
             <div 
-              className="bg-background overflow-auto transition-all duration-300"
+              className="bg-transparent overflow-auto transition-all duration-300"
               style={{ 
                 width: getViewportWidth(viewportSize),
                 maxWidth: '100%',
