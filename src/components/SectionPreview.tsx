@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay } from '@/types/sections';
-import { PresellData } from '@/types/presell';
+import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X } from 'lucide-react';
 
@@ -307,11 +307,11 @@ export const SectionPreview = ({
           <a
             key={element.id}
             {...dragProps}
-            href={element.link || presellData.affiliateLink || '#'}
+            href={presellData.affiliateLink || element.link || '#'}
             className={`mb-4 ${baseClass} ${animationClass} ${presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
             style={getButtonStyle()}
             onClick={(e) => {
-              if (!element.link && !presellData.affiliateLink) e.preventDefault();
+              if (!presellData.affiliateLink && !element.link) e.preventDefault();
             }}
           >
             {element.content}
@@ -330,20 +330,26 @@ export const SectionPreview = ({
           backgroundClip: 'padding-box, border-box',
         } : {};
         return element.imageUrl ? (
-          <img
+          <a
             key={element.id}
             {...dragProps}
-            src={element.imageUrl}
-            alt={element.content || 'Imagem'}
-            className={`rounded-lg shadow-lg mb-4 ${baseClass} ${animationClass}`}
-            style={{ 
-              maxHeight: '500px', 
-              objectFit: 'cover',
-              width: `${element.mediaWidth || 100}%`,
-              maxWidth: '100%',
-              ...imageGlowStyle,
-            }}
-          />
+            href={presellData.affiliateLink || '#'}
+            onClick={(e) => { if (!presellData.affiliateLink) e.preventDefault(); }}
+            className={`block ${baseClass} ${animationClass}`}
+          >
+            <img
+              src={element.imageUrl}
+              alt={element.content || 'Imagem'}
+              className="rounded-lg shadow-lg mb-4 cursor-pointer hover:opacity-90 transition-opacity"
+              style={{ 
+                maxHeight: '500px', 
+                objectFit: 'cover',
+                width: `${element.mediaWidth || 100}%`,
+                maxWidth: '100%',
+                ...imageGlowStyle,
+              }}
+            />
+          </a>
         ) : null;
       case 'video':
         const videoColors = element.glowBorderColors || ['#FF6A00', '#FF2D55'];
@@ -376,8 +382,10 @@ export const SectionPreview = ({
     }
   };
 
+  const t = translations[presellData.language || 'pt'];
+
   return (
-    <div className="relative min-h-full">
+    <div className="relative min-h-full" style={{ background: 'transparent' }}>
       <style>
         {`
           @keyframes neonPulse {
@@ -519,6 +527,83 @@ export const SectionPreview = ({
             <p className="text-sm">Adicione seções na aba "Criar Site" para começar</p>
           </div>
         </div>
+      )}
+
+      {/* Professional Footer */}
+      {sections.length > 0 && (
+        <footer
+          style={{
+            backgroundColor: presellData.footerStyle?.backgroundColor || '#0a0a0a',
+            color: presellData.footerStyle?.textColor || '#888888',
+            padding: '3rem 2rem 2rem',
+          }}
+        >
+          <div className="max-w-6xl mx-auto">
+            {/* Logo */}
+            {floatingHeader.logoImage && (
+              <div className="flex justify-center mb-6">
+                <img src={floatingHeader.logoImage} alt="Logo" className="h-10 object-contain opacity-70" />
+              </div>
+            )}
+
+            {/* Sections Navigation */}
+            {presellData.footerStyle?.showSections !== false && sections.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-4 mb-6">
+                {sections.map((section) => (
+                  <a
+                    key={section.id}
+                    href={`#section-${section.id}`}
+                    onClick={(e) => handleSmoothScroll(e, section.id)}
+                    className="text-sm hover:text-white transition-colors opacity-70 hover:opacity-100"
+                    style={{ color: presellData.footerStyle?.textColor || '#888888' }}
+                  >
+                    {section.name}
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {/* Divider */}
+            <div 
+              className="border-t my-6 opacity-20"
+              style={{ borderColor: presellData.footerStyle?.textColor || '#888888' }}
+            />
+
+            {/* Legal Links */}
+            <div className="flex flex-wrap justify-center gap-4 mb-4">
+              {presellData.termsLink && (
+                <a
+                  href={presellData.termsLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm hover:text-white transition-colors opacity-70 hover:opacity-100"
+                  style={{ color: presellData.footerStyle?.textColor || '#888888' }}
+                >
+                  {t.terms}
+                </a>
+              )}
+              {presellData.termsLink && presellData.privacyLink && (
+                <span className="opacity-30">|</span>
+              )}
+              {presellData.privacyLink && (
+                <a
+                  href={presellData.privacyLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm hover:text-white transition-colors opacity-70 hover:opacity-100"
+                  style={{ color: presellData.footerStyle?.textColor || '#888888' }}
+                >
+                  {t.privacy}
+                </a>
+              )}
+            </div>
+
+            {/* Copyright */}
+            <div className="text-center text-xs opacity-50">
+              © {new Date().getFullYear()} Todos os direitos reservados.
+            </div>
+          </div>
+        </footer>
       )}
 
       {/* Floating Trash */}
