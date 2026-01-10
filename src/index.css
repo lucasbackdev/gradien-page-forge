@@ -77,6 +77,14 @@ All colors MUST be HSL.
     --border: 0 0% 20%;
     --input: 0 0% 20%;
     --ring: 24 100% 50%;
+
+    /* Elementor-like editor colors */
+    --editor-bg: 0 0% 12%;
+    --editor-sidebar: 0 0% 15%;
+    --editor-header: 0 0% 10%;
+    --editor-widget: 0 0% 18%;
+    --editor-widget-hover: 0 0% 22%;
+    --editor-border: 0 0% 25%;
   }
 }
 
