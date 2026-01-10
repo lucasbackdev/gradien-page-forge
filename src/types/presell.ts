@@ -28,12 +28,15 @@ export interface PresellElement {
   };
 }
 
+export type ButtonTemplate = 'default' | 'shiny-green';
+
 export interface ButtonStyle {
   borderRadius: 'square' | 'rounded' | 'pill';
   shadow: boolean;
   neonGlow: boolean;
   floating: boolean;
   hoverEffect: boolean;
+  template: ButtonTemplate;
 }
 
 export interface FooterStyle {
@@ -193,6 +196,7 @@ export const defaultPresellData: PresellData = {
     neonGlow: false,
     floating: false,
     hoverEffect: true,
+    template: 'default',
   },
   fonts: {
     title: 'Poppins',

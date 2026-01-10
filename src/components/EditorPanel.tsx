@@ -1,4 +1,4 @@
-import { PresellData, PresellElement, availableFonts } from '@/types/presell';
+import { PresellData, PresellElement, availableFonts, ButtonTemplate } from '@/types/presell';
 import { PresellSection } from '@/types/sections';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +17,7 @@ import {
   Grid3X3,
   Layers,
   Menu,
+  LayoutTemplate,
 } from 'lucide-react';
 import {
   Select,
@@ -28,6 +29,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionEditor } from './SectionEditor';
 import { FloatingHeaderEditor } from './FloatingHeaderEditor';
+import shinyButtonPreview from '@/assets/shiny-button-preview.gif';
 
 interface EditorPanelProps {
   data: PresellData;
@@ -67,26 +69,33 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
             borderColor: 'hsl(0 0% 20%)'
           }}
         >
-          <TabsList className="w-full h-10 bg-transparent rounded-none p-0 grid grid-cols-3">
+          <TabsList className="w-full h-10 bg-transparent rounded-none p-0 grid grid-cols-4">
             <TabsTrigger 
               value="elements" 
               className="h-full rounded-none border-b-2 border-transparent text-xs text-gray-400 data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
             >
-              <Layers className="w-3.5 h-3.5 mr-1.5" />
+              <Layers className="w-3.5 h-3.5 mr-1" />
               Elementos
+            </TabsTrigger>
+            <TabsTrigger 
+              value="templates" 
+              className="h-full rounded-none border-b-2 border-transparent text-xs text-gray-400 data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
+            >
+              <LayoutTemplate className="w-3.5 h-3.5 mr-1" />
+              Modelos
             </TabsTrigger>
             <TabsTrigger 
               value="links" 
               className="h-full rounded-none border-b-2 border-transparent text-xs text-gray-400 data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
             >
-              <Link2 className="w-3.5 h-3.5 mr-1.5" />
+              <Link2 className="w-3.5 h-3.5 mr-1" />
               Links
             </TabsTrigger>
             <TabsTrigger 
               value="style" 
               className="h-full rounded-none border-b-2 border-transparent text-xs text-gray-400 data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
             >
-              <Palette className="w-3.5 h-3.5 mr-1.5" />
+              <Palette className="w-3.5 h-3.5 mr-1" />
               Estilo
             </TabsTrigger>
           </TabsList>
@@ -203,6 +212,74 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                   onUpdateSections={(sections) => onChange({ ...data, sections })}
                 />
               </div>
+            </div>
+          </TabsContent>
+
+          {/* Templates Tab */}
+          <TabsContent value="templates" className="mt-0 h-full">
+            <div className="p-3 space-y-4">
+              <div 
+                className="flex items-center gap-2 py-2 text-xs font-medium text-gray-300 border-b"
+                style={{ borderColor: 'hsl(0 0% 20%)' }}
+              >
+                <MousePointer2 className="w-3.5 h-3.5" />
+                Modelos de Botões
+              </div>
+
+              <div className="grid grid-cols-1 gap-3">
+                {/* Default Button */}
+                <div 
+                  className={`p-3 rounded-lg cursor-pointer transition-all border-2 ${
+                    data.buttonStyle.template === 'default' 
+                      ? 'border-primary bg-primary/10' 
+                      : 'border-[hsl(0_0%_25%)] bg-[hsl(0_0%_15%)] hover:border-[hsl(0_0%_35%)]'
+                  }`}
+                  onClick={() => onChange({
+                    ...data,
+                    buttonStyle: { ...data.buttonStyle, template: 'default' }
+                  })}
+                >
+                  <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Padrão</div>
+                  <div className="flex justify-center py-2">
+                    <div 
+                      className="px-4 py-2 text-sm font-medium rounded-lg text-white"
+                      style={{
+                        background: data.colors.buttonGradient.enabled 
+                          ? `linear-gradient(135deg, ${data.colors.buttonGradient.color1}, ${data.colors.buttonGradient.color2})`
+                          : data.colors.button
+                      }}
+                    >
+                      Botão Padrão
+                    </div>
+                  </div>
+                </div>
+
+                {/* Shiny Green Button */}
+                <div 
+                  className={`p-3 rounded-lg cursor-pointer transition-all border-2 ${
+                    data.buttonStyle.template === 'shiny-green' 
+                      ? 'border-primary bg-primary/10' 
+                      : 'border-[hsl(0_0%_25%)] bg-[hsl(0_0%_15%)] hover:border-[hsl(0_0%_35%)]'
+                  }`}
+                  onClick={() => onChange({
+                    ...data,
+                    buttonStyle: { ...data.buttonStyle, template: 'shiny-green' }
+                  })}
+                >
+                  <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Shiny Verde</div>
+                  <div className="flex justify-center py-2">
+                    <img 
+                      src={shinyButtonPreview} 
+                      alt="Shiny Button Preview" 
+                      className="h-12 object-contain rounded"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-[9px] text-gray-500 mt-2">
+                Selecione um modelo de botão. O estilo será aplicado em todos os botões da página.
+              </p>
             </div>
           </TabsContent>
 
