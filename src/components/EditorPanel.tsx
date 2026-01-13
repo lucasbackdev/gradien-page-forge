@@ -46,54 +46,42 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
   };
 
   return (
-    <div className="h-full flex flex-col" style={{ backgroundColor: 'hsl(0 0% 12%)' }}>
+    <div className="h-full flex flex-col bg-background">
       {/* Elementor-style Header */}
-      <div 
-        className="flex items-center justify-between px-3 py-2 border-b"
-        style={{ 
-          backgroundColor: 'hsl(0 0% 10%)',
-          borderColor: 'hsl(0 0% 20%)'
-        }}
-      >
-        <Menu className="w-4 h-4 text-gray-400 cursor-pointer hover:text-white" />
-        <span className="text-sm font-semibold text-white tracking-wide">editor</span>
-        <Grid3X3 className="w-4 h-4 text-gray-400 cursor-pointer hover:text-white" />
+      <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted">
+        <Menu className="w-4 h-4 text-muted-foreground cursor-pointer hover:text-foreground" />
+        <span className="text-sm font-semibold text-foreground tracking-wide">editor</span>
+        <Grid3X3 className="w-4 h-4 text-muted-foreground cursor-pointer hover:text-foreground" />
       </div>
 
       <Tabs defaultValue="elements" className="flex-1 flex flex-col overflow-hidden">
         {/* Elementor-style Tabs */}
-        <div 
-          className="border-b"
-          style={{ 
-            backgroundColor: 'hsl(0 0% 12%)',
-            borderColor: 'hsl(0 0% 20%)'
-          }}
-        >
+        <div className="border-b border-border bg-background">
           <TabsList className="w-full h-10 bg-transparent rounded-none p-0 grid grid-cols-4">
             <TabsTrigger 
               value="elements" 
-              className="h-full rounded-none border-b-2 border-transparent text-xs text-gray-400 data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
+              className="h-full rounded-none border-b-2 border-transparent text-xs text-muted-foreground data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
             >
               <Layers className="w-3.5 h-3.5 mr-1" />
               Elementos
             </TabsTrigger>
             <TabsTrigger 
               value="templates" 
-              className="h-full rounded-none border-b-2 border-transparent text-xs text-gray-400 data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
+              className="h-full rounded-none border-b-2 border-transparent text-xs text-muted-foreground data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
             >
               <LayoutTemplate className="w-3.5 h-3.5 mr-1" />
               Modelos
             </TabsTrigger>
             <TabsTrigger 
               value="links" 
-              className="h-full rounded-none border-b-2 border-transparent text-xs text-gray-400 data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
+              className="h-full rounded-none border-b-2 border-transparent text-xs text-muted-foreground data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
             >
               <Link2 className="w-3.5 h-3.5 mr-1" />
               Links
             </TabsTrigger>
             <TabsTrigger 
               value="style" 
-              className="h-full rounded-none border-b-2 border-transparent text-xs text-gray-400 data-[state=active]:text-white data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
+              className="h-full rounded-none border-b-2 border-transparent text-xs text-muted-foreground data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
             >
               <Palette className="w-3.5 h-3.5 mr-1" />
               Estilo
@@ -107,34 +95,31 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
             <div className="p-3 space-y-4">
               {/* Basic Settings Accordion */}
               <div className="space-y-3">
-                <div 
-                  className="flex items-center gap-2 py-2 text-xs font-medium text-gray-300 border-b"
-                  style={{ borderColor: 'hsl(0 0% 20%)' }}
-                >
+                <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border">
                   <Settings className="w-3.5 h-3.5" />
                   Configurações Básicas
                 </div>
 
                 {/* Page Title */}
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] text-gray-400 uppercase tracking-wide">Título da Aba</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Título da Aba</Label>
                   <Input
                     value={data.pageTitle}
                     onChange={(e) => onChange({ ...data, pageTitle: e.target.value })}
-                    className="h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white placeholder:text-gray-500"
+                    className="h-8 text-xs bg-muted border-border text-foreground placeholder:text-muted-foreground"
                     placeholder="Título do navegador"
                   />
                 </div>
 
                 {/* Favicon */}
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] text-gray-400 uppercase tracking-wide">Favicon</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Favicon</Label>
                   <div className="flex items-center gap-2">
                     <Input
                       type="file"
                       accept="image/*"
                       onChange={(e) => e.target.files?.[0] && handleImageUpload('favicon', e.target.files[0])}
-                      className="flex-1 h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white file:text-gray-400 file:text-xs"
+                      className="flex-1 h-8 text-xs bg-muted border-border text-foreground file:text-muted-foreground file:text-xs"
                     />
                     {data.favicon && (
                       <img src={data.favicon} alt="Favicon" className="h-6 w-6 object-cover rounded" />
@@ -145,17 +130,17 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                 {/* Fonts */}
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1.5">
-                    <Label className="text-[10px] text-gray-400 uppercase tracking-wide">Fonte Títulos</Label>
+                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Fonte Títulos</Label>
                     <Select 
                       value={data.fonts.title} 
                       onValueChange={(value) => onChange({ ...data, fonts: { ...data.fonts, title: value } })}
                     >
-                      <SelectTrigger className="h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white">
+                      <SelectTrigger className="h-8 text-xs bg-muted border-border text-foreground">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[hsl(0_0%_15%)] border-[hsl(0_0%_25%)]">
+                      <SelectContent className="bg-popover border-border">
                         {availableFonts.map((font) => (
-                          <SelectItem key={font.value} value={font.value} className="text-xs text-white">
+                          <SelectItem key={font.value} value={font.value} className="text-xs text-popover-foreground">
                             {font.name}
                           </SelectItem>
                         ))}
@@ -163,17 +148,17 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[10px] text-gray-400 uppercase tracking-wide">Fonte Corpo</Label>
+                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Fonte Corpo</Label>
                     <Select 
                       value={data.fonts.body} 
                       onValueChange={(value) => onChange({ ...data, fonts: { ...data.fonts, body: value } })}
                     >
-                      <SelectTrigger className="h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white">
+                      <SelectTrigger className="h-8 text-xs bg-muted border-border text-foreground">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[hsl(0_0%_15%)] border-[hsl(0_0%_25%)]">
+                      <SelectContent className="bg-popover border-border">
                         {availableFonts.map((font) => (
-                          <SelectItem key={font.value} value={font.value} className="text-xs text-white">
+                          <SelectItem key={font.value} value={font.value} className="text-xs text-popover-foreground">
                             {font.name}
                           </SelectItem>
                         ))}
@@ -185,10 +170,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
 
               {/* Header Editor */}
               <div className="space-y-3">
-                <div 
-                  className="flex items-center gap-2 py-2 text-xs font-medium text-gray-300 border-b"
-                  style={{ borderColor: 'hsl(0 0% 20%)' }}
-                >
+                <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border">
                   <Menu className="w-3.5 h-3.5" />
                   Cabeçalho Flutuante
                 </div>
@@ -200,10 +182,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
 
               {/* Sections Editor */}
               <div className="space-y-3">
-                <div 
-                  className="flex items-center gap-2 py-2 text-xs font-medium text-gray-300 border-b"
-                  style={{ borderColor: 'hsl(0 0% 20%)' }}
-                >
+                <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border">
                   <Layers className="w-3.5 h-3.5" />
                   Seções
                 </div>
@@ -218,10 +197,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
           {/* Templates Tab */}
           <TabsContent value="templates" className="mt-0 h-full">
             <div className="p-3 space-y-4">
-              <div 
-                className="flex items-center gap-2 py-2 text-xs font-medium text-gray-300 border-b"
-                style={{ borderColor: 'hsl(0 0% 20%)' }}
-              >
+              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border">
                 <MousePointer2 className="w-3.5 h-3.5" />
                 Modelos de Botões
               </div>
@@ -232,14 +208,14 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                   className={`p-3 rounded-lg cursor-pointer transition-all border-2 ${
                     data.buttonStyle.template === 'default' 
                       ? 'border-primary bg-primary/10' 
-                      : 'border-[hsl(0_0%_25%)] bg-[hsl(0_0%_15%)] hover:border-[hsl(0_0%_35%)]'
+                      : 'border-border bg-muted hover:border-muted-foreground/50'
                   }`}
                   onClick={() => onChange({
                     ...data,
                     buttonStyle: { ...data.buttonStyle, template: 'default' }
                   })}
                 >
-                  <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Padrão</div>
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wide mb-2">Padrão</div>
                   <div className="flex justify-center py-2">
                     <div 
                       className="px-4 py-2 text-sm font-medium rounded-lg text-white"
@@ -259,14 +235,14 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                   className={`p-3 rounded-lg cursor-pointer transition-all border-2 ${
                     data.buttonStyle.template === 'shiny-green' 
                       ? 'border-primary bg-primary/10' 
-                      : 'border-[hsl(0_0%_25%)] bg-[hsl(0_0%_15%)] hover:border-[hsl(0_0%_35%)]'
+                      : 'border-border bg-muted hover:border-muted-foreground/50'
                   }`}
                   onClick={() => onChange({
                     ...data,
                     buttonStyle: { ...data.buttonStyle, template: 'shiny-green' }
                   })}
                 >
-                  <div className="text-[10px] text-gray-400 uppercase tracking-wide mb-2">Shiny Verde</div>
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wide mb-2">Shiny Verde</div>
                   <div className="flex justify-center py-2">
                     <img 
                       src={shinyButtonPreview} 
@@ -277,7 +253,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                 </div>
               </div>
 
-              <p className="text-[9px] text-gray-500 mt-2">
+              <p className="text-[9px] text-muted-foreground mt-2">
                 Selecione um modelo de botão. O estilo será aplicado em todos os botões da página.
               </p>
             </div>
@@ -286,64 +262,58 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
           {/* Links Tab */}
           <TabsContent value="links" className="mt-0 h-full">
             <div className="p-3 space-y-4">
-              <div 
-                className="flex items-center gap-2 py-2 text-xs font-medium text-gray-300 border-b"
-                style={{ borderColor: 'hsl(0 0% 20%)' }}
-              >
+              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border">
                 <Link2 className="w-3.5 h-3.5" />
                 Links Principais
               </div>
 
               {/* Affiliate Link */}
               <div className="space-y-1.5">
-                <Label className="text-[10px] text-gray-400 uppercase tracking-wide">Link de Afiliado</Label>
+                <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Link de Afiliado</Label>
                 <Input
                   value={data.affiliateLink}
                   onChange={(e) => onChange({ ...data, affiliateLink: e.target.value })}
-                  className="h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white placeholder:text-gray-500"
+                  className="h-8 text-xs bg-muted border-border text-foreground placeholder:text-muted-foreground"
                   placeholder="https://"
                 />
-                <p className="text-[9px] text-gray-500">
+                <p className="text-[9px] text-muted-foreground">
                   Aplicado em todos os botões e imagens
                 </p>
               </div>
 
               {/* Terms Link */}
               <div className="space-y-1.5">
-                <Label className="text-[10px] text-gray-400 uppercase tracking-wide">Link de Termos</Label>
+                <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Link de Termos</Label>
                 <Input
                   value={data.termsLink}
                   onChange={(e) => onChange({ ...data, termsLink: e.target.value })}
-                  className="h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white placeholder:text-gray-500"
+                  className="h-8 text-xs bg-muted border-border text-foreground placeholder:text-muted-foreground"
                   placeholder="https://"
                 />
-                <p className="text-[9px] text-gray-500">Aparece no rodapé</p>
+                <p className="text-[9px] text-muted-foreground">Aparece no rodapé</p>
               </div>
 
               {/* Privacy Link */}
               <div className="space-y-1.5">
-                <Label className="text-[10px] text-gray-400 uppercase tracking-wide">Link de Privacidade</Label>
+                <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Link de Privacidade</Label>
                 <Input
                   value={data.privacyLink}
                   onChange={(e) => onChange({ ...data, privacyLink: e.target.value })}
-                  className="h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white placeholder:text-gray-500"
+                  className="h-8 text-xs bg-muted border-border text-foreground placeholder:text-muted-foreground"
                   placeholder="https://"
                 />
-                <p className="text-[9px] text-gray-500">Aparece no rodapé</p>
+                <p className="text-[9px] text-muted-foreground">Aparece no rodapé</p>
               </div>
 
               {/* Footer Customization */}
-              <div 
-                className="flex items-center gap-2 py-2 text-xs font-medium text-gray-300 border-b mt-6"
-                style={{ borderColor: 'hsl(0 0% 20%)' }}
-              >
+              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-6">
                 <Palette className="w-3.5 h-3.5" />
                 Personalizar Rodapé
               </div>
 
               <div className="space-y-3">
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] text-gray-400 uppercase tracking-wide">Cor de Fundo</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Cor de Fundo</Label>
                   <div className="flex gap-2">
                     <Input
                       type="color"
@@ -352,7 +322,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                         ...data,
                         footerStyle: { ...data.footerStyle, backgroundColor: e.target.value }
                       })}
-                      className="h-8 w-10 p-1 bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)]"
+                      className="h-8 w-10 p-1 bg-muted border-border"
                     />
                     <Input
                       value={data.footerStyle?.backgroundColor || '#0a0a0a'}
@@ -360,13 +330,13 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                         ...data,
                         footerStyle: { ...data.footerStyle, backgroundColor: e.target.value }
                       })}
-                      className="flex-1 h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white"
+                      className="flex-1 h-8 text-xs bg-muted border-border text-foreground"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] text-gray-400 uppercase tracking-wide">Cor do Texto</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Cor do Texto</Label>
                   <div className="flex gap-2">
                     <Input
                       type="color"
@@ -375,7 +345,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                         ...data,
                         footerStyle: { ...data.footerStyle, textColor: e.target.value }
                       })}
-                      className="h-8 w-10 p-1 bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)]"
+                      className="h-8 w-10 p-1 bg-muted border-border"
                     />
                     <Input
                       value={data.footerStyle?.textColor || '#888888'}
@@ -383,13 +353,13 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                         ...data,
                         footerStyle: { ...data.footerStyle, textColor: e.target.value }
                       })}
-                      className="flex-1 h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white"
+                      className="flex-1 h-8 text-xs bg-muted border-border text-foreground"
                     />
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between py-2">
-                  <Label className="text-[10px] text-gray-400 uppercase tracking-wide">Mostrar Links das Seções</Label>
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Mostrar Links das Seções</Label>
                   <Switch
                     checked={data.footerStyle?.showSections !== false}
                     onCheckedChange={(checked) => onChange({
@@ -406,10 +376,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
           <TabsContent value="style" className="mt-0 h-full">
             <div className="p-3 space-y-4">
               {/* Button Colors */}
-              <div 
-                className="flex items-center gap-2 py-2 text-xs font-medium text-gray-300 border-b"
-                style={{ borderColor: 'hsl(0 0% 20%)' }}
-              >
+              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border">
                 <MousePointer2 className="w-3.5 h-3.5" />
                 Cores dos Botões
               </div>
@@ -426,13 +393,13 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                       }
                     })}
                   />
-                  <Label className="text-[10px] text-gray-400">Usar Gradiente</Label>
+                  <Label className="text-[10px] text-muted-foreground">Usar Gradiente</Label>
                 </div>
 
                 {data.colors.buttonGradient.enabled ? (
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-1.5">
-                      <Label className="text-[9px] text-gray-500">Cor 1</Label>
+                      <Label className="text-[9px] text-muted-foreground">Cor 1</Label>
                       <div className="flex gap-1">
                         <Input
                           type="color"
@@ -444,7 +411,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                               buttonGradient: { ...data.colors.buttonGradient, color1: e.target.value }
                             }
                           })}
-                          className="h-7 w-8 p-0.5 bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)]"
+                          className="h-7 w-8 p-0.5 bg-muted border-border"
                         />
                         <Input
                           value={data.colors.buttonGradient.color1}
@@ -455,12 +422,12 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                               buttonGradient: { ...data.colors.buttonGradient, color1: e.target.value }
                             }
                           })}
-                          className="flex-1 h-7 text-[10px] bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white"
+                          className="flex-1 h-7 text-[10px] bg-muted border-border text-foreground"
                         />
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <Label className="text-[9px] text-gray-500">Cor 2</Label>
+                      <Label className="text-[9px] text-muted-foreground">Cor 2</Label>
                       <div className="flex gap-1">
                         <Input
                           type="color"
@@ -472,7 +439,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                               buttonGradient: { ...data.colors.buttonGradient, color2: e.target.value }
                             }
                           })}
-                          className="h-7 w-8 p-0.5 bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)]"
+                          className="h-7 w-8 p-0.5 bg-muted border-border"
                         />
                         <Input
                           value={data.colors.buttonGradient.color2}
@@ -483,14 +450,14 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                               buttonGradient: { ...data.colors.buttonGradient, color2: e.target.value }
                             }
                           })}
-                          className="flex-1 h-7 text-[10px] bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white"
+                          className="flex-1 h-7 text-[10px] bg-muted border-border text-foreground"
                         />
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] text-gray-500">Cor do Botão</Label>
+                    <Label className="text-[9px] text-muted-foreground">Cor do Botão</Label>
                     <div className="flex gap-2">
                       <Input
                         type="color"
@@ -499,7 +466,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                           ...data,
                           colors: { ...data.colors, button: e.target.value }
                         })}
-                        className="h-8 w-10 p-1 bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)]"
+                        className="h-8 w-10 p-1 bg-muted border-border"
                       />
                       <Input
                         value={data.colors.button}
@@ -508,14 +475,14 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                           colors: { ...data.colors, button: e.target.value }
                         })}
                         placeholder="#FF6A00"
-                        className="flex-1 h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white"
+                        className="flex-1 h-8 text-xs bg-muted border-border text-foreground"
                       />
                     </div>
                   </div>
                 )}
 
                 <div className="space-y-1.5">
-                  <Label className="text-[9px] text-gray-500">Cor do Texto</Label>
+                  <Label className="text-[9px] text-muted-foreground">Cor do Texto</Label>
                   <div className="flex gap-2">
                     <Input
                       type="color"
@@ -524,7 +491,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                         ...data,
                         colors: { ...data.colors, buttonText: e.target.value }
                       })}
-                      className="h-8 w-10 p-1 bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)]"
+                      className="h-8 w-10 p-1 bg-muted border-border"
                     />
                     <Input
                       value={data.colors.buttonText}
@@ -533,23 +500,20 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                         colors: { ...data.colors, buttonText: e.target.value }
                       })}
                       placeholder="#ffffff"
-                      className="flex-1 h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white"
+                      className="flex-1 h-8 text-xs bg-muted border-border text-foreground"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Border Style */}
-              <div 
-                className="flex items-center gap-2 py-2 text-xs font-medium text-gray-300 border-b mt-4"
-                style={{ borderColor: 'hsl(0 0% 20%)' }}
-              >
+              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-4">
                 <Settings className="w-3.5 h-3.5" />
                 Estilo das Bordas
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-[10px] text-gray-400 uppercase tracking-wide">Formato</Label>
+                <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Formato</Label>
                 <Select 
                   value={data.buttonStyle.borderRadius} 
                   onValueChange={(value: 'square' | 'rounded' | 'pill') => onChange({
@@ -557,29 +521,26 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                     buttonStyle: { ...data.buttonStyle, borderRadius: value }
                   })}
                 >
-                  <SelectTrigger className="h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white">
+                  <SelectTrigger className="h-8 text-xs bg-muted border-border text-foreground">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[hsl(0_0%_15%)] border-[hsl(0_0%_25%)]">
-                    <SelectItem value="square" className="text-xs text-white">Quadradas</SelectItem>
-                    <SelectItem value="rounded" className="text-xs text-white">Arredondadas</SelectItem>
-                    <SelectItem value="pill" className="text-xs text-white">Pílula</SelectItem>
+                  <SelectContent className="bg-popover border-border">
+                    <SelectItem value="square" className="text-xs text-popover-foreground">Quadradas</SelectItem>
+                    <SelectItem value="rounded" className="text-xs text-popover-foreground">Arredondadas</SelectItem>
+                    <SelectItem value="pill" className="text-xs text-popover-foreground">Pílula</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Button Effects */}
-              <div 
-                className="flex items-center gap-2 py-2 text-xs font-medium text-gray-300 border-b mt-4"
-                style={{ borderColor: 'hsl(0 0% 20%)' }}
-              >
+              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-4">
                 <Palette className="w-3.5 h-3.5" />
                 Efeitos do Botão
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between py-1.5">
-                  <Label className="text-[10px] text-gray-400">Sombra</Label>
+                  <Label className="text-[10px] text-muted-foreground">Sombra</Label>
                   <Switch
                     checked={data.buttonStyle.shadow}
                     onCheckedChange={(checked) => onChange({
@@ -590,7 +551,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                 </div>
 
                 <div className="flex items-center justify-between py-1.5">
-                  <Label className="text-[10px] text-gray-400">Brilho Neon</Label>
+                  <Label className="text-[10px] text-muted-foreground">Brilho Neon</Label>
                   <Switch
                     checked={data.buttonStyle.neonGlow}
                     onCheckedChange={(checked) => onChange({
@@ -601,7 +562,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                 </div>
 
                 <div className="flex items-center justify-between py-1.5">
-                  <Label className="text-[10px] text-gray-400">Efeito Hover</Label>
+                  <Label className="text-[10px] text-muted-foreground">Efeito Hover</Label>
                   <Switch
                     checked={data.buttonStyle.hoverEffect}
                     onCheckedChange={(checked) => onChange({
@@ -613,17 +574,14 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
               </div>
 
               {/* WhatsApp */}
-              <div 
-                className="flex items-center gap-2 py-2 text-xs font-medium text-gray-300 border-b mt-4"
-                style={{ borderColor: 'hsl(0 0% 20%)' }}
-              >
+              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-4">
                 <MousePointer2 className="w-3.5 h-3.5" />
                 WhatsApp Flutuante
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between py-1.5">
-                  <Label className="text-[10px] text-gray-400">Ativar</Label>
+                  <Label className="text-[10px] text-muted-foreground">Ativar</Label>
                   <Switch
                     checked={data.whatsappEnabled}
                     onCheckedChange={(checked) => onChange({
@@ -635,29 +593,26 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
 
                 {data.whatsappEnabled && (
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] text-gray-500">Link WhatsApp</Label>
+                    <Label className="text-[9px] text-muted-foreground">Link WhatsApp</Label>
                     <Input
                       value={data.whatsappLink}
                       onChange={(e) => onChange({ ...data, whatsappLink: e.target.value })}
                       placeholder="https://wa.me/5511999999999"
-                      className="h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white placeholder:text-gray-500"
+                      className="h-8 text-xs bg-muted border-border text-foreground placeholder:text-muted-foreground"
                     />
                   </div>
                 )}
               </div>
 
               {/* IP Tracking */}
-              <div 
-                className="flex items-center gap-2 py-2 text-xs font-medium text-gray-300 border-b mt-4"
-                style={{ borderColor: 'hsl(0 0% 20%)' }}
-              >
+              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-4">
                 <Settings className="w-3.5 h-3.5" />
                 IP Tracking
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between py-1.5">
-                  <Label className="text-[10px] text-gray-400">Ativar</Label>
+                  <Label className="text-[10px] text-muted-foreground">Ativar</Label>
                   <Switch
                     checked={data.ipTracking?.enabled || false}
                     onCheckedChange={(checked) => onChange({
@@ -669,7 +624,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
 
                 {data.ipTracking?.enabled && (
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] text-gray-500">URL do pixel</Label>
+                    <Label className="text-[9px] text-muted-foreground">URL do pixel</Label>
                     <Input
                       value={data.ipTracking?.url || ''}
                       onChange={(e) => {
@@ -680,10 +635,10 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                         });
                       }}
                       placeholder="https://iplogger.org/xxxxxx"
-                      className="h-8 text-xs bg-[hsl(0_0%_18%)] border-[hsl(0_0%_25%)] text-white placeholder:text-gray-500"
+                      className="h-8 text-xs bg-muted border-border text-foreground placeholder:text-muted-foreground"
                     />
                     {data.ipTracking?.url && !data.ipTracking.url.match(/^https?:\/\//) && (
-                      <p className="text-[9px] text-red-400">URL inválida</p>
+                      <p className="text-[9px] text-destructive">URL inválida</p>
                     )}
                   </div>
                 )}
