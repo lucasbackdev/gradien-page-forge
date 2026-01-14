@@ -722,8 +722,8 @@ export const SectionPreview = ({
             onDragEnd={handleSectionDragEnd}
           >
             {/* Unicorn Studio Background */}
-            {section.unicornBackground?.enabled && (
-              <Suspense fallback={<div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-black" style={{ zIndex: 0 }} />}>
+            {section.unicornBackground?.enabled && section.unicornBackground.projectId && (
+              <Suspense fallback={<div className="absolute inset-0" style={{ zIndex: 0 }} />}>
                 <div className="absolute inset-0" style={{ zIndex: 0, pointerEvents: 'none' }}>
                   <UnicornScene 
                     projectId={section.unicornBackground.projectId}
@@ -733,6 +733,12 @@ export const SectionPreview = ({
                     height="100%"
                     lazyLoad={false}
                     production={true}
+                    showPlaceholderWhileLoading={true}
+                    showPlaceholderOnError={true}
+                    placeholderClassName="bg-black"
+                    onError={(err: Error) => {
+                      console.error('UnicornScene error:', err);
+                    }}
                   />
                 </div>
               </Suspense>
