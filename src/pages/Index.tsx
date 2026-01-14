@@ -197,6 +197,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Sections
+    html += `\n<main class="page-main">`;
+
     data.sections.forEach((section, sectionIndex) => {
       const bgStyle = section.backgroundImage 
         ? `background-image: url('public/section-${sectionIndex}-bg.png'); background-size: cover; background-position: center;`
@@ -261,6 +263,8 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </section>`;
     });
+
+    html += `\n</main>`;
 
     // Footer
     const t = translations[data.language || 'pt'];
@@ -358,10 +362,8 @@ document.addEventListener('DOMContentLoaded', function() {
       return 'none';
     };
 
-    // Get background from first section for body - use same as first section to avoid color mismatch
-    const firstSectionBg = data.sections.length > 0 
-      ? (data.sections[0].backgroundColor || '#1a1a2e')
-      : '#1a1a2e';
+    // Use footer background for the page chrome, and make footer stick to bottom
+    const footerBgColor = data.footerStyle?.backgroundColor || '#0a0a0a';
 
     return `
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -378,7 +380,13 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  background-color: ${firstSectionBg};
+  background-color: ${footerBgColor};
+  display: flex;
+  flex-direction: column;
+}
+
+.page-main {
+  flex: 1;
 }
 
 .floating-header {
@@ -689,6 +697,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
 
 .site-footer {
   width: 100%;
+  margin-top: auto;
 }
 
 .footer-content {
