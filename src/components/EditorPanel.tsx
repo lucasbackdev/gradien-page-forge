@@ -18,6 +18,7 @@ import {
   Layers,
   Menu,
   LayoutTemplate,
+  Sparkles,
 } from 'lucide-react';
 import {
   Select,
@@ -255,6 +256,40 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
 
               <p className="text-[9px] text-muted-foreground mt-2">
                 Selecione um modelo de botão. O estilo será aplicado em todos os botões da página.
+              </p>
+
+              {/* Backgrounds Section */}
+              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-6">
+                <Sparkles className="w-3.5 h-3.5" />
+                Backgrounds Animados
+              </div>
+
+              <div className="grid grid-cols-1 gap-3">
+                {/* Aurora Waves Background */}
+                <div 
+                  className="p-3 rounded-lg cursor-pointer transition-all border-2 border-border bg-muted hover:border-primary/50"
+                  onClick={() => {
+                    navigator.clipboard.writeText('d1f8eec5-b6cb-428e-b3e0-6f568dd0e853');
+                    // Show toast notification
+                  }}
+                >
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wide mb-2">Aurora Waves</div>
+                  <div className="relative h-24 rounded-lg overflow-hidden bg-gradient-to-br from-purple-900 via-blue-900 to-cyan-800">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-white/50 text-xs text-center px-2">
+                        <Sparkles className="w-6 h-6 mx-auto mb-1 text-cyan-400" />
+                        Background Animado 3D
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-[9px] text-muted-foreground mt-2">
+                    Aplique nas seções via editor de seção → Fundo da Seção → Background Animado
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-[9px] text-muted-foreground mt-2 p-2 bg-muted/50 rounded">
+                <strong>Como usar:</strong> Vá em Elementos → Seções → Selecione uma seção → Ative "Background Animado" nas configurações de fundo.
               </p>
             </div>
           </TabsContent>

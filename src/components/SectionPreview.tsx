@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay } from '@/types/sections';
+import { useState, useRef, useEffect } from 'react';
+import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, UnicornBackground } from '@/types/sections';
 import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X, GripHorizontal } from 'lucide-react';
@@ -29,6 +29,37 @@ export const SectionPreview = ({
   const [resizeStartY, setResizeStartY] = useState(0);
   const [resizeStartHeight, setResizeStartHeight] = useState(0);
   const trashRef = useRef<HTMLDivElement>(null);
+
+  // Check if any section has unicorn background enabled
+  const hasUnicornBackground = sections.some(s => s.unicornBackground?.enabled);
+
+  // Load Unicorn Studio script when needed
+  useEffect(() => {
+    if (!hasUnicornBackground) return;
+
+    // Check if script is already loaded
+    if (document.querySelector('script[src*="unicornStudio"]')) {
+      // Reinitialize if script already exists
+      if (typeof (window as any).UnicornStudio !== 'undefined') {
+        setTimeout(() => {
+          (window as any).UnicornStudio.init();
+        }, 100);
+      }
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/gh/nicklassandell/unicorn-studio.js@v1.4.29/dist/unicornStudio.umd.js';
+    script.async = true;
+    script.onload = () => {
+      if (typeof (window as any).UnicornStudio !== 'undefined') {
+        setTimeout(() => {
+          (window as any).UnicornStudio.init();
+        }, 100);
+      }
+    };
+    document.head.appendChild(script);
+  }, [hasUnicornBackground, sections]);
 
   const getGradientStyle = (gradient: PresellSection['backgroundGradient']) => {
     if (!gradient?.enabled) return undefined;
@@ -713,6 +744,17 @@ export const SectionPreview = ({
             onDragOver={(e) => handleSectionDragOver(e, index)}
             onDragEnd={handleSectionDragEnd}
           >
+            {/* Unicorn Studio Background */}
+            {section.unicornBackground?.enabled && (
+              <div
+                data-us-project={section.unicornBackground.projectId}
+                data-us-scale={section.unicornBackground.scale || 1}
+                data-us-dpi={section.unicornBackground.dpi || 1}
+                className="absolute inset-0"
+                style={{ zIndex: 0 }}
+              />
+            )}
+
             {/* Background overlay for images */}
             {section.backgroundImage && section.backgroundOverlay?.enabled && (
               <div 
