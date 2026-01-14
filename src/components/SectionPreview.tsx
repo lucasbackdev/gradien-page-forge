@@ -32,19 +32,32 @@ export const SectionPreview = ({
 
   // Check if any section has unicorn background enabled
   const hasUnicornBackground = sections.some(s => s.unicornBackground?.enabled);
+  const unicornSectionIds = sections.filter(s => s.unicornBackground?.enabled).map(s => s.id).join(',');
 
   // Load Unicorn Studio script when needed
   useEffect(() => {
     if (!hasUnicornBackground) return;
 
-    // Check if script is already loaded
-    if (document.querySelector('script[src*="unicornStudio"]')) {
-      // Reinitialize if script already exists
-      if (typeof (window as any).UnicornStudio !== 'undefined') {
+    const initUnicorn = () => {
+      if (typeof (window as any).UnicornStudio !== 'undefined' && (window as any).UnicornStudio.init) {
+        // Destroy existing instances first
+        if ((window as any).UnicornStudio.destroy) {
+          try {
+            (window as any).UnicornStudio.destroy();
+          } catch (e) {
+            // Ignore errors on destroy
+          }
+        }
         setTimeout(() => {
           (window as any).UnicornStudio.init();
-        }, 100);
+        }, 200);
       }
+    };
+
+    // Check if script is already loaded
+    const existingScript = document.querySelector('script[src*="unicornStudio"]');
+    if (existingScript) {
+      initUnicorn();
       return;
     }
 
@@ -52,14 +65,10 @@ export const SectionPreview = ({
     script.src = 'https://cdn.jsdelivr.net/gh/nicklassandell/unicorn-studio.js@v1.4.29/dist/unicornStudio.umd.js';
     script.async = true;
     script.onload = () => {
-      if (typeof (window as any).UnicornStudio !== 'undefined') {
-        setTimeout(() => {
-          (window as any).UnicornStudio.init();
-        }, 100);
-      }
+      initUnicorn();
     };
     document.head.appendChild(script);
-  }, [hasUnicornBackground, sections]);
+  }, [hasUnicornBackground, unicornSectionIds]);
 
   const getGradientStyle = (gradient: PresellSection['backgroundGradient']) => {
     if (!gradient?.enabled) return undefined;
@@ -737,7 +746,10 @@ export const SectionPreview = ({
           <section
             key={section.id}
             id={`section-${section.id}`}
-            style={getSectionStyle(section)}
+            style={{
+              ...getSectionStyle(section),
+              overflow: section.unicornBackground?.enabled ? 'hidden' : undefined,
+            }}
             className={`relative group ${floatingHeader.enabled && index === 0 ? 'pt-24' : ''} ${draggedSectionIndex === index ? 'opacity-50' : ''}`}
             draggable
             onDragStart={(e) => handleSectionDragStart(e, index)}
@@ -747,17 +759,18 @@ export const SectionPreview = ({
             {/* Unicorn Studio Background */}
             {section.unicornBackground?.enabled && (
               <div
+                key={`unicorn-${section.id}-${section.unicornBackground.projectId}`}
                 data-us-project={section.unicornBackground.projectId}
                 data-us-scale={section.unicornBackground.scale || 1}
                 data-us-dpi={section.unicornBackground.dpi || 1}
-                className="absolute inset-0"
-                style={{ zIndex: 0 }}
+                className="absolute inset-0 overflow-hidden"
+                style={{ zIndex: 0, pointerEvents: 'none' }}
               />
             )}
 
             {/* Background overlay for images */}
             {section.backgroundImage && section.backgroundOverlay?.enabled && (
-              <div 
+              <div
                 className="absolute inset-0" 
                 style={{ 
                   background: getOverlayStyle(section.backgroundOverlay),

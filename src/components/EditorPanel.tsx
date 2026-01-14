@@ -31,6 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionEditor } from './SectionEditor';
 import { FloatingHeaderEditor } from './FloatingHeaderEditor';
 import shinyButtonPreview from '@/assets/shiny-button-preview.gif';
+import auroraWavesPreview from '@/assets/aurora-waves-preview.png';
 
 interface EditorPanelProps {
   data: PresellData;
@@ -274,13 +275,12 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                   }}
                 >
                   <div className="text-[10px] text-muted-foreground uppercase tracking-wide mb-2">Aurora Waves</div>
-                  <div className="relative h-24 rounded-lg overflow-hidden bg-gradient-to-br from-purple-900 via-blue-900 to-cyan-800">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="text-white/50 text-xs text-center px-2">
-                        <Sparkles className="w-6 h-6 mx-auto mb-1 text-cyan-400" />
-                        Background Animado 3D
-                      </div>
-                    </div>
+                  <div className="relative h-24 rounded-lg overflow-hidden">
+                    <img 
+                      src={auroraWavesPreview} 
+                      alt="Aurora Waves Preview" 
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <p className="text-[9px] text-muted-foreground mt-2">
                     Aplique nas seções via editor de seção → Fundo da Seção → Background Animado
