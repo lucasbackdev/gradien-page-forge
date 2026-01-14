@@ -514,15 +514,35 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                     className="mt-1"
                   />
                 </div>
-                <div>
-                  <Label className="text-xs">Link do Botão</Label>
-                  <Input
-                    value={selectedElement.link || ''}
-                    onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, { link: e.target.value })}
-                    placeholder="https://..."
-                    className="mt-1 h-8"
+                
+                {/* Popup toggle */}
+                <div className="flex items-center gap-2 p-3 border rounded-lg bg-muted/30">
+                  <Switch
+                    checked={selectedElement.opensPopup || false}
+                    onCheckedChange={(checked) => updateSectionElement(selectedSection.id, selectedElement.id, { 
+                      opensPopup: checked,
+                      link: checked ? '' : selectedElement.link 
+                    })}
                   />
+                  <div>
+                    <Label className="text-xs font-medium">Abrir Popup de Leads</Label>
+                    <p className="text-[10px] text-muted-foreground">
+                      Ao clicar, abre o formulário de captação
+                    </p>
+                  </div>
                 </div>
+
+                {!selectedElement.opensPopup && (
+                  <div>
+                    <Label className="text-xs">Link do Botão</Label>
+                    <Input
+                      value={selectedElement.link || ''}
+                      onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, { link: e.target.value })}
+                      placeholder="https://..."
+                      className="mt-1 h-8"
+                    />
+                  </div>
+                )}
               </>
             )}
 
