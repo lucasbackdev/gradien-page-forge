@@ -88,6 +88,8 @@ export interface SectionElement {
   responsiveAlign?: ResponsiveAlign;
   // Inline group - elements with same group stay on same line
   inlineGroup?: string;
+  // Opens lead popup instead of navigating to link
+  opensPopup?: boolean;
 }
 
 export interface ResponsiveLayout {

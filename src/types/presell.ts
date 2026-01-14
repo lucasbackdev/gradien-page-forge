@@ -26,6 +26,8 @@ export interface PresellElement {
     color1: string;
     color2: string;
   };
+  // Popup trigger
+  opensPopup?: boolean;
 }
 
 export type ButtonTemplate = 'default' | 'shiny-green';
@@ -37,6 +39,18 @@ export interface ButtonStyle {
   floating: boolean;
   hoverEffect: boolean;
   template: ButtonTemplate;
+}
+
+export interface PopupConfig {
+  enabled: boolean;
+  title: string;
+  fullNameRequired: boolean;
+  emailRequired: boolean;
+  phoneRequired: boolean;
+  buttonStyle: 'gradient' | 'solid' | 'outline' | 'rounded';
+  buttonText: string;
+  redirectUrl: string;
+  buttonColor: string;
 }
 
 export interface FooterStyle {
@@ -140,6 +154,9 @@ export interface PresellData {
   
   // Language
   language: 'pt' | 'es' | 'en' | 'de';
+  
+  // Lead Popup
+  popupConfig: PopupConfig;
 }
 
 export const defaultPresellData: PresellData = {
@@ -232,6 +249,17 @@ export const defaultPresellData: PresellData = {
     linksColor: '#888888',
   },
   language: 'pt',
+  popupConfig: {
+    enabled: false,
+    title: 'Cadastre-se',
+    fullNameRequired: true,
+    emailRequired: true,
+    phoneRequired: false,
+    buttonStyle: 'gradient',
+    buttonText: 'Enviar',
+    redirectUrl: '',
+    buttonColor: '#8B5CF6',
+  },
 };
 
 export const translations = {
