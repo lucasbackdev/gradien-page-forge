@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType } from '@/types/sections';
+import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, UnicornBackground } from '@/types/sections';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -27,7 +27,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronDown, Bold } from 'lucide-react';
+import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronDown, Bold, Sparkles } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface SectionEditorProps {
@@ -430,6 +430,51 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                 </div>
                               </div>
                             )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Unicorn Background */}
+                    <div className="space-y-2 border-t pt-3 mt-3">
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={section.unicornBackground?.enabled || false}
+                          onCheckedChange={(checked) => updateSection(section.id, {
+                            unicornBackground: { 
+                              enabled: checked,
+                              projectId: section.unicornBackground?.projectId || 'd1f8eec5-b6cb-428e-b3e0-6f568dd0e853',
+                              scale: section.unicornBackground?.scale || 1,
+                              dpi: section.unicornBackground?.dpi || 1,
+                            }
+                          })}
+                        />
+                        <Label className="text-sm flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-cyan-400" />
+                          Background Animado
+                        </Label>
+                      </div>
+                      
+                      {section.unicornBackground?.enabled && (
+                        <div className="space-y-2 pl-4">
+                          <p className="text-xs text-muted-foreground">
+                            Aurora Waves - Background 3D animado
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs">Escala:</Label>
+                            <Slider
+                              value={[section.unicornBackground.scale || 1]}
+                              onValueChange={(value) => updateSection(section.id, {
+                                unicornBackground: { ...section.unicornBackground!, scale: value[0] }
+                              })}
+                              min={0.5}
+                              max={2}
+                              step={0.1}
+                              className="flex-1"
+                            />
+                            <span className="text-xs text-muted-foreground w-8">
+                              {section.unicornBackground.scale || 1}x
+                            </span>
                           </div>
                         </div>
                       )}

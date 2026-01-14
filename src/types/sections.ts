@@ -62,6 +62,13 @@ export interface SectionElement {
   mediaWidth?: number;
 }
 
+export interface UnicornBackground {
+  enabled: boolean;
+  projectId: string;
+  scale?: number;
+  dpi?: number;
+}
+
 export interface PresellSection {
   id: string;
   type: SectionType;
@@ -77,6 +84,7 @@ export interface PresellSection {
   };
   backgroundImage?: string;
   backgroundOverlay?: BackgroundOverlay;
+  unicornBackground?: UnicornBackground;
   textColor?: string;
   elements: SectionElement[];
   padding?: string;

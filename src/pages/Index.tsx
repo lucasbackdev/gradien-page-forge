@@ -82,6 +82,23 @@ ${presellData.whatsappEnabled && presellData.whatsappLink ? `
 </a>
 ` : ''}
 ${ipTrackingPixel}
+${presellData.sections.some(s => s.unicornBackground?.enabled) ? `
+<!-- Unicorn Studio Background Animation -->
+<script>
+(function() {
+  var script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/gh/nicklassandell/unicorn-studio.js@v1.4.29/dist/unicornStudio.umd.js';
+  script.onload = function() {
+    if (typeof UnicornStudio !== 'undefined' && UnicornStudio.init) {
+      setTimeout(function() {
+        UnicornStudio.init();
+      }, 100);
+    }
+  };
+  document.head.appendChild(script);
+})();
+</script>
+` : ''}
 <script>
 // Mobile menu toggle
 document.addEventListener('DOMContentLoaded', function() {
@@ -208,8 +225,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const minHeightStyle = section.minHeight ? `min-height: ${section.minHeight}; display: flex; flex-direction: column; justify-content: center;` : '';
 
+      // Unicorn Background support
+      const unicornBgHtml = section.unicornBackground?.enabled 
+        ? `<div data-us-project="${section.unicornBackground.projectId}" data-us-scale="${section.unicornBackground.scale || 1}" data-us-dpi="${section.unicornBackground.dpi || 1}" style="position: absolute; inset: 0; z-index: 0;"></div>`
+        : '';
+
       html += `
-<section id="section-${section.id}" class="section section-${section.layout}" style="${bgStyle} ${minHeightStyle} color: ${section.textColor || '#ffffff'}; padding: ${section.padding || '4rem 2rem'}; position: relative;">
+<section id="section-${section.id}" class="section section-${section.layout}" style="${bgStyle} ${minHeightStyle} color: ${section.textColor || '#ffffff'}; padding: ${section.padding || '4rem 2rem'}; position: relative; overflow: hidden;">
+  ${unicornBgHtml}
   ${section.backgroundImage ? `<div class="section-overlay" style="background: ${section.backgroundOverlay?.enabled ? getOverlayCSS(section.backgroundOverlay) : 'rgba(0,0,0,0.5)'}; position: absolute; inset: 0; z-index: 0;"></div>` : ''}
   <div class="section-content" style="position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; justify-content: center;">
     ${section.elements.map((el, elIndex) => {
