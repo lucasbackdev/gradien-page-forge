@@ -90,11 +90,41 @@ export interface SectionElement {
   inlineGroup?: string;
 }
 
+export interface ResponsiveLayout {
+  desktop: LayoutDirection;
+  tablet: LayoutDirection;
+  mobile: LayoutDirection;
+}
+
+export interface ResponsiveColumnSettings {
+  desktop: {
+    leftColumnElements?: string[];
+    rightColumnElements?: string[];
+    columnGap?: string;
+    columnWidthRatio?: string;
+  };
+  tablet: {
+    leftColumnElements?: string[];
+    rightColumnElements?: string[];
+    columnGap?: string;
+    columnWidthRatio?: string;
+  };
+  mobile: {
+    leftColumnElements?: string[];
+    rightColumnElements?: string[];
+    columnGap?: string;
+    columnWidthRatio?: string;
+  };
+}
+
 export interface PresellSection {
   id: string;
   type: SectionType;
   name: string;
   layout: LayoutDirection;
+  // Responsive layout settings
+  responsiveLayout?: ResponsiveLayout;
+  responsiveColumnSettings?: ResponsiveColumnSettings;
   backgroundColor?: string;
   backgroundGradient?: {
     enabled: boolean;
@@ -108,12 +138,12 @@ export interface PresellSection {
   textColor?: string;
   elements: SectionElement[];
   padding?: string;
-  minHeight?: string; // 'auto' | '100vh' | custom value like '500px'
-  // Two columns settings
-  leftColumnElements?: string[]; // IDs of elements in left column
-  rightColumnElements?: string[]; // IDs of elements in right column
+  minHeight?: string;
+  // Legacy - for backwards compatibility
+  leftColumnElements?: string[];
+  rightColumnElements?: string[];
   columnGap?: string;
-  columnWidthRatio?: string; // e.g., '50-50', '40-60', '60-40', '30-70', '70-30'
+  columnWidthRatio?: string;
 }
 
 export type HeaderPosition = 'left' | 'center' | 'right';
