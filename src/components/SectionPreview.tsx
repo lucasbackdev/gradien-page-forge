@@ -436,8 +436,11 @@ export const SectionPreview = ({
 
   const t = translations[presellData.language || 'pt'];
 
+  // Get footer background for the preview container to avoid color mismatch
+  const containerBgColor = presellData.footerStyle?.backgroundColor || '#0a0a0a';
+
   return (
-    <div className="relative min-h-full" style={{ background: 'transparent' }}>
+    <div className="relative min-h-full" style={{ backgroundColor: containerBgColor }}>
       <style>
         {`
           @keyframes neonPulse {
