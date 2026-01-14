@@ -282,9 +282,9 @@ document.addEventListener('DOMContentLoaded', function() {
     ` : ''}
     <div class="footer-divider" style="border-color: ${footerText}"></div>
     <div class="footer-legal">
-      ${data.termsLink ? `<a href="${data.termsLink}" target="_blank" rel="noopener noreferrer" style="color: ${footerText}">${t.terms}</a>` : ''}
+      ${data.termsLink ? `<a href="${data.termsLink}" target="_blank" rel="noopener noreferrer" style="color: ${data.footerStyle?.linksColor || footerText}">${data.footerStyle?.termsText || t.terms}</a>` : ''}
       ${data.termsLink && data.privacyLink ? '<span class="footer-separator">|</span>' : ''}
-      ${data.privacyLink ? `<a href="${data.privacyLink}" target="_blank" rel="noopener noreferrer" style="color: ${footerText}">${t.privacy}</a>` : ''}
+      ${data.privacyLink ? `<a href="${data.privacyLink}" target="_blank" rel="noopener noreferrer" style="color: ${data.footerStyle?.linksColor || footerText}">${data.footerStyle?.privacyText || t.privacy}</a>` : ''}
     </div>
     <div class="footer-copyright">© ${new Date().getFullYear()} Todos os direitos reservados.</div>
   </div>

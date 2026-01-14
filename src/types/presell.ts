@@ -43,6 +43,9 @@ export interface FooterStyle {
   backgroundColor: string;
   textColor: string;
   showSections: boolean;
+  termsText?: string;
+  privacyText?: string;
+  linksColor?: string;
 }
 
 export interface PresellData {
@@ -224,6 +227,9 @@ export const defaultPresellData: PresellData = {
     backgroundColor: '#0a0a0a',
     textColor: '#888888',
     showSections: true,
+    termsText: '',
+    privacyText: '',
+    linksColor: '#888888',
   },
   language: 'pt',
 };

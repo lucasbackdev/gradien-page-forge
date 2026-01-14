@@ -368,6 +368,61 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                     })}
                   />
                 </div>
+
+                {/* Customização dos links de Termos e Privacidade */}
+                <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-4">
+                  <Link2 className="w-3.5 h-3.5" />
+                  Links de Termos e Privacidade
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Texto do Link de Termos</Label>
+                  <Input
+                    value={data.footerStyle?.termsText || ''}
+                    onChange={(e) => onChange({
+                      ...data,
+                      footerStyle: { ...data.footerStyle, termsText: e.target.value }
+                    })}
+                    className="h-8 text-xs bg-muted border-border text-foreground"
+                    placeholder="Termos de Uso"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Texto do Link de Privacidade</Label>
+                  <Input
+                    value={data.footerStyle?.privacyText || ''}
+                    onChange={(e) => onChange({
+                      ...data,
+                      footerStyle: { ...data.footerStyle, privacyText: e.target.value }
+                    })}
+                    className="h-8 text-xs bg-muted border-border text-foreground"
+                    placeholder="Política de Privacidade"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Cor dos Links</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={data.footerStyle?.linksColor || '#888888'}
+                      onChange={(e) => onChange({
+                        ...data,
+                        footerStyle: { ...data.footerStyle, linksColor: e.target.value }
+                      })}
+                      className="h-8 w-10 p-1 bg-muted border-border"
+                    />
+                    <Input
+                      value={data.footerStyle?.linksColor || '#888888'}
+                      onChange={(e) => onChange({
+                        ...data,
+                        footerStyle: { ...data.footerStyle, linksColor: e.target.value }
+                      })}
+                      className="flex-1 h-8 text-xs bg-muted border-border text-foreground"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </TabsContent>

@@ -836,10 +836,10 @@ export const SectionPreview = ({
                   href={presellData.termsLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm hover:text-white transition-colors opacity-70 hover:opacity-100"
-                  style={{ color: presellData.footerStyle?.textColor || '#888888' }}
+                  className="text-sm hover:opacity-100 transition-colors opacity-70"
+                  style={{ color: presellData.footerStyle?.linksColor || presellData.footerStyle?.textColor || '#888888' }}
                 >
-                  {t.terms}
+                  {presellData.footerStyle?.termsText || t.terms}
                 </a>
               )}
               {presellData.termsLink && presellData.privacyLink && (
@@ -850,10 +850,10 @@ export const SectionPreview = ({
                   href={presellData.privacyLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm hover:text-white transition-colors opacity-70 hover:opacity-100"
-                  style={{ color: presellData.footerStyle?.textColor || '#888888' }}
+                  className="text-sm hover:opacity-100 transition-colors opacity-70"
+                  style={{ color: presellData.footerStyle?.linksColor || presellData.footerStyle?.textColor || '#888888' }}
                 >
-                  {t.privacy}
+                  {presellData.footerStyle?.privacyText || t.privacy}
                 </a>
               )}
             </div>
