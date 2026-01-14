@@ -9,17 +9,54 @@ import { PresellData, PresellElement, defaultPresellData, translations } from '@
 import { PresellSection, SectionElement } from '@/types/sections';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { useSavedPages, SavedPage } from '@/hooks/useSavedPages';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Loader2, FileText, Trash2 } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { pageTemplates, PageTemplate } from '@/templates/pageTemplates';
+import { LayoutTemplate, Star, Rocket } from 'lucide-react';
 import JSZip from 'jszip';
 
 const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, subscription, signOut } = useAuth();
+  const { savedPages, loading: pagesLoading, savePage, updatePage, deletePage } = useSavedPages();
   const [presellData, setPresellData] = useState<PresellData>(defaultPresellData);
   const [darkMode, setDarkMode] = useState(false);
   const [viewportSize, setViewportSize] = useState<ViewportSize>('desktop');
   const [currentPageId, setCurrentPageId] = useState<string | undefined>(undefined);
+  
+  // Dialog states
+  const [templatesOpen, setTemplatesOpen] = useState(false);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [loadDialogOpen, setLoadDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [pageName, setPageName] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [pageToDelete, setPageToDelete] = useState<SavedPage | null>(null);
 
   useEffect(() => {
     if (darkMode) {
@@ -879,6 +916,102 @@ ${data.buttonStyle.template === 'shiny-green' ? `
     );
   }
 
+  const handleSaveNew = async () => {
+    if (!pageName.trim()) {
+      toast({
+        title: "Nome obrigatório",
+        description: "Por favor, insira um nome para a página.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSaving(true);
+    const result = await savePage(pageName.trim(), presellData);
+    setSaving(false);
+
+    if (result) {
+      setCurrentPageId(result.id);
+      setSaveDialogOpen(false);
+      setPageName('');
+    }
+  };
+
+  const handleUpdateCurrent = async () => {
+    if (!currentPageId) {
+      setSaveDialogOpen(true);
+      return;
+    }
+    
+    const currentPage = savedPages.find(p => p.id === currentPageId);
+    if (!currentPage) {
+      setSaveDialogOpen(true);
+      return;
+    }
+
+    setSaving(true);
+    await updatePage(currentPageId, currentPage.name, presellData);
+    setSaving(false);
+  };
+
+  const handleLoadPage = (page: SavedPage) => {
+    setPresellData(page.data);
+    setCurrentPageId(page.id);
+    setLoadDialogOpen(false);
+    toast({
+      title: "Página carregada",
+      description: `"${page.name}" foi carregada para edição.`,
+    });
+  };
+
+  const handleDeletePage = async () => {
+    if (!pageToDelete) return;
+    
+    const success = await deletePage(pageToDelete.id);
+    if (success && currentPageId === pageToDelete.id) {
+      setCurrentPageId(undefined);
+    }
+    setPageToDelete(null);
+    setDeleteDialogOpen(false);
+  };
+
+  const handleSelectTemplate = (template: PageTemplate) => {
+    const clonedData = JSON.parse(JSON.stringify(template.data));
+    setPresellData(clonedData);
+    setCurrentPageId(undefined);
+    setTemplatesOpen(false);
+    toast({
+      title: "Template aplicado!",
+      description: `"${template.name}" foi carregado para edição.`,
+    });
+  };
+
+  const getLevelColor = (level: PageTemplate['level']) => {
+    switch (level) {
+      case 'simples':
+        return 'bg-green-500/20 text-green-400 border-green-500/30';
+      case 'intermediário':
+        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'avançado':
+        return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+    }
+  };
+
+  const getLevelIcon = (level: PageTemplate['level']) => {
+    switch (level) {
+      case 'simples':
+        return <FileText className="w-4 h-4" />;
+      case 'intermediário':
+        return <Star className="w-4 h-4" />;
+      case 'avançado':
+        return <Rocket className="w-4 h-4" />;
+    }
+  };
+
+  const currentPageName = currentPageId 
+    ? savedPages.find(p => p.id === currentPageId)?.name 
+    : null;
+
   return (
     <div className="h-screen flex flex-col bg-background">
       <TopBar
@@ -889,6 +1022,9 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         onLoadPage={setPresellData}
         currentPageId={currentPageId}
         onPageIdChange={setCurrentPageId}
+        onOpenTemplates={() => setTemplatesOpen(true)}
+        onOpenSave={handleUpdateCurrent}
+        onOpenLoad={() => setLoadDialogOpen(true)}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -932,6 +1068,183 @@ ${data.buttonStyle.template === 'shiny-green' ? `
           </div>
         </div>
       </div>
+
+      {/* Templates Dialog */}
+      <Dialog open={templatesOpen} onOpenChange={setTemplatesOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <LayoutTemplate className="w-5 h-5" />
+              Modelos de Página Prontos
+            </DialogTitle>
+            <DialogDescription>
+              Escolha um modelo para começar. Você pode editar tudo depois.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            {pageTemplates.map((template) => (
+              <div
+                key={template.id}
+                className="group relative border border-border rounded-xl p-5 hover:border-primary/50 hover:bg-accent/30 transition-all cursor-pointer"
+                onClick={() => handleSelectTemplate(template)}
+              >
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-3xl">
+                    {template.preview}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold text-lg text-foreground">
+                        {template.name}
+                      </h3>
+                      <Badge 
+                        variant="outline" 
+                        className={`text-xs ${getLevelColor(template.level)}`}
+                      >
+                        {getLevelIcon(template.level)}
+                        <span className="ml-1 capitalize">{template.level}</span>
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {template.description}
+                    </p>
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <span>📄 {template.data.sections.length} seções</span>
+                      <span>
+                        {template.data.floatingHeader.enabled ? '🔝 Com header fixo' : '📜 Sem header fixo'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <Button 
+                    size="sm" 
+                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSelectTemplate(template);
+                    }}
+                  >
+                    Usar
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-xs text-muted-foreground text-center pt-2 border-t border-border">
+            💡 Dica: Após selecionar um template, você pode editar todos os textos, cores, imagens e seções.
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Save Dialog */}
+      <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Salvar Página</DialogTitle>
+            <DialogDescription>
+              Dê um nome para salvar esta página na sua conta.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="page-name">Nome da Página</Label>
+            <Input
+              id="page-name"
+              value={pageName}
+              onChange={(e) => setPageName(e.target.value)}
+              placeholder="Ex: Landing Page Principal"
+              className="mt-2"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSaveDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveNew} disabled={saving}>
+              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Load Dialog */}
+      <Dialog open={loadDialogOpen} onOpenChange={setLoadDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Minhas Páginas Salvas</DialogTitle>
+            <DialogDescription>
+              Selecione uma página para carregar e editar.
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-80 pr-4">
+            {pagesLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : savedPages.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>Nenhuma página salva ainda.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {savedPages.map((page) => (
+                  <div
+                    key={page.id}
+                    className={`flex items-center justify-between p-3 rounded-lg border transition-colors hover:bg-accent/50 cursor-pointer ${
+                      currentPageId === page.id ? 'border-primary bg-accent/30' : 'border-border'
+                    }`}
+                    onClick={() => handleLoadPage(page)}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{page.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Atualizado {format(new Date(page.updated_at), "d 'de' MMM 'às' HH:mm", { locale: ptBR })}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPageToDelete(page);
+                        setDeleteDialogOpen(true);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir página?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. A página "{pageToDelete?.name}" será permanentemente excluída.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeletePage}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
