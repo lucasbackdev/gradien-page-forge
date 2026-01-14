@@ -2,7 +2,9 @@ import { Moon, Sun, Menu, Shield, LogOut, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ShinyDownloadButton } from './ShinyDownloadButton';
+import { SavedPagesManager } from './SavedPagesManager';
 import { useAuth } from '@/hooks/useAuth';
+import { PresellData } from '@/types/presell';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,12 +17,20 @@ interface TopBarProps {
   darkMode: boolean;
   onToggleDarkMode: () => void;
   onDownload: () => void;
+  currentData: PresellData;
+  onLoadPage: (data: PresellData) => void;
+  currentPageId?: string;
+  onPageIdChange?: (id: string | undefined) => void;
 }
 
 export const TopBar = ({
   darkMode,
   onToggleDarkMode,
   onDownload,
+  currentData,
+  onLoadPage,
+  currentPageId,
+  onPageIdChange,
 }: TopBarProps) => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
@@ -37,6 +47,15 @@ export const TopBar = ({
       </div>
       
       <div className="flex items-center gap-3">
+        {user && (
+          <SavedPagesManager
+            currentData={currentData}
+            onLoadPage={onLoadPage}
+            currentPageId={currentPageId}
+            onPageIdChange={onPageIdChange}
+          />
+        )}
+        
         <ShinyDownloadButton onClick={onDownload} />
 
         <DropdownMenu>
