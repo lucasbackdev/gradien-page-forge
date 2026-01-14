@@ -120,7 +120,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Spline 3D Background */}
       <div className="absolute inset-0 z-0">
         <iframe
@@ -130,9 +130,15 @@ const Auth = () => {
           height="100%"
           className="pointer-events-none"
           title="Background Animation"
+          loading="lazy"
+          allow="autoplay"
         />
       </div>
-      <Card className="w-full max-w-md relative z-10 bg-background/80 backdrop-blur-md border-border/50">
+      
+      {/* Fallback gradient background in case iframe doesn't load */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-purple-900/30 via-[#0a0a0f] to-blue-900/30" />
+      
+      <Card className="w-full max-w-md relative z-10 bg-card/90 backdrop-blur-xl border-border/50 shadow-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gradient">Gradien Page Forge</CardTitle>
           <CardDescription>Acesse sua conta ou crie uma nova</CardDescription>
