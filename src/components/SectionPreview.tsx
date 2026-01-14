@@ -436,16 +436,16 @@ export const SectionPreview = ({
 
   const t = translations[presellData.language || 'pt'];
 
-  // Get first section background for the main area, footer color for the bottom
+  // Use first section background for everything above footer
   const firstSectionBg = sections.length > 0 
     ? (sections[0].backgroundColor || '#1a1a2e')
     : (presellData.footerStyle?.backgroundColor || '#0a0a0a');
   const footerBgColor = presellData.footerStyle?.backgroundColor || '#0a0a0a';
 
   return (
-    <div className="relative min-h-screen flex flex-col" style={{ backgroundColor: footerBgColor }}>
-      {/* Main area wrapper with first section's background */}
-      <div className="flex-1 flex flex-col" style={{ backgroundColor: firstSectionBg }}>
+    <div className="relative min-h-screen flex flex-col" style={{ backgroundColor: firstSectionBg }}>
+      {/* Main content area - inherits first section background */}
+      <div className="flex-1 flex flex-col">
       <style>
         {`
           @keyframes neonPulse {
