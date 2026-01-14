@@ -1,10 +1,13 @@
-import { Moon, Sun, Menu } from 'lucide-react';
+import { Moon, Sun, Menu, Shield, LogOut, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ShinyDownloadButton } from './ShinyDownloadButton';
+import { useAuth } from '@/hooks/useAuth';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
@@ -19,6 +22,14 @@ export const TopBar = ({
   onToggleDarkMode,
   onDownload,
 }: TopBarProps) => {
+  const navigate = useNavigate();
+  const { user, isAdmin, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
+  };
+
   return (
     <header className="h-16 bg-background border-b border-border shadow-sm flex items-center justify-between px-6">
       <div className="flex items-center gap-3">
@@ -48,6 +59,32 @@ export const TopBar = ({
                 </>
               )}
             </DropdownMenuItem>
+            
+            {user && (
+              <>
+                <DropdownMenuSeparator />
+                {isAdmin && (
+                  <DropdownMenuItem onClick={() => navigate('/adm')} className="cursor-pointer">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Painel Admin
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sair
+                </DropdownMenuItem>
+              </>
+            )}
+            
+            {!user && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/auth')} className="cursor-pointer">
+                  <User className="h-4 w-4 mr-2" />
+                  Entrar
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
