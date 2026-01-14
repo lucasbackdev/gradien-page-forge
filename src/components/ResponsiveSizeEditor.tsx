@@ -1,8 +1,9 @@
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Monitor, Tablet, Smartphone } from 'lucide-react';
+import { Monitor, Tablet, Smartphone, ChevronUp, ChevronDown } from 'lucide-react';
 import { ResponsiveSize, ResponsiveFontSize } from '@/types/sections';
 
 interface ResponsiveMediaSizeEditorProps {
@@ -11,6 +12,7 @@ interface ResponsiveMediaSizeEditorProps {
   min?: number;
   max?: number;
   label?: string;
+  step?: number;
 }
 
 export const ResponsiveMediaSizeEditor = ({ 
@@ -18,8 +20,51 @@ export const ResponsiveMediaSizeEditor = ({
   onChange, 
   min = 20, 
   max = 100,
+  step = 5,
   label = 'Tamanho'
 }: ResponsiveMediaSizeEditorProps) => {
+  const handleIncrement = (device: keyof ResponsiveSize) => {
+    const newValue = Math.min(max, value[device] + step);
+    onChange({ ...value, [device]: newValue });
+  };
+
+  const handleDecrement = (device: keyof ResponsiveSize) => {
+    const newValue = Math.max(min, value[device] - step);
+    onChange({ ...value, [device]: newValue });
+  };
+
+  const renderDeviceControls = (device: keyof ResponsiveSize) => (
+    <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-6 w-6 p-0"
+          onClick={() => handleIncrement(device)}
+        >
+          <ChevronUp className="w-3 h-3" />
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-6 w-6 p-0"
+          onClick={() => handleDecrement(device)}
+        >
+          <ChevronDown className="w-3 h-3" />
+        </Button>
+      </div>
+      <Slider
+        value={[value[device]]}
+        onValueChange={(v) => onChange({ ...value, [device]: v[0] })}
+        min={min}
+        max={max}
+        step={step}
+        className="flex-1"
+      />
+      <span className="text-xs w-10 text-right">{value[device]}%</span>
+    </div>
+  );
+
   return (
     <div className="space-y-2">
       <Label className="text-xs font-medium">{label} Responsivo</Label>
@@ -40,45 +85,15 @@ export const ResponsiveMediaSizeEditor = ({
         </TabsList>
         
         <TabsContent value="desktop" className="mt-2">
-          <div className="flex items-center gap-2">
-            <Slider
-              value={[value.desktop]}
-              onValueChange={(v) => onChange({ ...value, desktop: v[0] })}
-              min={min}
-              max={max}
-              step={5}
-              className="flex-1"
-            />
-            <span className="text-xs w-10 text-right">{value.desktop}%</span>
-          </div>
+          {renderDeviceControls('desktop')}
         </TabsContent>
         
         <TabsContent value="tablet" className="mt-2">
-          <div className="flex items-center gap-2">
-            <Slider
-              value={[value.tablet]}
-              onValueChange={(v) => onChange({ ...value, tablet: v[0] })}
-              min={min}
-              max={max}
-              step={5}
-              className="flex-1"
-            />
-            <span className="text-xs w-10 text-right">{value.tablet}%</span>
-          </div>
+          {renderDeviceControls('tablet')}
         </TabsContent>
         
         <TabsContent value="mobile" className="mt-2">
-          <div className="flex items-center gap-2">
-            <Slider
-              value={[value.mobile]}
-              onValueChange={(v) => onChange({ ...value, mobile: v[0] })}
-              min={min}
-              max={max}
-              step={5}
-              className="flex-1"
-            />
-            <span className="text-xs w-10 text-right">{value.mobile}%</span>
-          </div>
+          {renderDeviceControls('mobile')}
         </TabsContent>
       </Tabs>
     </div>
@@ -91,11 +106,54 @@ interface ResponsiveFontSizeEditorProps {
   label?: string;
 }
 
+const parseFontSize = (size: string): number => {
+  return parseInt(size.replace(/[^0-9]/g, '')) || 16;
+};
+
 export const ResponsiveFontSizeEditor = ({ 
   value, 
   onChange, 
   label = 'Tamanho da Fonte' 
 }: ResponsiveFontSizeEditorProps) => {
+  const handleIncrement = (device: keyof ResponsiveFontSize) => {
+    const current = parseFontSize(value[device]);
+    onChange({ ...value, [device]: `${current + 2}px` });
+  };
+
+  const handleDecrement = (device: keyof ResponsiveFontSize) => {
+    const current = parseFontSize(value[device]);
+    onChange({ ...value, [device]: `${Math.max(8, current - 2)}px` });
+  };
+
+  const renderDeviceControls = (device: keyof ResponsiveFontSize) => (
+    <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-6 w-6 p-0"
+          onClick={() => handleIncrement(device)}
+        >
+          <ChevronUp className="w-3 h-3" />
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-6 w-6 p-0"
+          onClick={() => handleDecrement(device)}
+        >
+          <ChevronDown className="w-3 h-3" />
+        </Button>
+      </div>
+      <Input
+        value={value[device]}
+        onChange={(e) => onChange({ ...value, [device]: e.target.value })}
+        placeholder="ex: 36px"
+        className="h-8 flex-1"
+      />
+    </div>
+  );
+
   return (
     <div className="space-y-2">
       <Label className="text-xs font-medium">{label} Responsivo</Label>
@@ -116,30 +174,15 @@ export const ResponsiveFontSizeEditor = ({
         </TabsList>
         
         <TabsContent value="desktop" className="mt-2">
-          <Input
-            value={value.desktop}
-            onChange={(e) => onChange({ ...value, desktop: e.target.value })}
-            placeholder="ex: 36px"
-            className="h-8"
-          />
+          {renderDeviceControls('desktop')}
         </TabsContent>
         
         <TabsContent value="tablet" className="mt-2">
-          <Input
-            value={value.tablet}
-            onChange={(e) => onChange({ ...value, tablet: e.target.value })}
-            placeholder="ex: 28px"
-            className="h-8"
-          />
+          {renderDeviceControls('tablet')}
         </TabsContent>
         
         <TabsContent value="mobile" className="mt-2">
-          <Input
-            value={value.mobile}
-            onChange={(e) => onChange({ ...value, mobile: e.target.value })}
-            placeholder="ex: 24px"
-            className="h-8"
-          />
+          {renderDeviceControls('mobile')}
         </TabsContent>
       </Tabs>
     </div>
