@@ -928,16 +928,28 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                             {/* Inline Group - to place elements side by side */}
                             <div className="space-y-1">
                               <Label className="text-xs flex items-center gap-1">
-                                <Link className="w-3 h-3" /> Grupo (lado a lado)
+                                <Link className="w-3 h-3" /> Linha (agrupar lado a lado)
                               </Label>
-                              <Input
-                                placeholder="Ex: grupo1"
-                                value={element.inlineGroup || ''}
-                                onChange={(e) => updateSectionElement(section.id, element.id, { inlineGroup: e.target.value || undefined })}
-                                className="h-7 text-xs"
-                              />
+                              <Select
+                                value={element.inlineGroup || 'none'}
+                                onValueChange={(value) => updateSectionElement(section.id, element.id, { 
+                                  inlineGroup: value === 'none' ? undefined : value 
+                                })}
+                              >
+                                <SelectTrigger className="h-8">
+                                  <SelectValue placeholder="Sozinho" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="none">Sozinho</SelectItem>
+                                  <SelectItem value="linha-1">Linha 1</SelectItem>
+                                  <SelectItem value="linha-2">Linha 2</SelectItem>
+                                  <SelectItem value="linha-3">Linha 3</SelectItem>
+                                  <SelectItem value="linha-4">Linha 4</SelectItem>
+                                  <SelectItem value="linha-5">Linha 5</SelectItem>
+                                </SelectContent>
+                              </Select>
                               <p className="text-xs text-muted-foreground">
-                                Elementos com o mesmo grupo ficam lado a lado
+                                Elementos na mesma linha ficam lado a lado
                               </p>
                             </div>
                           </div>
