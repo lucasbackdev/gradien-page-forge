@@ -35,6 +35,15 @@ const Index = () => {
     }));
   };
 
+  const handleUpdateSectionHeight = (sectionId: string, minHeight: string) => {
+    setPresellData(prev => ({
+      ...prev,
+      sections: prev.sections.map(s => 
+        s.id === sectionId ? { ...s, minHeight } : s
+      ),
+    }));
+  };
+
   const handleDownload = async () => {
     try {
       const zip = new JSZip();
@@ -192,10 +201,12 @@ document.addEventListener('DOMContentLoaded', function() {
           ? `background: ${getGradientCSS(section.backgroundGradient)};`
           : `background-color: ${section.backgroundColor || '#1a1a2e'};`;
 
+      const minHeightStyle = section.minHeight ? `min-height: ${section.minHeight}; display: flex; flex-direction: column; justify-content: center;` : '';
+
       html += `
-<section id="section-${section.id}" class="section section-${section.layout}" style="${bgStyle} color: ${section.textColor || '#ffffff'}; padding: ${section.padding || '4rem 2rem'}; position: relative;">
+<section id="section-${section.id}" class="section section-${section.layout}" style="${bgStyle} ${minHeightStyle} color: ${section.textColor || '#ffffff'}; padding: ${section.padding || '4rem 2rem'}; position: relative;">
   ${section.backgroundImage ? `<div class="section-overlay" style="background: ${section.backgroundOverlay?.enabled ? getOverlayCSS(section.backgroundOverlay) : 'rgba(0,0,0,0.5)'}; position: absolute; inset: 0; z-index: 0;"></div>` : ''}
-  <div class="section-content" style="position: relative; z-index: 1;">
+  <div class="section-content" style="position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; justify-content: center;">
     ${section.elements.map((el, elIndex) => {
       if (el.type === 'text') {
         const textStyle = el.gradientText?.enabled && el.gradientText.colors?.length
@@ -344,13 +355,21 @@ document.addEventListener('DOMContentLoaded', function() {
       return 'none';
     };
 
+    // Get background from first section for body
+    const firstSectionBg = data.sections.length > 0 
+      ? (data.sections[0].backgroundColor || '#1a1a2e')
+      : '#1a1a2e';
+    const footerBgColor = data.footerStyle?.backgroundColor || '#0a0a0a';
+
     return `
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { 
+html, body { 
   font-family: ${data.fonts.body || 'system-ui'}, sans-serif;
   line-height: 1.6;
   min-height: 100vh;
-  background-color: #1a1a2e;
+  background-color: ${footerBgColor};
+  margin: 0;
+  padding: 0;
 }
 
 .floating-header {
@@ -800,6 +819,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
                   floatingHeader={presellData.floatingHeader}
                   onReorderSections={(sections) => setPresellData(prev => ({ ...prev, sections }))}
                   onUpdateSectionElements={handleUpdateSectionElements}
+                  onUpdateSectionHeight={handleUpdateSectionHeight}
                 />
               ) : (
                 <PreviewPanel 

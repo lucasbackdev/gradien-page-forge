@@ -454,6 +454,31 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                     </div>
                   </div>
 
+                  {/* Section Height */}
+                  <div className="space-y-3">
+                    <Label className="font-semibold">Altura da Seção</Label>
+                    <Select
+                      value={section.minHeight || 'auto'}
+                      onValueChange={(value) => updateSection(section.id, { minHeight: value === 'auto' ? undefined : value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Altura automática" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="auto">Automática</SelectItem>
+                        <SelectItem value="50vh">Metade da tela (50vh)</SelectItem>
+                        <SelectItem value="75vh">3/4 da tela (75vh)</SelectItem>
+                        <SelectItem value="100vh">Tela cheia (100vh)</SelectItem>
+                        <SelectItem value="400px">400px</SelectItem>
+                        <SelectItem value="600px">600px</SelectItem>
+                        <SelectItem value="800px">800px</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      Arraste a borda inferior da seção no preview para ajustar manualmente
+                    </p>
+                  </div>
+
                   {/* Elements */}
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
