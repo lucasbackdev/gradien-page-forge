@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, ResponsiveSize, ResponsiveFontSize, ResponsiveAlign, LayoutDirection } from '@/types/sections';
+import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, ResponsiveSize, ResponsiveFontSize, ResponsiveAlign, LayoutDirection, ResponsiveLayout, ResponsiveColumnSettings } from '@/types/sections';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -27,8 +27,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronDown, Bold, Link, Columns, ArrowLeftRight } from 'lucide-react';
+import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronDown, Bold, Link, Columns, ArrowLeftRight, Monitor, Tablet, Smartphone } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveMediaSizeEditor, ResponsiveFontSizeEditor } from '@/components/ResponsiveSizeEditor';
 import { ResponsiveAlignEditor } from '@/components/ResponsiveAlignEditor';
 
@@ -239,124 +240,237 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
               <CollapsibleContent className="animate-accordion-down">
                 <div className="space-y-4 pt-4 border-t mt-3">
                   
-                  {/* Two columns settings */}
-                  {(section.layout === 'two-columns' || section.layout === 'two-columns-reverse') && (
-                    <div className="space-y-3 p-3 bg-muted/50 rounded-lg">
-                      <Label className="font-semibold flex items-center gap-2">
-                        <Columns className="w-4 h-4" />
-                        Configurações de Colunas
-                      </Label>
+                  {/* Responsive Layout Settings */}
+                  <div className="space-y-3 p-3 bg-muted/50 rounded-lg">
+                    <Label className="font-semibold flex items-center gap-2">
+                      <Columns className="w-4 h-4" />
+                      Layout por Dispositivo
+                    </Label>
+                    
+                    <Tabs defaultValue="desktop" className="w-full">
+                      <TabsList className="grid w-full grid-cols-3 h-8">
+                        <TabsTrigger value="desktop" className="text-xs h-7">
+                          <Monitor className="w-3 h-3 mr-1" />
+                          Desktop
+                        </TabsTrigger>
+                        <TabsTrigger value="tablet" className="text-xs h-7">
+                          <Tablet className="w-3 h-3 mr-1" />
+                          Tablet
+                        </TabsTrigger>
+                        <TabsTrigger value="mobile" className="text-xs h-7">
+                          <Smartphone className="w-3 h-3 mr-1" />
+                          Mobile
+                        </TabsTrigger>
+                      </TabsList>
                       
-                      <div>
-                        <Label className="text-xs">Proporção das Colunas</Label>
-                        <Select
-                          value={section.columnWidthRatio || '50-50'}
-                          onValueChange={(value) => updateSection(section.id, { columnWidthRatio: value })}
-                        >
-                          <SelectTrigger className="mt-1">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="50-50">50% / 50%</SelectItem>
-                            <SelectItem value="40-60">40% / 60%</SelectItem>
-                            <SelectItem value="60-40">60% / 40%</SelectItem>
-                            <SelectItem value="30-70">30% / 70%</SelectItem>
-                            <SelectItem value="70-30">70% / 30%</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      {(['desktop', 'tablet', 'mobile'] as const).map((device) => {
+                        const currentLayout = section.responsiveLayout?.[device] || section.layout;
+                        const columnSettings = section.responsiveColumnSettings?.[device] || {};
+                        const isColumnsLayout = currentLayout === 'two-columns' || currentLayout === 'two-columns-reverse';
+                        
+                        return (
+                          <TabsContent key={device} value={device} className="space-y-3 mt-3">
+                            {/* Layout type for this device */}
+                            <div>
+                              <Label className="text-xs">Layout ({device})</Label>
+                              <Select
+                                value={currentLayout}
+                                onValueChange={(value: LayoutDirection) => {
+                                  const newResponsiveLayout: ResponsiveLayout = {
+                                    desktop: section.responsiveLayout?.desktop || section.layout,
+                                    tablet: section.responsiveLayout?.tablet || section.layout,
+                                    mobile: section.responsiveLayout?.mobile || section.layout,
+                                    [device]: value,
+                                  };
+                                  updateSection(section.id, { responsiveLayout: newResponsiveLayout });
+                                }}
+                              >
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="vertical">
+                                    <div className="flex items-center gap-2">
+                                      <AlignVerticalJustifyCenter className="w-4 h-4" />
+                                      <span>Vertical</span>
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="horizontal">
+                                    <div className="flex items-center gap-2">
+                                      <AlignHorizontalJustifyCenter className="w-4 h-4" />
+                                      <span>Horizontal</span>
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="two-columns">
+                                    <div className="flex items-center gap-2">
+                                      <Columns className="w-4 h-4" />
+                                      <span>Duas Colunas</span>
+                                    </div>
+                                  </SelectItem>
+                                  <SelectItem value="two-columns-reverse">
+                                    <div className="flex items-center gap-2">
+                                      <ArrowLeftRight className="w-4 h-4" />
+                                      <span>Duas Colunas (invertido)</span>
+                                    </div>
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            
+                            {/* Column settings only when two-columns is selected */}
+                            {isColumnsLayout && (
+                              <>
+                                <div>
+                                  <Label className="text-xs">Proporção das Colunas</Label>
+                                  <Select
+                                    value={columnSettings.columnWidthRatio || '50-50'}
+                                    onValueChange={(value) => {
+                                      const newSettings: ResponsiveColumnSettings = {
+                                        desktop: section.responsiveColumnSettings?.desktop || {},
+                                        tablet: section.responsiveColumnSettings?.tablet || {},
+                                        mobile: section.responsiveColumnSettings?.mobile || {},
+                                        [device]: { ...columnSettings, columnWidthRatio: value },
+                                      };
+                                      updateSection(section.id, { responsiveColumnSettings: newSettings });
+                                    }}
+                                  >
+                                    <SelectTrigger className="mt-1">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="50-50">50% / 50%</SelectItem>
+                                      <SelectItem value="40-60">40% / 60%</SelectItem>
+                                      <SelectItem value="60-40">60% / 40%</SelectItem>
+                                      <SelectItem value="30-70">30% / 70%</SelectItem>
+                                      <SelectItem value="70-30">70% / 30%</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
 
-                      <div>
-                        <Label className="text-xs">Espaçamento entre colunas</Label>
-                        <Select
-                          value={section.columnGap || '2rem'}
-                          onValueChange={(value) => updateSection(section.id, { columnGap: value })}
-                        >
-                          <SelectTrigger className="mt-1">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1rem">Pequeno</SelectItem>
-                            <SelectItem value="2rem">Médio</SelectItem>
-                            <SelectItem value="3rem">Grande</SelectItem>
-                            <SelectItem value="4rem">Extra Grande</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                                <div>
+                                  <Label className="text-xs">Espaçamento</Label>
+                                  <Select
+                                    value={columnSettings.columnGap || '2rem'}
+                                    onValueChange={(value) => {
+                                      const newSettings: ResponsiveColumnSettings = {
+                                        desktop: section.responsiveColumnSettings?.desktop || {},
+                                        tablet: section.responsiveColumnSettings?.tablet || {},
+                                        mobile: section.responsiveColumnSettings?.mobile || {},
+                                        [device]: { ...columnSettings, columnGap: value },
+                                      };
+                                      updateSection(section.id, { responsiveColumnSettings: newSettings });
+                                    }}
+                                  >
+                                    <SelectTrigger className="mt-1">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="1rem">Pequeno</SelectItem>
+                                      <SelectItem value="2rem">Médio</SelectItem>
+                                      <SelectItem value="3rem">Grande</SelectItem>
+                                      <SelectItem value="4rem">Extra Grande</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
 
-                      <div className="space-y-2">
-                        <Label className="text-xs">Coluna Esquerda</Label>
-                        <div className="flex flex-wrap gap-1">
-                          {section.elements.map((el) => (
-                            <Button
-                              key={el.id}
-                              variant={section.leftColumnElements?.includes(el.id) ? 'default' : 'outline'}
-                              size="sm"
-                              className="h-7 text-xs"
-                              onClick={() => {
-                                const currentLeft = section.leftColumnElements || [];
-                                const currentRight = section.rightColumnElements || [];
-                                
-                                if (currentLeft.includes(el.id)) {
-                                  // Remove from left
-                                  updateSection(section.id, {
-                                    leftColumnElements: currentLeft.filter(id => id !== el.id)
-                                  });
-                                } else {
-                                  // Add to left, remove from right
-                                  updateSection(section.id, {
-                                    leftColumnElements: [...currentLeft, el.id],
-                                    rightColumnElements: currentRight.filter(id => id !== el.id)
-                                  });
-                                }
-                              }}
-                            >
-                              {el.type === 'text' ? '📝' : el.type === 'image' ? '🖼️' : el.type === 'video' ? '🎬' : '🔘'}
-                              {el.content?.slice(0, 10) || el.type}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
+                                <div className="space-y-2">
+                                  <Label className="text-xs">Coluna Esquerda</Label>
+                                  <div className="flex flex-wrap gap-1">
+                                    {section.elements.map((el) => (
+                                      <Button
+                                        key={el.id}
+                                        variant={columnSettings.leftColumnElements?.includes(el.id) ? 'default' : 'outline'}
+                                        size="sm"
+                                        className="h-7 text-xs"
+                                        onClick={() => {
+                                          const currentLeft = columnSettings.leftColumnElements || [];
+                                          const currentRight = columnSettings.rightColumnElements || [];
+                                          
+                                          let newLeft: string[];
+                                          let newRight: string[];
+                                          
+                                          if (currentLeft.includes(el.id)) {
+                                            newLeft = currentLeft.filter(id => id !== el.id);
+                                            newRight = currentRight;
+                                          } else {
+                                            newLeft = [...currentLeft, el.id];
+                                            newRight = currentRight.filter(id => id !== el.id);
+                                          }
+                                          
+                                          const newSettings: ResponsiveColumnSettings = {
+                                            desktop: section.responsiveColumnSettings?.desktop || {},
+                                            tablet: section.responsiveColumnSettings?.tablet || {},
+                                            mobile: section.responsiveColumnSettings?.mobile || {},
+                                            [device]: { 
+                                              ...columnSettings, 
+                                              leftColumnElements: newLeft,
+                                              rightColumnElements: newRight 
+                                            },
+                                          };
+                                          updateSection(section.id, { responsiveColumnSettings: newSettings });
+                                        }}
+                                      >
+                                        {el.type === 'text' ? '📝' : el.type === 'image' ? '🖼️' : el.type === 'video' ? '🎬' : '🔘'}
+                                        {el.content?.slice(0, 8) || el.type}
+                                      </Button>
+                                    ))}
+                                  </div>
+                                </div>
 
-                      <div className="space-y-2">
-                        <Label className="text-xs">Coluna Direita</Label>
-                        <div className="flex flex-wrap gap-1">
-                          {section.elements.map((el) => (
-                            <Button
-                              key={el.id}
-                              variant={section.rightColumnElements?.includes(el.id) ? 'default' : 'outline'}
-                              size="sm"
-                              className="h-7 text-xs"
-                              onClick={() => {
-                                const currentLeft = section.leftColumnElements || [];
-                                const currentRight = section.rightColumnElements || [];
-                                
-                                if (currentRight.includes(el.id)) {
-                                  // Remove from right
-                                  updateSection(section.id, {
-                                    rightColumnElements: currentRight.filter(id => id !== el.id)
-                                  });
-                                } else {
-                                  // Add to right, remove from left
-                                  updateSection(section.id, {
-                                    rightColumnElements: [...currentRight, el.id],
-                                    leftColumnElements: currentLeft.filter(id => id !== el.id)
-                                  });
-                                }
-                              }}
-                            >
-                              {el.type === 'text' ? '📝' : el.type === 'image' ? '🖼️' : el.type === 'video' ? '🎬' : '🔘'}
-                              {el.content?.slice(0, 10) || el.type}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <p className="text-xs text-muted-foreground">
-                        Clique nos elementos para movê-los entre colunas. Elementos não selecionados serão divididos automaticamente.
-                      </p>
-                    </div>
-                  )}
+                                <div className="space-y-2">
+                                  <Label className="text-xs">Coluna Direita</Label>
+                                  <div className="flex flex-wrap gap-1">
+                                    {section.elements.map((el) => (
+                                      <Button
+                                        key={el.id}
+                                        variant={columnSettings.rightColumnElements?.includes(el.id) ? 'default' : 'outline'}
+                                        size="sm"
+                                        className="h-7 text-xs"
+                                        onClick={() => {
+                                          const currentLeft = columnSettings.leftColumnElements || [];
+                                          const currentRight = columnSettings.rightColumnElements || [];
+                                          
+                                          let newLeft: string[];
+                                          let newRight: string[];
+                                          
+                                          if (currentRight.includes(el.id)) {
+                                            newRight = currentRight.filter(id => id !== el.id);
+                                            newLeft = currentLeft;
+                                          } else {
+                                            newRight = [...currentRight, el.id];
+                                            newLeft = currentLeft.filter(id => id !== el.id);
+                                          }
+                                          
+                                          const newSettings: ResponsiveColumnSettings = {
+                                            desktop: section.responsiveColumnSettings?.desktop || {},
+                                            tablet: section.responsiveColumnSettings?.tablet || {},
+                                            mobile: section.responsiveColumnSettings?.mobile || {},
+                                            [device]: { 
+                                              ...columnSettings, 
+                                              leftColumnElements: newLeft,
+                                              rightColumnElements: newRight 
+                                            },
+                                          };
+                                          updateSection(section.id, { responsiveColumnSettings: newSettings });
+                                        }}
+                                      >
+                                        {el.type === 'text' ? '📝' : el.type === 'image' ? '🖼️' : el.type === 'video' ? '🎬' : '🔘'}
+                                        {el.content?.slice(0, 8) || el.type}
+                                      </Button>
+                                    ))}
+                                  </div>
+                                </div>
+                              </>
+                            )}
+                          </TabsContent>
+                        );
+                      })}
+                    </Tabs>
+                    
+                    <p className="text-xs text-muted-foreground">
+                      Configure layouts diferentes para cada tamanho de tela.
+                    </p>
+                  </div>
 
                   {/* Background settings */}
                   <div className="space-y-3">

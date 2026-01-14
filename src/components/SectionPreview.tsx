@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, ResponsiveSize, ResponsiveFontSize, ResponsiveAlign, HorizontalAlign, LayoutDirection } from '@/types/sections';
+import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, ResponsiveSize, ResponsiveFontSize, ResponsiveAlign, HorizontalAlign, LayoutDirection, ResponsiveColumnSettings } from '@/types/sections';
 import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X, GripHorizontal } from 'lucide-react';
@@ -828,78 +828,92 @@ export const SectionPreview = ({
               </button>
             </div>
 
-            <div 
-              className={`max-w-6xl mx-auto relative z-10 flex-1 ${
-                section.layout === 'horizontal' 
-                  ? 'flex flex-wrap items-center justify-center gap-8' 
-                  : section.layout === 'two-columns' || section.layout === 'two-columns-reverse'
-                    ? 'flex flex-col'
-                    : 'flex flex-col items-stretch'
-              }`}
-            >
-              {/* Two columns layout */}
-              {(section.layout === 'two-columns' || section.layout === 'two-columns-reverse') ? (
-                <div className={`flex flex-col md:flex-row gap-6 md:gap-8 w-full items-center ${section.layout === 'two-columns-reverse' ? 'md:flex-row-reverse' : ''}`}
-                  style={{ gap: section.columnGap || '2rem' }}
+            {(() => {
+              // Get the current layout based on viewport
+              const deviceKey = viewportSize === 'mobile' ? 'mobile' : viewportSize === 'tablet' ? 'tablet' : 'desktop';
+              const currentLayout = section.responsiveLayout?.[deviceKey] || section.layout;
+              const columnSettings = section.responsiveColumnSettings?.[deviceKey] || {
+                leftColumnElements: section.leftColumnElements,
+                rightColumnElements: section.rightColumnElements,
+                columnGap: section.columnGap,
+                columnWidthRatio: section.columnWidthRatio,
+              };
+              
+              const isColumnsLayout = currentLayout === 'two-columns' || currentLayout === 'two-columns-reverse';
+              
+              const getWidthClass = (ratio: string | undefined, isLeft: boolean) => {
+                if (!ratio || ratio === '50-50') return 'w-1/2';
+                if (ratio === '40-60') return isLeft ? 'w-[40%]' : 'w-[60%]';
+                if (ratio === '60-40') return isLeft ? 'w-[60%]' : 'w-[40%]';
+                if (ratio === '30-70') return isLeft ? 'w-[30%]' : 'w-[70%]';
+                if (ratio === '70-30') return isLeft ? 'w-[70%]' : 'w-[30%]';
+                return 'w-1/2';
+              };
+
+              return (
+                <div 
+                  className={`max-w-6xl mx-auto relative z-10 flex-1 ${
+                    currentLayout === 'horizontal' 
+                      ? 'flex flex-wrap items-center justify-center gap-8' 
+                      : isColumnsLayout
+                        ? 'flex flex-col'
+                        : 'flex flex-col items-stretch'
+                  }`}
                 >
-                  {/* Left Column */}
-                  <div className={`w-full ${
-                    section.columnWidthRatio === '40-60' ? 'md:w-[40%]' :
-                    section.columnWidthRatio === '60-40' ? 'md:w-[60%]' :
-                    section.columnWidthRatio === '30-70' ? 'md:w-[30%]' :
-                    section.columnWidthRatio === '70-30' ? 'md:w-[70%]' :
-                    'md:w-1/2'
-                  } flex flex-col items-center md:items-start`}>
-                    {section.elements
-                      .filter(el => section.leftColumnElements?.includes(el.id) || 
-                        (!section.leftColumnElements?.length && !section.rightColumnElements?.length && 
-                          section.elements.indexOf(el) < Math.ceil(section.elements.length / 2)))
-                      .map((element) => {
-                        const elIndex = section.elements.findIndex(e => e.id === element.id);
-                        return renderElement(element, section.id, elIndex, section.layout, false);
-                      })}
-                  </div>
-                  
-                  {/* Right Column */}
-                  <div className={`w-full ${
-                    section.columnWidthRatio === '40-60' ? 'md:w-[60%]' :
-                    section.columnWidthRatio === '60-40' ? 'md:w-[40%]' :
-                    section.columnWidthRatio === '30-70' ? 'md:w-[70%]' :
-                    section.columnWidthRatio === '70-30' ? 'md:w-[30%]' :
-                    'md:w-1/2'
-                  } flex flex-col items-center md:items-start`}>
-                    {section.elements
-                      .filter(el => section.rightColumnElements?.includes(el.id) ||
-                        (!section.leftColumnElements?.length && !section.rightColumnElements?.length && 
-                          section.elements.indexOf(el) >= Math.ceil(section.elements.length / 2)))
-                      .map((element) => {
-                        const elIndex = section.elements.findIndex(e => e.id === element.id);
-                        return renderElement(element, section.id, elIndex, section.layout, false);
-                      })}
-                  </div>
-                </div>
-              ) : (
-                /* Regular layout - Render grouped elements */
-                groupElements(section.elements).map((group, groupIndex) => {
-                  if (group.group && group.elements.length > 1) {
-                    // Render inline group - elements side by side
-                    return (
-                      <div key={`group-${groupIndex}`} className="flex flex-row flex-wrap items-center gap-6 w-full mb-4 md:flex-nowrap">
-                        {group.elements.map((element) => {
-                          const elIndex = section.elements.findIndex(e => e.id === element.id);
-                          return renderElement(element, section.id, elIndex, section.layout, true);
-                        })}
+                  {/* Two columns layout */}
+                  {isColumnsLayout ? (
+                    <div 
+                      className={`flex flex-row gap-6 w-full items-start ${currentLayout === 'two-columns-reverse' ? 'flex-row-reverse' : ''}`}
+                      style={{ gap: columnSettings.columnGap || '2rem' }}
+                    >
+                      {/* Left Column */}
+                      <div className={`${getWidthClass(columnSettings.columnWidthRatio, true)} flex flex-col items-start`}>
+                        {section.elements
+                          .filter(el => columnSettings.leftColumnElements?.includes(el.id) || 
+                            (!columnSettings.leftColumnElements?.length && !columnSettings.rightColumnElements?.length && 
+                              section.elements.indexOf(el) < Math.ceil(section.elements.length / 2)))
+                          .map((element) => {
+                            const elIndex = section.elements.findIndex(e => e.id === element.id);
+                            return renderElement(element, section.id, elIndex, currentLayout, false);
+                          })}
                       </div>
-                    );
-                  } else {
-                    // Render single element
-                    const element = group.elements[0];
-                    const elIndex = section.elements.findIndex(e => e.id === element.id);
-                    return renderElement(element, section.id, elIndex, section.layout, false);
-                  }
-                })
-              )}
-            </div>
+                      
+                      {/* Right Column */}
+                      <div className={`${getWidthClass(columnSettings.columnWidthRatio, false)} flex flex-col items-start`}>
+                        {section.elements
+                          .filter(el => columnSettings.rightColumnElements?.includes(el.id) ||
+                            (!columnSettings.leftColumnElements?.length && !columnSettings.rightColumnElements?.length && 
+                              section.elements.indexOf(el) >= Math.ceil(section.elements.length / 2)))
+                          .map((element) => {
+                            const elIndex = section.elements.findIndex(e => e.id === element.id);
+                            return renderElement(element, section.id, elIndex, currentLayout, false);
+                          })}
+                      </div>
+                    </div>
+                  ) : (
+                    /* Regular layout - Render grouped elements */
+                    groupElements(section.elements).map((group, groupIndex) => {
+                      if (group.group && group.elements.length > 1) {
+                        // Render inline group - elements side by side
+                        return (
+                          <div key={`group-${groupIndex}`} className="flex flex-row flex-wrap items-center gap-6 w-full mb-4 md:flex-nowrap">
+                            {group.elements.map((element) => {
+                              const elIndex = section.elements.findIndex(e => e.id === element.id);
+                              return renderElement(element, section.id, elIndex, currentLayout, true);
+                            })}
+                          </div>
+                        );
+                      } else {
+                        // Render single element
+                        const element = group.elements[0];
+                        const elIndex = section.elements.findIndex(e => e.id === element.id);
+                        return renderElement(element, section.id, elIndex, currentLayout, false);
+                      }
+                    })
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Resize handle */}
             {onUpdateSectionHeight && (
