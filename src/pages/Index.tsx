@@ -99,6 +99,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
       zip.file('index.html', fullHtml);
       
+      // Add Netlify _redirects file for proper routing
+      zip.file('_redirects', '/* /index.html 200');
+      
       const publicFolder = zip.folder('public');
       
       if (presellData.floatingHeader.logoImage && publicFolder) {
