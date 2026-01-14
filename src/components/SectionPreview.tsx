@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, ResponsiveSize, ResponsiveFontSize } from '@/types/sections';
+import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, ResponsiveSize, ResponsiveFontSize, ManualPosition } from '@/types/sections';
 import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X, GripHorizontal } from 'lucide-react';
@@ -349,7 +349,7 @@ export const SectionPreview = ({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const renderElement = (element: SectionElement, sectionId: string, elementIndex: number, sectionLayout: 'vertical' | 'horizontal') => {
+  const renderElement = (element: SectionElement, sectionId: string, elementIndex: number, sectionLayout: 'vertical' | 'horizontal', isManualMode: boolean = false) => {
     const isDragging = draggedElementInfo?.sectionId === sectionId && draggedElementInfo?.elementIndex === elementIndex;
     
     const dragProps = {
@@ -361,6 +361,16 @@ export const SectionPreview = ({
 
     const baseClass = `cursor-move transition-all ${isDragging ? 'opacity-50 scale-95' : 'hover:ring-2 hover:ring-primary/50 hover:ring-offset-2'}`;
     const animationClass = element.animation ? 'animate-fade-in' : '';
+    
+    // Manual positioning styles
+    const manualStyles: React.CSSProperties = isManualMode && element.manualPosition ? {
+      position: 'absolute',
+      left: `${element.manualPosition.x}%`,
+      top: `${element.manualPosition.y}%`,
+      transform: 'translate(-50%, -50%)',
+      width: `${element.manualPosition.width}%`,
+      zIndex: 10 + elementIndex,
+    } : {};
 
     switch (element.type) {
       case 'text':
@@ -368,8 +378,8 @@ export const SectionPreview = ({
           <div 
             key={element.id} 
             {...dragProps}
-            style={getTextStyle(element)} 
-            className={`mb-4 ${baseClass} ${animationClass}`}
+            style={{...getTextStyle(element), ...manualStyles}} 
+            className={`${isManualMode ? '' : 'mb-4'} ${baseClass} ${animationClass}`}
           >
             {renderTextWithHighlight(element.content || '', element)}
           </div>
@@ -382,8 +392,8 @@ export const SectionPreview = ({
             key={element.id}
             {...dragProps}
             href={presellData.affiliateLink || element.link || '#'}
-            className={`mb-4 ${baseClass} ${animationClass} ${buttonClass} ${!isShinyButton && presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
-            style={getButtonStyle()}
+            className={`${isManualMode ? '' : 'mb-4'} ${baseClass} ${animationClass} ${buttonClass} ${!isShinyButton && presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
+            style={{...getButtonStyle(), ...manualStyles}}
             onClick={(e) => {
               if (!presellData.affiliateLink && !element.link) e.preventDefault();
             }}
@@ -411,15 +421,16 @@ export const SectionPreview = ({
             href={presellData.affiliateLink || '#'}
             onClick={(e) => { if (!presellData.affiliateLink) e.preventDefault(); }}
             className={`block ${baseClass} ${animationClass}`}
+            style={manualStyles}
           >
             <img
               src={element.imageUrl}
               alt={element.content || 'Imagem'}
-              className="rounded-lg shadow-lg mb-4 cursor-pointer hover:opacity-90 transition-opacity"
+              className={`rounded-lg shadow-lg ${isManualMode ? '' : 'mb-4'} cursor-pointer hover:opacity-90 transition-opacity`}
               style={{ 
                 maxHeight: '500px', 
                 objectFit: 'cover',
-                width: `${imageMediaWidth}%`,
+                width: isManualMode ? '100%' : `${imageMediaWidth}%`,
                 maxWidth: '100%',
                 ...imageGlowStyle,
               }}
@@ -445,11 +456,12 @@ export const SectionPreview = ({
             {...dragProps}
             src={element.videoUrl}
             controls
-            className={`rounded-lg shadow-lg mb-4 ${baseClass} ${animationClass}`}
+            className={`rounded-lg shadow-lg ${isManualMode ? '' : 'mb-4'} ${baseClass} ${animationClass}`}
             style={{ 
-              width: `${videoMediaWidth}%`,
+              width: isManualMode ? '100%' : `${videoMediaWidth}%`,
               maxWidth: '150%',
               ...videoGlowStyle,
+              ...manualStyles,
             }}
           />
         ) : null;
@@ -776,13 +788,16 @@ export const SectionPreview = ({
             </div>
 
             <div 
-              className={`max-w-6xl mx-auto relative z-10 flex-1 flex ${
-                section.layout === 'horizontal' 
-                  ? 'flex-wrap items-center justify-center gap-8' 
-                  : 'flex-col items-center justify-center text-center'
+              className={`max-w-6xl mx-auto relative z-10 flex-1 ${
+                section.manualMode 
+                  ? 'relative w-full h-full min-h-[300px]'
+                  : section.layout === 'horizontal' 
+                    ? 'flex flex-wrap items-center justify-center gap-8' 
+                    : 'flex flex-col items-center justify-center text-center'
               }`}
+              style={section.manualMode ? { position: 'relative' } : {}}
             >
-              {section.elements.map((element, elementIndex) => renderElement(element, section.id, elementIndex, section.layout))}
+              {section.elements.map((element, elementIndex) => renderElement(element, section.id, elementIndex, section.layout, section.manualMode))}
             </div>
 
             {/* Resize handle */}

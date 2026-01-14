@@ -54,6 +54,14 @@ export interface ResponsiveFontSize {
   mobile: string;
 }
 
+// Manual positioning for free-form layout
+export interface ManualPosition {
+  x: number; // percentage from left
+  y: number; // percentage from top  
+  width: number; // percentage
+  height: number; // auto or percentage
+}
+
 export interface SectionElement {
   id: string;
   type: 'text' | 'image' | 'button' | 'video';
@@ -75,6 +83,8 @@ export interface SectionElement {
   // Responsive sizes
   responsiveMediaWidth?: ResponsiveSize;
   responsiveFontSize?: ResponsiveFontSize;
+  // Manual positioning
+  manualPosition?: ManualPosition;
 }
 
 export interface PresellSection {
@@ -96,6 +106,7 @@ export interface PresellSection {
   elements: SectionElement[];
   padding?: string;
   minHeight?: string; // 'auto' | '100vh' | custom value like '500px'
+  manualMode?: boolean; // Enable free-form positioning
 }
 
 export type HeaderPosition = 'left' | 'center' | 'right';
