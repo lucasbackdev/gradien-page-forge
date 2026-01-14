@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, ResponsiveSize, ResponsiveFontSize, ManualPosition } from '@/types/sections';
+import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, ResponsiveSize, ResponsiveFontSize, ResponsiveAlign } from '@/types/sections';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -27,10 +27,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronDown, Bold, Move } from 'lucide-react';
+import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronDown, Bold, Link } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ResponsiveMediaSizeEditor, ResponsiveFontSizeEditor } from '@/components/ResponsiveSizeEditor';
-import { ManualPositionEditor } from '@/components/ManualPositionEditor';
+import { ResponsiveAlignEditor } from '@/components/ResponsiveAlignEditor';
+
 
 interface SectionEditorProps {
   sections: PresellSection[];
@@ -482,24 +483,12 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                     </p>
                   </div>
 
-                  {/* Manual Mode Toggle */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={section.manualMode || false}
-                        onCheckedChange={(checked) => updateSection(section.id, { manualMode: checked })}
-                      />
-                      <Label className="font-semibold flex items-center gap-2">
-                        <Move className="w-4 h-4" />
-                        Modo Manual
-                      </Label>
-                    </div>
-                    {section.manualMode && (
-                      <p className="text-xs text-muted-foreground bg-primary/10 p-2 rounded">
-                        Com modo manual ativado, você pode posicionar cada elemento livremente.
-                        Os elementos podem ficar lado a lado, sobrepostos, em qualquer posição da seção.
-                      </p>
-                    )}
+                  {/* Inline Group Info */}
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground bg-primary/10 p-2 rounded">
+                      💡 Use o mesmo "Grupo" em elementos para deixá-los lado a lado.
+                      Arraste os elementos no preview para reorganizar ou excluir.
+                    </p>
                   </div>
 
                   {/* Elements */}
@@ -930,13 +919,27 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                               <Label className="text-xs">Ativar Animação (Scroll)</Label>
                             </div>
 
-                            {/* Manual Position Editor - only shows when manual mode is enabled */}
-                            {section.manualMode && (
-                              <ManualPositionEditor
-                                value={element.manualPosition || { x: 50, y: 50, width: 50, height: 50 }}
-                                onChange={(value) => updateSectionElement(section.id, element.id, { manualPosition: value })}
+                            {/* Responsive Align Editor */}
+                            <ResponsiveAlignEditor
+                              value={element.responsiveAlign || { desktop: 'center', tablet: 'center', mobile: 'center' }}
+                              onChange={(value) => updateSectionElement(section.id, element.id, { responsiveAlign: value })}
+                            />
+
+                            {/* Inline Group - to place elements side by side */}
+                            <div className="space-y-1">
+                              <Label className="text-xs flex items-center gap-1">
+                                <Link className="w-3 h-3" /> Grupo (lado a lado)
+                              </Label>
+                              <Input
+                                placeholder="Ex: grupo1"
+                                value={element.inlineGroup || ''}
+                                onChange={(e) => updateSectionElement(section.id, element.id, { inlineGroup: e.target.value || undefined })}
+                                className="h-7 text-xs"
                               />
-                            )}
+                              <p className="text-xs text-muted-foreground">
+                                Elementos com o mesmo grupo ficam lado a lado
+                              </p>
+                            </div>
                           </div>
                           <Button
                             variant="ghost"

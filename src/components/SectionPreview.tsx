@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, ResponsiveSize, ResponsiveFontSize, ManualPosition } from '@/types/sections';
+import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, ResponsiveSize, ResponsiveFontSize, ResponsiveAlign, HorizontalAlign } from '@/types/sections';
 import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X, GripHorizontal } from 'lucide-react';
@@ -190,6 +190,22 @@ export const SectionPreview = ({
     return element.fontSize || '18px';
   };
 
+  // Helper to get responsive horizontal alignment
+  const getResponsiveAlign = (element: SectionElement): HorizontalAlign => {
+    if (element.responsiveAlign) {
+      return element.responsiveAlign[viewportSize] || 'center';
+    }
+    return 'center';
+  };
+
+  const getAlignmentClass = (align: HorizontalAlign): string => {
+    switch (align) {
+      case 'left': return 'text-left self-start';
+      case 'right': return 'text-right self-end';
+      default: return 'text-center self-center';
+    }
+  };
+
   const getTextStyle = (element: SectionElement): React.CSSProperties => {
     const fontSize = getResponsiveFontSize(element);
     const baseStyle: React.CSSProperties = {
@@ -349,7 +365,7 @@ export const SectionPreview = ({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const renderElement = (element: SectionElement, sectionId: string, elementIndex: number, sectionLayout: 'vertical' | 'horizontal', isManualMode: boolean = false) => {
+  const renderElement = (element: SectionElement, sectionId: string, elementIndex: number, sectionLayout: 'vertical' | 'horizontal') => {
     const isDragging = draggedElementInfo?.sectionId === sectionId && draggedElementInfo?.elementIndex === elementIndex;
     
     const dragProps = {
@@ -361,16 +377,7 @@ export const SectionPreview = ({
 
     const baseClass = `cursor-move transition-all ${isDragging ? 'opacity-50 scale-95' : 'hover:ring-2 hover:ring-primary/50 hover:ring-offset-2'}`;
     const animationClass = element.animation ? 'animate-fade-in' : '';
-    
-    // Manual positioning styles
-    const manualStyles: React.CSSProperties = isManualMode && element.manualPosition ? {
-      position: 'absolute',
-      left: `${element.manualPosition.x}%`,
-      top: `${element.manualPosition.y}%`,
-      transform: 'translate(-50%, -50%)',
-      width: `${element.manualPosition.width}%`,
-      zIndex: 10 + elementIndex,
-    } : {};
+    const alignClass = getAlignmentClass(getResponsiveAlign(element));
 
     switch (element.type) {
       case 'text':
@@ -378,8 +385,8 @@ export const SectionPreview = ({
           <div 
             key={element.id} 
             {...dragProps}
-            style={{...getTextStyle(element), ...manualStyles}} 
-            className={`${isManualMode ? '' : 'mb-4'} ${baseClass} ${animationClass}`}
+            style={getTextStyle(element)} 
+            className={`mb-4 w-full ${baseClass} ${animationClass} ${alignClass}`}
           >
             {renderTextWithHighlight(element.content || '', element)}
           </div>
@@ -388,18 +395,19 @@ export const SectionPreview = ({
         const buttonClass = getButtonClass();
         const isShinyButton = presellData.buttonStyle.template === 'shiny-green';
         return (
-          <a
-            key={element.id}
-            {...dragProps}
-            href={presellData.affiliateLink || element.link || '#'}
-            className={`${isManualMode ? '' : 'mb-4'} ${baseClass} ${animationClass} ${buttonClass} ${!isShinyButton && presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
-            style={{...getButtonStyle(), ...manualStyles}}
-            onClick={(e) => {
-              if (!presellData.affiliateLink && !element.link) e.preventDefault();
-            }}
-          >
-            {isShinyButton ? <span>{element.content}</span> : element.content}
-          </a>
+          <div key={element.id} className={`w-full mb-4 flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
+            <a
+              {...dragProps}
+              href={presellData.affiliateLink || element.link || '#'}
+              className={`${baseClass} ${animationClass} ${buttonClass} ${!isShinyButton && presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
+              style={getButtonStyle()}
+              onClick={(e) => {
+                if (!presellData.affiliateLink && !element.link) e.preventDefault();
+              }}
+            >
+              {isShinyButton ? <span>{element.content}</span> : element.content}
+            </a>
+          </div>
         );
       case 'image':
         const imageColors = element.glowBorderColors || ['#FF6A00', '#FF2D55'];
@@ -415,27 +423,26 @@ export const SectionPreview = ({
         } : {};
         const imageMediaWidth = getResponsiveMediaWidth(element);
         return element.imageUrl ? (
-          <a
-            key={element.id}
-            {...dragProps}
-            href={presellData.affiliateLink || '#'}
-            onClick={(e) => { if (!presellData.affiliateLink) e.preventDefault(); }}
-            className={`block ${baseClass} ${animationClass}`}
-            style={manualStyles}
-          >
-            <img
-              src={element.imageUrl}
-              alt={element.content || 'Imagem'}
-              className={`rounded-lg shadow-lg ${isManualMode ? '' : 'mb-4'} cursor-pointer hover:opacity-90 transition-opacity`}
-              style={{ 
-                maxHeight: '500px', 
-                objectFit: 'cover',
-                width: isManualMode ? '100%' : `${imageMediaWidth}%`,
-                maxWidth: '100%',
-                ...imageGlowStyle,
-              }}
-            />
-          </a>
+          <div key={element.id} className={`w-full mb-4 flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
+            <a
+              {...dragProps}
+              href={presellData.affiliateLink || '#'}
+              onClick={(e) => { if (!presellData.affiliateLink) e.preventDefault(); }}
+              className={`block ${baseClass} ${animationClass}`}
+              style={{ width: `${imageMediaWidth}%`, maxWidth: '100%' }}
+            >
+              <img
+                src={element.imageUrl}
+                alt={element.content || 'Imagem'}
+                className="rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity w-full"
+                style={{ 
+                  maxHeight: '500px', 
+                  objectFit: 'cover',
+                  ...imageGlowStyle,
+                }}
+              />
+            </a>
+          </div>
         ) : null;
       case 'video':
         const videoColors = element.glowBorderColors || ['#FF6A00', '#FF2D55'];
@@ -451,23 +458,54 @@ export const SectionPreview = ({
         } : {};
         const videoMediaWidth = getResponsiveMediaWidth(element);
         return element.videoUrl ? (
-          <video
-            key={element.id}
-            {...dragProps}
-            src={element.videoUrl}
-            controls
-            className={`rounded-lg shadow-lg ${isManualMode ? '' : 'mb-4'} ${baseClass} ${animationClass}`}
-            style={{ 
-              width: isManualMode ? '100%' : `${videoMediaWidth}%`,
-              maxWidth: '150%',
-              ...videoGlowStyle,
-              ...manualStyles,
-            }}
-          />
+          <div key={element.id} className={`w-full mb-4 flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
+            <video
+              {...dragProps}
+              src={element.videoUrl}
+              controls
+              className={`rounded-lg shadow-lg ${baseClass} ${animationClass}`}
+              style={{ 
+                width: `${videoMediaWidth}%`,
+                maxWidth: '100%',
+                ...videoGlowStyle,
+              }}
+            />
+          </div>
         ) : null;
       default:
         return null;
     }
+  };
+
+  // Group elements by inlineGroup for side-by-side rendering
+  const groupElements = (elements: SectionElement[]) => {
+    const groups: { group: string | null; elements: SectionElement[] }[] = [];
+    let currentGroup: { group: string | null; elements: SectionElement[] } | null = null;
+
+    elements.forEach((element) => {
+      const group = element.inlineGroup || null;
+      
+      if (group) {
+        // If same group as current, add to it
+        if (currentGroup && currentGroup.group === group) {
+          currentGroup.elements.push(element);
+        } else {
+          // Start new group
+          if (currentGroup) groups.push(currentGroup);
+          currentGroup = { group, elements: [element] };
+        }
+      } else {
+        // No group - push current group if exists, then add as single
+        if (currentGroup) {
+          groups.push(currentGroup);
+          currentGroup = null;
+        }
+        groups.push({ group: null, elements: [element] });
+      }
+    });
+
+    if (currentGroup) groups.push(currentGroup);
+    return groups;
   };
 
   const t = translations[presellData.language || 'pt'];
@@ -789,15 +827,30 @@ export const SectionPreview = ({
 
             <div 
               className={`max-w-6xl mx-auto relative z-10 flex-1 ${
-                section.manualMode 
-                  ? 'relative w-full h-full min-h-[300px]'
-                  : section.layout === 'horizontal' 
-                    ? 'flex flex-wrap items-center justify-center gap-8' 
-                    : 'flex flex-col items-center justify-center text-center'
+                section.layout === 'horizontal' 
+                  ? 'flex flex-wrap items-center justify-center gap-8' 
+                  : 'flex flex-col items-stretch'
               }`}
-              style={section.manualMode ? { position: 'relative' } : {}}
             >
-              {section.elements.map((element, elementIndex) => renderElement(element, section.id, elementIndex, section.layout, section.manualMode))}
+              {/* Render grouped elements */}
+              {groupElements(section.elements).map((group, groupIndex) => {
+                if (group.group && group.elements.length > 1) {
+                  // Render inline group
+                  return (
+                    <div key={`group-${groupIndex}`} className="flex flex-wrap items-center justify-center gap-4 w-full mb-4">
+                      {group.elements.map((element) => {
+                        const elIndex = section.elements.findIndex(e => e.id === element.id);
+                        return renderElement(element, section.id, elIndex, section.layout);
+                      })}
+                    </div>
+                  );
+                } else {
+                  // Render single element
+                  const element = group.elements[0];
+                  const elIndex = section.elements.findIndex(e => e.id === element.id);
+                  return renderElement(element, section.id, elIndex, section.layout);
+                }
+              })}
             </div>
 
             {/* Resize handle */}
