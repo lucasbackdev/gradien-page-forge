@@ -1057,6 +1057,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
                   onUpdateSectionElements={handleUpdateSectionElements}
                   onUpdateSectionHeight={handleUpdateSectionHeight}
                   viewportSize={viewportSize}
+                  userId={user?.id}
                 />
               ) : (
                 <PreviewPanel 
