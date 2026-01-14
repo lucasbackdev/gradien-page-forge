@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Mail, Lock, User } from "lucide-react";
+
+declare global {
+  interface Window {
+    UnicornStudio: {
+      isInitialized?: boolean;
+      init: () => void;
+    };
+  }
+}
 import { z } from "zod";
 
 const emailSchema = z.string().email("Email inválido");
@@ -21,6 +30,31 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+
+  // Unicorn Studio background initialization
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = "https://cdn.unicorn.studio/v1.4.29/dist/unicornStudio.umd.js";
+    script.onload = () => {
+      if (window.UnicornStudio && !window.UnicornStudio.isInitialized) {
+        setTimeout(() => {
+          if (window.UnicornStudio && window.UnicornStudio.init) {
+            window.UnicornStudio.init();
+            window.UnicornStudio.isInitialized = true;
+          }
+        }, 100);
+      }
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup script on unmount
+      const existingScript = document.querySelector('script[src="https://cdn.unicorn.studio/v1.4.29/dist/unicornStudio.umd.js"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -120,23 +154,16 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Spline 3D Background */}
-      <div className="absolute inset-0 z-0">
-        <iframe
-          src="https://my.spline.design/glowingplanetparticles-HmCVKutonlFn3Oqqe6DI9nWi/"
-          frameBorder="0"
-          width="100%"
-          height="100%"
-          className="pointer-events-none"
-          title="Background Animation"
-          loading="lazy"
-          allow="autoplay"
-        />
-      </div>
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Unicorn Studio Background */}
+      <div 
+        data-us-project="wLUFdNmXvNcG2dFwwTnN" 
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{ width: '100%', height: '100%' }}
+      />
       
-      {/* Fallback gradient background in case iframe doesn't load */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-purple-900/30 via-[#0a0a0f] to-blue-900/30" />
+      {/* Fallback gradient background */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-purple-900/20 via-black to-blue-900/20" />
       
       <Card className="w-full max-w-md relative z-10 bg-card/90 backdrop-blur-xl border-border/50 shadow-2xl">
         <CardHeader className="text-center">
