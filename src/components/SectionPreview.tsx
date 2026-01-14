@@ -440,7 +440,7 @@ export const SectionPreview = ({
   const containerBgColor = presellData.footerStyle?.backgroundColor || '#0a0a0a';
 
   return (
-    <div className="relative min-h-full" style={{ backgroundColor: containerBgColor }}>
+    <div className="relative min-h-screen flex flex-col" style={{ backgroundColor: containerBgColor }}>
       <style>
         {`
           @keyframes neonPulse {
@@ -663,81 +663,83 @@ export const SectionPreview = ({
       )}
 
       {/* Sections */}
-      {sections.map((section, index) => (
-        <section
-          key={section.id}
-          id={`section-${section.id}`}
-          style={getSectionStyle(section)}
-          className={`relative group ${floatingHeader.enabled && index === 0 ? 'pt-24' : ''} ${draggedSectionIndex === index ? 'opacity-50' : ''}`}
-          draggable
-          onDragStart={(e) => handleSectionDragStart(e, index)}
-          onDragOver={(e) => handleSectionDragOver(e, index)}
-          onDragEnd={handleSectionDragEnd}
-        >
-          {/* Background overlay for images */}
-          {section.backgroundImage && section.backgroundOverlay?.enabled && (
-            <div 
-              className="absolute inset-0" 
-              style={{ 
-                background: getOverlayStyle(section.backgroundOverlay),
-                zIndex: 0 
-              }}
-            />
-          )}
-          {section.backgroundImage && !section.backgroundOverlay?.enabled && (
-            <div 
-              className="absolute inset-0 bg-black/50" 
-              style={{ zIndex: 0 }}
-            />
-          )}
-
-          {/* Section reorder controls */}
-          <div className="absolute top-2 right-2 z-20 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={() => moveSectionUp(index)}
-              disabled={index === 0}
-              className="p-2 bg-black/50 rounded hover:bg-black/70 disabled:opacity-30 text-white"
-              title="Mover para cima"
-            >
-              <ChevronUp className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => moveSectionDown(index)}
-              disabled={index === sections.length - 1}
-              className="p-2 bg-black/50 rounded hover:bg-black/70 disabled:opacity-30 text-white"
-              title="Mover para baixo"
-            >
-              <ChevronDown className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div 
-            className={`max-w-6xl mx-auto relative z-10 flex-1 flex ${
-              section.layout === 'horizontal' 
-                ? 'flex-wrap items-center justify-center gap-8' 
-                : 'flex-col items-center justify-center text-center'
-            }`}
+      <main className="flex-1">
+        {sections.map((section, index) => (
+          <section
+            key={section.id}
+            id={`section-${section.id}`}
+            style={getSectionStyle(section)}
+            className={`relative group ${floatingHeader.enabled && index === 0 ? 'pt-24' : ''} ${draggedSectionIndex === index ? 'opacity-50' : ''}`}
+            draggable
+            onDragStart={(e) => handleSectionDragStart(e, index)}
+            onDragOver={(e) => handleSectionDragOver(e, index)}
+            onDragEnd={handleSectionDragEnd}
           >
-            {section.elements.map((element, elementIndex) => renderElement(element, section.id, elementIndex, section.layout))}
-          </div>
+            {/* Background overlay for images */}
+            {section.backgroundImage && section.backgroundOverlay?.enabled && (
+              <div 
+                className="absolute inset-0" 
+                style={{ 
+                  background: getOverlayStyle(section.backgroundOverlay),
+                  zIndex: 0 
+                }}
+              />
+            )}
+            {section.backgroundImage && !section.backgroundOverlay?.enabled && (
+              <div 
+                className="absolute inset-0 bg-black/50" 
+                style={{ zIndex: 0 }}
+              />
+            )}
 
-          {/* Resize handle */}
-          {onUpdateSectionHeight && (
-            <div
-              className="absolute bottom-0 left-0 right-0 h-4 cursor-ns-resize opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-30"
-              onMouseDown={(e) => {
-                const sectionElement = e.currentTarget.parentElement;
-                if (sectionElement) {
-                  handleResizeStart(e, section.id, sectionElement);
-                }
-              }}
-            >
-              <div className="w-16 h-1.5 bg-white/50 rounded-full hover:bg-white/80 transition-colors" />
-              <GripHorizontal className="w-4 h-4 text-white/50 absolute" />
+            {/* Section reorder controls */}
+            <div className="absolute top-2 right-2 z-20 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={() => moveSectionUp(index)}
+                disabled={index === 0}
+                className="p-2 bg-black/50 rounded hover:bg-black/70 disabled:opacity-30 text-white"
+                title="Mover para cima"
+              >
+                <ChevronUp className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => moveSectionDown(index)}
+                disabled={index === sections.length - 1}
+                className="p-2 bg-black/50 rounded hover:bg-black/70 disabled:opacity-30 text-white"
+                title="Mover para baixo"
+              >
+                <ChevronDown className="w-4 h-4" />
+              </button>
             </div>
-          )}
-        </section>
-      ))}
+
+            <div 
+              className={`max-w-6xl mx-auto relative z-10 flex-1 flex ${
+                section.layout === 'horizontal' 
+                  ? 'flex-wrap items-center justify-center gap-8' 
+                  : 'flex-col items-center justify-center text-center'
+              }`}
+            >
+              {section.elements.map((element, elementIndex) => renderElement(element, section.id, elementIndex, section.layout))}
+            </div>
+
+            {/* Resize handle */}
+            {onUpdateSectionHeight && (
+              <div
+                className="absolute bottom-0 left-0 right-0 h-4 cursor-ns-resize opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-30"
+                onMouseDown={(e) => {
+                  const sectionElement = e.currentTarget.parentElement;
+                  if (sectionElement) {
+                    handleResizeStart(e, section.id, sectionElement);
+                  }
+                }}
+              >
+                <div className="w-16 h-1.5 bg-white/50 rounded-full hover:bg-white/80 transition-colors" />
+                <GripHorizontal className="w-4 h-4 text-white/50 absolute" />
+              </div>
+            )}
+          </section>
+        ))}
+      </main>
 
       {sections.length === 0 && (
         <div className="min-h-[50vh] flex items-center justify-center text-muted-foreground">
