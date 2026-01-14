@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, ResponsiveSize, ResponsiveFontSize, ResponsiveAlign, HorizontalAlign } from '@/types/sections';
+import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, ResponsiveSize, ResponsiveFontSize, ResponsiveAlign, HorizontalAlign, LayoutDirection } from '@/types/sections';
 import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X, GripHorizontal } from 'lucide-react';
@@ -365,7 +365,7 @@ export const SectionPreview = ({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const renderElement = (element: SectionElement, sectionId: string, elementIndex: number, sectionLayout: 'vertical' | 'horizontal', isInGroup: boolean = false) => {
+  const renderElement = (element: SectionElement, sectionId: string, elementIndex: number, sectionLayout: LayoutDirection, isInGroup: boolean = false) => {
     const isDragging = draggedElementInfo?.sectionId === sectionId && draggedElementInfo?.elementIndex === elementIndex;
     
     const dragProps = {
@@ -832,28 +832,73 @@ export const SectionPreview = ({
               className={`max-w-6xl mx-auto relative z-10 flex-1 ${
                 section.layout === 'horizontal' 
                   ? 'flex flex-wrap items-center justify-center gap-8' 
-                  : 'flex flex-col items-stretch'
+                  : section.layout === 'two-columns' || section.layout === 'two-columns-reverse'
+                    ? 'flex flex-col'
+                    : 'flex flex-col items-stretch'
               }`}
             >
-              {/* Render grouped elements */}
-              {groupElements(section.elements).map((group, groupIndex) => {
-                if (group.group && group.elements.length > 1) {
-                  // Render inline group - elements side by side
-                  return (
-                    <div key={`group-${groupIndex}`} className="flex flex-row flex-wrap items-center gap-6 w-full mb-4 md:flex-nowrap">
-                      {group.elements.map((element) => {
+              {/* Two columns layout */}
+              {(section.layout === 'two-columns' || section.layout === 'two-columns-reverse') ? (
+                <div className={`flex flex-col md:flex-row gap-6 md:gap-8 w-full items-center ${section.layout === 'two-columns-reverse' ? 'md:flex-row-reverse' : ''}`}
+                  style={{ gap: section.columnGap || '2rem' }}
+                >
+                  {/* Left Column */}
+                  <div className={`w-full ${
+                    section.columnWidthRatio === '40-60' ? 'md:w-[40%]' :
+                    section.columnWidthRatio === '60-40' ? 'md:w-[60%]' :
+                    section.columnWidthRatio === '30-70' ? 'md:w-[30%]' :
+                    section.columnWidthRatio === '70-30' ? 'md:w-[70%]' :
+                    'md:w-1/2'
+                  } flex flex-col items-center md:items-start`}>
+                    {section.elements
+                      .filter(el => section.leftColumnElements?.includes(el.id) || 
+                        (!section.leftColumnElements?.length && !section.rightColumnElements?.length && 
+                          section.elements.indexOf(el) < Math.ceil(section.elements.length / 2)))
+                      .map((element) => {
                         const elIndex = section.elements.findIndex(e => e.id === element.id);
-                        return renderElement(element, section.id, elIndex, section.layout, true);
+                        return renderElement(element, section.id, elIndex, section.layout, false);
                       })}
-                    </div>
-                  );
-                } else {
-                  // Render single element
-                  const element = group.elements[0];
-                  const elIndex = section.elements.findIndex(e => e.id === element.id);
-                  return renderElement(element, section.id, elIndex, section.layout, false);
-                }
-              })}
+                  </div>
+                  
+                  {/* Right Column */}
+                  <div className={`w-full ${
+                    section.columnWidthRatio === '40-60' ? 'md:w-[60%]' :
+                    section.columnWidthRatio === '60-40' ? 'md:w-[40%]' :
+                    section.columnWidthRatio === '30-70' ? 'md:w-[70%]' :
+                    section.columnWidthRatio === '70-30' ? 'md:w-[30%]' :
+                    'md:w-1/2'
+                  } flex flex-col items-center md:items-start`}>
+                    {section.elements
+                      .filter(el => section.rightColumnElements?.includes(el.id) ||
+                        (!section.leftColumnElements?.length && !section.rightColumnElements?.length && 
+                          section.elements.indexOf(el) >= Math.ceil(section.elements.length / 2)))
+                      .map((element) => {
+                        const elIndex = section.elements.findIndex(e => e.id === element.id);
+                        return renderElement(element, section.id, elIndex, section.layout, false);
+                      })}
+                  </div>
+                </div>
+              ) : (
+                /* Regular layout - Render grouped elements */
+                groupElements(section.elements).map((group, groupIndex) => {
+                  if (group.group && group.elements.length > 1) {
+                    // Render inline group - elements side by side
+                    return (
+                      <div key={`group-${groupIndex}`} className="flex flex-row flex-wrap items-center gap-6 w-full mb-4 md:flex-nowrap">
+                        {group.elements.map((element) => {
+                          const elIndex = section.elements.findIndex(e => e.id === element.id);
+                          return renderElement(element, section.id, elIndex, section.layout, true);
+                        })}
+                      </div>
+                    );
+                  } else {
+                    // Render single element
+                    const element = group.elements[0];
+                    const elIndex = section.elements.findIndex(e => e.id === element.id);
+                    return renderElement(element, section.id, elIndex, section.layout, false);
+                  }
+                })
+              )}
             </div>
 
             {/* Resize handle */}
