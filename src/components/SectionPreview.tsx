@@ -14,6 +14,7 @@ interface SectionPreviewProps {
   onUpdateSectionElements: (sectionId: string, elements: SectionElement[]) => void;
   onUpdateSectionHeight?: (sectionId: string, minHeight: string) => void;
   viewportSize?: ViewportSize;
+  userId?: string;
 }
 
 export const SectionPreview = ({ 
@@ -23,7 +24,8 @@ export const SectionPreview = ({
   onReorderSections,
   onUpdateSectionElements,
   onUpdateSectionHeight,
-  viewportSize = 'desktop'
+  viewportSize = 'desktop',
+  userId
 }: SectionPreviewProps) => {
   const [draggedSectionIndex, setDraggedSectionIndex] = useState<number | null>(null);
   const [draggedElementInfo, setDraggedElementInfo] = useState<{ sectionId: string; elementIndex: number } | null>(null);
@@ -1043,13 +1045,13 @@ export const SectionPreview = ({
       )}
 
       {/* Lead Capture Popup */}
-      {presellData.popupConfig?.enabled && (
+      {presellData.popupConfig?.enabled && userId && (
         <LeadPopup
           isOpen={showLeadPopup}
           onClose={() => setShowLeadPopup(false)}
           config={presellData.popupConfig}
-          userId="preview"
-          sourcePage="preview"
+          userId={userId}
+          sourcePage={presellData.pageTitle || 'Página'}
         />
       )}
     </div>
