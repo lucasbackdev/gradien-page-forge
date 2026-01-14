@@ -926,7 +926,7 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                             />
 
                             {/* Inline Group - to place elements side by side */}
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                               <Label className="text-xs flex items-center gap-1">
                                 <Link className="w-3 h-3" /> Linha (agrupar lado a lado)
                               </Label>
@@ -948,6 +948,50 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                   <SelectItem value="linha-5">Linha 5</SelectItem>
                                 </SelectContent>
                               </Select>
+                              
+                              {/* Quick add text beside image/video */}
+                              {(element.type === 'image' || element.type === 'video') && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-full h-8 text-xs"
+                                  onClick={() => {
+                                    // Find a line that is not used or use the same as current element
+                                    const currentLine = element.inlineGroup || 'linha-1';
+                                    
+                                    // Update current element to be in the line if not already
+                                    if (!element.inlineGroup) {
+                                      updateSectionElement(section.id, element.id, { inlineGroup: currentLine });
+                                    }
+                                    
+                                    // Add new text element in the same line
+                                    const newTextElement: SectionElement = {
+                                      id: Date.now().toString(),
+                                      type: 'text',
+                                      content: 'Adicione seu texto aqui...',
+                                      fontSize: '18px',
+                                      color: '#ffffff',
+                                      textType: 'description',
+                                      animation: false,
+                                      inlineGroup: currentLine,
+                                      responsiveAlign: { desktop: 'left', tablet: 'center', mobile: 'center' },
+                                    };
+                                    
+                                    onUpdateSections(sections.map(s => {
+                                      if (s.id !== section.id) return s;
+                                      // Insert the new text element right after the current element
+                                      const currentIndex = s.elements.findIndex(el => el.id === element.id);
+                                      const newElements = [...s.elements];
+                                      newElements.splice(currentIndex + 1, 0, newTextElement);
+                                      return { ...s, elements: newElements };
+                                    }));
+                                  }}
+                                >
+                                  <Type className="w-3 h-3 mr-1" />
+                                  Adicionar Texto ao Lado
+                                </Button>
+                              )}
+                              
                               <p className="text-xs text-muted-foreground">
                                 Elementos na mesma linha ficam lado a lado
                               </p>
