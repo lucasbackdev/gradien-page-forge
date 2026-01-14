@@ -355,21 +355,27 @@ document.addEventListener('DOMContentLoaded', function() {
       return 'none';
     };
 
-    // Get background from first section for body
+    // Get background from first section for body - use same as first section to avoid color mismatch
     const firstSectionBg = data.sections.length > 0 
       ? (data.sections[0].backgroundColor || '#1a1a2e')
       : '#1a1a2e';
-    const footerBgColor = data.footerStyle?.backgroundColor || '#0a0a0a';
 
     return `
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { 
+html { 
   font-family: ${data.fonts.body || 'system-ui'}, sans-serif;
   line-height: 1.6;
   min-height: 100vh;
-  background-color: ${footerBgColor};
   margin: 0;
   padding: 0;
+}
+body {
+  font-family: inherit;
+  line-height: inherit;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: ${firstSectionBg};
 }
 
 .floating-header {
