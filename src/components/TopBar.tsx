@@ -1,5 +1,6 @@
-import { Moon, Sun, Download } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ShinyDownloadButton } from './ShinyDownloadButton';
 
 interface TopBarProps {
   darkMode: boolean;
@@ -28,13 +29,7 @@ export const TopBar = ({
           {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </Button>
 
-        <Button
-          onClick={onDownload}
-          className="gradient-vibrant text-white font-semibold"
-        >
-          <Download className="w-4 h-4 mr-2" />
-          Download ZIP
-        </Button>
+        <ShinyDownloadButton onClick={onDownload} />
       </div>
     </header>
   );
