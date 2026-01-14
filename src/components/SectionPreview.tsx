@@ -1,8 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense, lazy } from 'react';
 import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, UnicornBackground } from '@/types/sections';
 import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X, GripHorizontal } from 'lucide-react';
+
+// Lazy load UnicornScene to avoid SSR issues
+const UnicornScene = lazy(() => import('unicornstudio-react'));
 
 interface SectionPreviewProps {
   sections: PresellSection[];
@@ -30,45 +33,7 @@ export const SectionPreview = ({
   const [resizeStartHeight, setResizeStartHeight] = useState(0);
   const trashRef = useRef<HTMLDivElement>(null);
 
-  // Check if any section has unicorn background enabled
-  const hasUnicornBackground = sections.some(s => s.unicornBackground?.enabled);
-  const unicornSectionIds = sections.filter(s => s.unicornBackground?.enabled).map(s => s.id).join(',');
-
-  // Load Unicorn Studio script when needed
-  useEffect(() => {
-    if (!hasUnicornBackground) return;
-
-    const initUnicorn = () => {
-      if (typeof (window as any).UnicornStudio !== 'undefined' && (window as any).UnicornStudio.init) {
-        // Destroy existing instances first
-        if ((window as any).UnicornStudio.destroy) {
-          try {
-            (window as any).UnicornStudio.destroy();
-          } catch (e) {
-            // Ignore errors on destroy
-          }
-        }
-        setTimeout(() => {
-          (window as any).UnicornStudio.init();
-        }, 200);
-      }
-    };
-
-    // Check if script is already loaded
-    const existingScript = document.querySelector('script[src*="unicornStudio"]');
-    if (existingScript) {
-      initUnicorn();
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/gh/nicklassandell/unicorn-studio.js@v1.4.29/dist/unicornStudio.umd.js';
-    script.async = true;
-    script.onload = () => {
-      initUnicorn();
-    };
-    document.head.appendChild(script);
-  }, [hasUnicornBackground, unicornSectionIds]);
+  // No longer need the manual script loading - using unicornstudio-react package
 
   const getGradientStyle = (gradient: PresellSection['backgroundGradient']) => {
     if (!gradient?.enabled) return undefined;
@@ -758,14 +723,19 @@ export const SectionPreview = ({
           >
             {/* Unicorn Studio Background */}
             {section.unicornBackground?.enabled && (
-              <div
-                key={`unicorn-${section.id}-${section.unicornBackground.projectId}`}
-                data-us-project={section.unicornBackground.projectId}
-                data-us-scale={section.unicornBackground.scale || 1}
-                data-us-dpi={section.unicornBackground.dpi || 1}
-                className="absolute inset-0 overflow-hidden"
-                style={{ zIndex: 0, pointerEvents: 'none' }}
-              />
+              <Suspense fallback={<div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-black" style={{ zIndex: 0 }} />}>
+                <div className="absolute inset-0" style={{ zIndex: 0, pointerEvents: 'none' }}>
+                  <UnicornScene 
+                    projectId={section.unicornBackground.projectId}
+                    scale={section.unicornBackground.scale || 1}
+                    dpi={section.unicornBackground.dpi || 1.5}
+                    width="100%"
+                    height="100%"
+                    lazyLoad={false}
+                    production={true}
+                  />
+                </div>
+              </Suspense>
             )}
 
             {/* Background overlay for images */}
