@@ -362,8 +362,38 @@ document.addEventListener('DOMContentLoaded', function() {
       return 'none';
     };
 
-    // Use footer background for the page chrome, and make footer stick to bottom
     const footerBgColor = data.footerStyle?.backgroundColor || '#0a0a0a';
+
+    // Make any empty "chrome" (space outside sections) match the FIRST section background
+    // so you never see a black band above the first section.
+    const pageChromeBg = (() => {
+      const first = data.sections[0];
+      if (first?.backgroundImage) {
+        // In the exported ZIP we save the first section background as section-0-bg.png
+        return {
+          css: `url('public/section-0-bg.png')`,
+          isImage: true,
+        };
+      }
+
+      if (first?.backgroundGradient?.enabled) {
+        return { css: getGradientCSS(first.backgroundGradient), isImage: false };
+      }
+
+      if (first?.backgroundColor) {
+        return { css: first.backgroundColor, isImage: false };
+      }
+
+      const g4 = data.colors.backgroundGradient4;
+      const g3 = data.colors.backgroundGradient3;
+      const g2 = data.colors.backgroundGradient;
+
+      if (g4?.enabled) return { css: `linear-gradient(135deg, ${g4.color1}, ${g4.color2}, ${g4.color3}, ${g4.color4})`, isImage: false };
+      if (g3?.enabled) return { css: `linear-gradient(135deg, ${g3.color1}, ${g3.color2}, ${g3.color3})`, isImage: false };
+      if (g2?.enabled) return { css: `linear-gradient(135deg, ${g2.color1}, ${g2.color2})`, isImage: false };
+
+      return { css: data.colors.background || footerBgColor, isImage: false };
+    })();
 
     return `
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -380,7 +410,8 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  background-color: ${footerBgColor};
+  ${pageChromeBg.isImage ? `background-image: ${pageChromeBg.css};` : `background: ${pageChromeBg.css};`}
+  ${pageChromeBg.isImage ? 'background-size: cover; background-position: center;' : ''}
   display: flex;
   flex-direction: column;
 }
