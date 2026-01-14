@@ -15,7 +15,7 @@ import JSZip from 'jszip';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { user, loading: authLoading, isAdmin, subscription } = useAuth();
+  const { user, loading: authLoading, isAdmin, subscription, signOut } = useAuth();
   const [presellData, setPresellData] = useState<PresellData>(defaultPresellData);
   const [darkMode, setDarkMode] = useState(false);
   const [viewportSize, setViewportSize] = useState<ViewportSize>('desktop');
@@ -864,7 +864,13 @@ ${data.buttonStyle.template === 'shiny-green' ? `
           <p className="text-muted-foreground mb-6">
             Sua assinatura expirou ou está pendente. Entre em contato com o administrador para liberar seu acesso.
           </p>
-          <Button onClick={() => navigate('/auth')} variant="outline">
+          <Button
+            onClick={async () => {
+              await signOut();
+              navigate('/auth');
+            }}
+            variant="outline"
+          >
             Voltar ao Login
           </Button>
         </div>
