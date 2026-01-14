@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TopBar } from '@/components/TopBar';
 import { EditorPanel } from '@/components/EditorPanel';
 import { PreviewPanel } from '@/components/PreviewPanel';
@@ -7,9 +8,14 @@ import { ResponsivePreview, ViewportSize, getViewportWidth } from '@/components/
 import { PresellData, PresellElement, defaultPresellData, translations } from '@/types/presell';
 import { PresellSection, SectionElement } from '@/types/sections';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import JSZip from 'jszip';
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user, loading: authLoading, isAdmin, subscription } = useAuth();
   const [presellData, setPresellData] = useState<PresellData>(defaultPresellData);
   const [darkMode, setDarkMode] = useState(false);
   const [viewportSize, setViewportSize] = useState<ViewportSize>('desktop');
@@ -831,6 +837,40 @@ ${data.buttonStyle.template === 'shiny-green' ? `
 }
 `;
   };
+
+  // Show loading state while checking auth
+  if (authLoading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // Redirect to auth if not logged in
+  if (!user) {
+    navigate('/auth');
+    return null;
+  }
+
+  // Check if subscription is active
+  const hasAccess = subscription?.status === 'active';
+
+  if (!hasAccess) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center bg-background p-4">
+        <div className="text-center max-w-md">
+          <h1 className="text-2xl font-bold mb-4 text-foreground">Acesso Expirado</h1>
+          <p className="text-muted-foreground mb-6">
+            Sua assinatura expirou ou está pendente. Entre em contato com o administrador para liberar seu acesso.
+          </p>
+          <Button onClick={() => navigate('/auth')} variant="outline">
+            Voltar ao Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen flex flex-col bg-background">
