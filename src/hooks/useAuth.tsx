@@ -104,7 +104,7 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
-    // Limpar estado local primeiro
+    // Limpar estado local primeiro (UI responde imediatamente)
     setAuthState({
       user: null,
       session: null,
@@ -112,13 +112,13 @@ export const useAuth = () => {
       isAdmin: false,
       subscription: null,
     });
-    
-    // Tentar fazer logout no servidor (ignorar erros de sessão não encontrada)
+
+    // Importante: quando a sessão já expirou no servidor, o logout "global" pode falhar
+    // com "session_not_found". Nesse caso, garantimos ao menos o logout local.
     try {
       await supabase.auth.signOut();
-    } catch (error) {
-      // Sessão já pode ter expirado, estado local já foi limpo
-      console.log("Logout completed (session may have expired)");
+    } catch {
+      await supabase.auth.signOut({ scope: "local" });
     }
   };
 
