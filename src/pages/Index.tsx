@@ -19,6 +19,7 @@ const Index = () => {
   const [presellData, setPresellData] = useState<PresellData>(defaultPresellData);
   const [darkMode, setDarkMode] = useState(false);
   const [viewportSize, setViewportSize] = useState<ViewportSize>('desktop');
+  const [currentPageId, setCurrentPageId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (darkMode) {
@@ -884,6 +885,10 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}
         onDownload={handleDownload}
+        currentData={presellData}
+        onLoadPage={setPresellData}
+        currentPageId={currentPageId}
+        onPageIdChange={setCurrentPageId}
       />
 
       <div className="flex-1 flex overflow-hidden">
