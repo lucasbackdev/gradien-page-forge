@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ShinyDownloadButton } from './ShinyDownloadButton';
 import { SavedPagesManager } from './SavedPagesManager';
+import { TemplateSelector } from './TemplateSelector';
 import { useAuth } from '@/hooks/useAuth';
 import { PresellData } from '@/types/presell';
 import {
@@ -47,6 +48,8 @@ export const TopBar = ({
       </div>
       
       <div className="flex items-center gap-3">
+        <TemplateSelector onSelectTemplate={onLoadPage} />
+        
         {user && (
           <SavedPagesManager
             currentData={currentData}
