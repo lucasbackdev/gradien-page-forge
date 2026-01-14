@@ -120,8 +120,19 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Spline 3D Background */}
+      <div className="absolute inset-0 z-0">
+        <iframe
+          src="https://my.spline.design/glowingplanetparticles-HmCVKutonlFn3Oqqe6DI9nWi/"
+          frameBorder="0"
+          width="100%"
+          height="100%"
+          className="pointer-events-none"
+          title="Background Animation"
+        />
+      </div>
+      <Card className="w-full max-w-md relative z-10 bg-background/80 backdrop-blur-md border-border/50">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-gradient">Gradien Page Forge</CardTitle>
           <CardDescription>Acesse sua conta ou crie uma nova</CardDescription>
