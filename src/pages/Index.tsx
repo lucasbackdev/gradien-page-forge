@@ -11,7 +11,7 @@ import JSZip from 'jszip';
 
 const Index = () => {
   const [presellData, setPresellData] = useState<PresellData>(defaultPresellData);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   const [viewportSize, setViewportSize] = useState<ViewportSize>('desktop');
 
   useEffect(() => {
