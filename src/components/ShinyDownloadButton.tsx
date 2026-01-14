@@ -107,7 +107,7 @@ export const ShinyDownloadButton = ({ onClick }: ShinyDownloadButtonProps) => {
         <div className="ink-splash" />
 
         <div className="wrapper-icones">
-          <Download className="w-5 h-5" style={{ color: 'inherit' }} />
+          <Download className="w-4 h-4" style={{ color: 'inherit' }} />
         </div>
 
         <span className="texto-principal">Download Page</span>

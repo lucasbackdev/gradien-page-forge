@@ -1,6 +1,12 @@
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ShinyDownloadButton } from './ShinyDownloadButton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface TopBarProps {
   darkMode: boolean;
@@ -20,16 +26,30 @@ export const TopBar = ({
       </div>
       
       <div className="flex items-center gap-3">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onToggleDarkMode}
-          className="hover:bg-muted"
-        >
-          {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
-
         <ShinyDownloadButton onClick={onDownload} />
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="hover:bg-muted">
+              <Menu className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={onToggleDarkMode} className="cursor-pointer">
+              {darkMode ? (
+                <>
+                  <Sun className="h-4 w-4 mr-2" />
+                  Modo Claro
+                </>
+              ) : (
+                <>
+                  <Moon className="h-4 w-4 mr-2" />
+                  Modo Escuro
+                </>
+              )}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
