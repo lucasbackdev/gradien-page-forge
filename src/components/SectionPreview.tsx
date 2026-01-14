@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay } from '@/types/sections';
 import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
-import { Trash2, ChevronUp, ChevronDown, Menu, X } from 'lucide-react';
+import { Trash2, ChevronUp, ChevronDown, Menu, X, GripHorizontal } from 'lucide-react';
 
 interface SectionPreviewProps {
   sections: PresellSection[];
@@ -10,6 +10,7 @@ interface SectionPreviewProps {
   floatingHeader: FloatingHeader;
   onReorderSections: (sections: PresellSection[]) => void;
   onUpdateSectionElements: (sectionId: string, elements: SectionElement[]) => void;
+  onUpdateSectionHeight?: (sectionId: string, minHeight: string) => void;
 }
 
 export const SectionPreview = ({ 
@@ -17,12 +18,16 @@ export const SectionPreview = ({
   presellData, 
   floatingHeader, 
   onReorderSections,
-  onUpdateSectionElements 
+  onUpdateSectionElements,
+  onUpdateSectionHeight
 }: SectionPreviewProps) => {
   const [draggedSectionIndex, setDraggedSectionIndex] = useState<number | null>(null);
   const [draggedElementInfo, setDraggedElementInfo] = useState<{ sectionId: string; elementIndex: number } | null>(null);
   const [showTrash, setShowTrash] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [resizingSection, setResizingSection] = useState<string | null>(null);
+  const [resizeStartY, setResizeStartY] = useState(0);
+  const [resizeStartHeight, setResizeStartHeight] = useState(0);
   const trashRef = useRef<HTMLDivElement>(null);
 
   const getGradientStyle = (gradient: PresellSection['backgroundGradient']) => {
@@ -73,6 +78,10 @@ export const SectionPreview = ({
       padding: section.padding || '4rem 2rem',
       color: section.textColor || '#ffffff',
       position: 'relative',
+      minHeight: section.minHeight || 'auto',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
     };
 
     if (section.backgroundImage) {
@@ -287,6 +296,35 @@ export const SectionPreview = ({
       element.scrollIntoView({ behavior: 'smooth' });
     }
     setMobileMenuOpen(false);
+  };
+
+  // Resize handlers
+  const handleResizeStart = (e: React.MouseEvent, sectionId: string, sectionElement: HTMLElement) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setResizingSection(sectionId);
+    setResizeStartY(e.clientY);
+    setResizeStartHeight(sectionElement.offsetHeight);
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaY = moveEvent.clientY - e.clientY;
+      const newHeight = Math.max(100, sectionElement.offsetHeight + deltaY);
+      sectionElement.style.minHeight = `${newHeight}px`;
+      setResizeStartY(moveEvent.clientY);
+    };
+
+    const handleMouseUp = () => {
+      if (onUpdateSectionHeight) {
+        const finalHeight = sectionElement.offsetHeight;
+        onUpdateSectionHeight(sectionId, `${finalHeight}px`);
+      }
+      setResizingSection(null);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
   };
 
   const renderElement = (element: SectionElement, sectionId: string, elementIndex: number, sectionLayout: 'vertical' | 'horizontal') => {
@@ -671,14 +709,30 @@ export const SectionPreview = ({
           </div>
 
           <div 
-            className={`max-w-6xl mx-auto relative z-10 ${
+            className={`max-w-6xl mx-auto relative z-10 flex-1 flex ${
               section.layout === 'horizontal' 
-                ? 'flex flex-wrap items-center justify-center gap-8' 
-                : 'flex flex-col items-center text-center'
+                ? 'flex-wrap items-center justify-center gap-8' 
+                : 'flex-col items-center justify-center text-center'
             }`}
           >
             {section.elements.map((element, elementIndex) => renderElement(element, section.id, elementIndex, section.layout))}
           </div>
+
+          {/* Resize handle */}
+          {onUpdateSectionHeight && (
+            <div
+              className="absolute bottom-0 left-0 right-0 h-4 cursor-ns-resize opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-30"
+              onMouseDown={(e) => {
+                const sectionElement = e.currentTarget.parentElement;
+                if (sectionElement) {
+                  handleResizeStart(e, section.id, sectionElement);
+                }
+              }}
+            >
+              <div className="w-16 h-1.5 bg-white/50 rounded-full hover:bg-white/80 transition-colors" />
+              <GripHorizontal className="w-4 h-4 text-white/50 absolute" />
+            </div>
+          )}
         </section>
       ))}
 

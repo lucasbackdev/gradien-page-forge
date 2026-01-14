@@ -80,6 +80,7 @@ export interface PresellSection {
   textColor?: string;
   elements: SectionElement[];
   padding?: string;
+  minHeight?: string; // 'auto' | '100vh' | custom value like '500px'
 }
 
 export type HeaderPosition = 'left' | 'center' | 'right';
