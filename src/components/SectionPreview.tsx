@@ -365,7 +365,7 @@ export const SectionPreview = ({
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  const renderElement = (element: SectionElement, sectionId: string, elementIndex: number, sectionLayout: 'vertical' | 'horizontal') => {
+  const renderElement = (element: SectionElement, sectionId: string, elementIndex: number, sectionLayout: 'vertical' | 'horizontal', isInGroup: boolean = false) => {
     const isDragging = draggedElementInfo?.sectionId === sectionId && draggedElementInfo?.elementIndex === elementIndex;
     
     const dragProps = {
@@ -378,6 +378,9 @@ export const SectionPreview = ({
     const baseClass = `cursor-move transition-all ${isDragging ? 'opacity-50 scale-95' : 'hover:ring-2 hover:ring-primary/50 hover:ring-offset-2'}`;
     const animationClass = element.animation ? 'animate-fade-in' : '';
     const alignClass = getAlignmentClass(getResponsiveAlign(element));
+    
+    // When in a group, use flex-1 to share space equally
+    const widthClass = isInGroup ? 'flex-1 min-w-0' : 'w-full';
 
     switch (element.type) {
       case 'text':
@@ -386,7 +389,7 @@ export const SectionPreview = ({
             key={element.id} 
             {...dragProps}
             style={getTextStyle(element)} 
-            className={`mb-4 w-full ${baseClass} ${animationClass} ${alignClass}`}
+            className={`${isInGroup ? '' : 'mb-4'} ${widthClass} ${baseClass} ${animationClass} ${alignClass}`}
           >
             {renderTextWithHighlight(element.content || '', element)}
           </div>
@@ -395,7 +398,7 @@ export const SectionPreview = ({
         const buttonClass = getButtonClass();
         const isShinyButton = presellData.buttonStyle.template === 'shiny-green';
         return (
-          <div key={element.id} className={`w-full mb-4 flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
+          <div key={element.id} className={`${widthClass} ${isInGroup ? '' : 'mb-4'} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
             <a
               {...dragProps}
               href={presellData.affiliateLink || element.link || '#'}
@@ -423,13 +426,13 @@ export const SectionPreview = ({
         } : {};
         const imageMediaWidth = getResponsiveMediaWidth(element);
         return element.imageUrl ? (
-          <div key={element.id} className={`w-full mb-4 flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
+          <div key={element.id} className={`${widthClass} ${isInGroup ? '' : 'mb-4'} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
             <a
               {...dragProps}
               href={presellData.affiliateLink || '#'}
               onClick={(e) => { if (!presellData.affiliateLink) e.preventDefault(); }}
               className={`block ${baseClass} ${animationClass}`}
-              style={{ width: `${imageMediaWidth}%`, maxWidth: '100%' }}
+              style={{ width: isInGroup ? '100%' : `${imageMediaWidth}%`, maxWidth: '100%' }}
             >
               <img
                 src={element.imageUrl}
@@ -458,14 +461,14 @@ export const SectionPreview = ({
         } : {};
         const videoMediaWidth = getResponsiveMediaWidth(element);
         return element.videoUrl ? (
-          <div key={element.id} className={`w-full mb-4 flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
+          <div key={element.id} className={`${widthClass} ${isInGroup ? '' : 'mb-4'} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
             <video
               {...dragProps}
               src={element.videoUrl}
               controls
               className={`rounded-lg shadow-lg ${baseClass} ${animationClass}`}
               style={{ 
-                width: `${videoMediaWidth}%`,
+                width: isInGroup ? '100%' : `${videoMediaWidth}%`,
                 maxWidth: '100%',
                 ...videoGlowStyle,
               }}
@@ -835,12 +838,12 @@ export const SectionPreview = ({
               {/* Render grouped elements */}
               {groupElements(section.elements).map((group, groupIndex) => {
                 if (group.group && group.elements.length > 1) {
-                  // Render inline group
+                  // Render inline group - elements side by side
                   return (
-                    <div key={`group-${groupIndex}`} className="flex flex-wrap items-center justify-center gap-4 w-full mb-4">
+                    <div key={`group-${groupIndex}`} className="flex flex-row flex-wrap items-center gap-6 w-full mb-4 md:flex-nowrap">
                       {group.elements.map((element) => {
                         const elIndex = section.elements.findIndex(e => e.id === element.id);
-                        return renderElement(element, section.id, elIndex, section.layout);
+                        return renderElement(element, section.id, elIndex, section.layout, true);
                       })}
                     </div>
                   );
@@ -848,7 +851,7 @@ export const SectionPreview = ({
                   // Render single element
                   const element = group.elements[0];
                   const elIndex = section.elements.findIndex(e => e.id === element.id);
-                  return renderElement(element, section.id, elIndex, section.layout);
+                  return renderElement(element, section.id, elIndex, section.layout, false);
                 }
               })}
             </div>
