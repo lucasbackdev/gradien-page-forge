@@ -21,7 +21,7 @@ import {
   DialogTrigger,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronLeft, Bold, Link, Columns, ArrowLeftRight, Monitor, Tablet, Smartphone, Settings, GripVertical } from 'lucide-react';
+import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronLeft, Bold, Link, Columns, ArrowLeftRight, Monitor, Tablet, Smartphone, Settings, GripVertical, MousePointerClick } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveMediaSizeEditor, ResponsiveFontSizeEditor } from '@/components/ResponsiveSizeEditor';
@@ -255,11 +255,10 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
         </div>
 
         {/* Add element buttons */}
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <Button
             variant="outline"
             size="sm"
-            className="flex-1"
             onClick={() => addElementToSection(selectedSection.id, 'text')}
           >
             <Type className="w-4 h-4 mr-1" /> Texto
@@ -267,7 +266,6 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
           <Button
             variant="outline"
             size="sm"
-            className="flex-1"
             onClick={() => addElementToSection(selectedSection.id, 'image')}
           >
             <Image className="w-4 h-4 mr-1" /> Imagem
@@ -275,10 +273,16 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
           <Button
             variant="outline"
             size="sm"
-            className="flex-1"
             onClick={() => addElementToSection(selectedSection.id, 'video')}
           >
             <Video className="w-4 h-4 mr-1" /> Vídeo
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => addElementToSection(selectedSection.id, 'button')}
+          >
+            <MousePointerClick className="w-4 h-4 mr-1" /> Botão
           </Button>
         </div>
 
