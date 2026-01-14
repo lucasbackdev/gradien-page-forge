@@ -136,8 +136,8 @@ All colors MUST be HSL.
 .aura-ink-button {
   --speed: 4s;
   --ice-blue: #A5F2F3;
-  min-width: 200px;
-  height: 48px;
+  min-width: 280px;
+  height: 64px;
   background-color: var(--ice-blue);
   border-radius: 9999px;
   position: relative;
@@ -145,6 +145,7 @@ All colors MUST be HSL.
   overflow: hidden;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   isolation: isolate;
   backface-visibility: hidden;
   transform: translateZ(0);
@@ -212,11 +213,11 @@ All colors MUST be HSL.
 
 .wrapper-icones {
   position: absolute;
-  left: 8px;
+  left: 11px;
   top: 50%;
-  margin-top: -16px;
-  width: 32px;
-  height: 32px;
+  margin-top: -21px;
+  width: 42px;
+  height: 42px;
   background: #000;
   border-radius: 50%;
   z-index: 20;
@@ -229,7 +230,7 @@ All colors MUST be HSL.
 }
 
 .aura-ink-button:hover .wrapper-icones {
-  transform: translateX(152px);
+  transform: translateX(216px);
   background: #fff;
   color: #000;
 }
@@ -237,7 +238,7 @@ All colors MUST be HSL.
 .texto-principal {
   transition: all 1.2s cubic-bezier(0.23, 1, 0.32, 1);
   opacity: 1;
-  transform: translateX(18px);
+  transform: translateX(22px);
   z-index: 10;
   color: #000;
   font-weight: 800;
@@ -266,7 +267,7 @@ All colors MUST be HSL.
 
 .aura-ink-button:hover .texto-hover {
   opacity: 1;
-  transform: translate(-50%, -50%) translateX(-14px);
+  transform: translate(-50%, -50%) translateX(-18px);
 }
 
 .particle-container {
