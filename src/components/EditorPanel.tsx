@@ -18,7 +18,6 @@ import {
   Layers,
   Menu,
   LayoutTemplate,
-  Sparkles,
 } from 'lucide-react';
 import {
   Select,
@@ -31,7 +30,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionEditor } from './SectionEditor';
 import { FloatingHeaderEditor } from './FloatingHeaderEditor';
 import shinyButtonPreview from '@/assets/shiny-button-preview.gif';
-import auroraWavesPreview from '@/assets/aurora-waves-preview.png';
+
 
 interface EditorPanelProps {
   data: PresellData;
@@ -259,34 +258,6 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                 Selecione um modelo de botão. O estilo será aplicado em todos os botões da página.
               </p>
 
-              {/* Backgrounds Section */}
-              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-6">
-                <Sparkles className="w-3.5 h-3.5" />
-                Backgrounds Animados
-              </div>
-
-              <div className="grid grid-cols-1 gap-3">
-                {/* Aurora Waves Background */}
-                <div 
-                  className="p-3 rounded-lg transition-all border-2 border-border bg-muted"
-                >
-                  <div className="text-[10px] text-muted-foreground uppercase tracking-wide mb-2">Aurora Waves</div>
-                  <div className="relative h-24 rounded-lg overflow-hidden">
-                    <img 
-                      src={auroraWavesPreview} 
-                      alt="Aurora Waves Preview" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <p className="text-[9px] text-muted-foreground mt-2">
-                    Aplique nas seções via editor de seção → Fundo da Seção → Background Animado
-                  </p>
-                </div>
-              </div>
-
-              <p className="text-[9px] text-muted-foreground mt-2 p-2 bg-muted/50 rounded">
-                <strong>Como usar:</strong> Vá em Elementos → Seções → Selecione uma seção → Ative "Background Animado" nas configurações de fundo.
-              </p>
             </div>
           </TabsContent>
 
