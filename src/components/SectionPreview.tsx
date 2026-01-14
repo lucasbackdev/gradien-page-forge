@@ -1,11 +1,8 @@
-import { useState, useRef, useEffect, Suspense, lazy } from 'react';
-import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, UnicornBackground } from '@/types/sections';
+import { useState, useRef } from 'react';
+import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay } from '@/types/sections';
 import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X, GripHorizontal } from 'lucide-react';
-
-// Lazy load UnicornScene to avoid SSR issues
-const UnicornScene = lazy(() => import('unicornstudio-react'));
 
 interface SectionPreviewProps {
   sections: PresellSection[];
@@ -711,38 +708,13 @@ export const SectionPreview = ({
           <section
             key={section.id}
             id={`section-${section.id}`}
-            style={{
-              ...getSectionStyle(section),
-              overflow: section.unicornBackground?.enabled ? 'hidden' : undefined,
-            }}
+            style={getSectionStyle(section)}
             className={`relative group ${floatingHeader.enabled && index === 0 ? 'pt-24' : ''} ${draggedSectionIndex === index ? 'opacity-50' : ''}`}
             draggable
             onDragStart={(e) => handleSectionDragStart(e, index)}
             onDragOver={(e) => handleSectionDragOver(e, index)}
             onDragEnd={handleSectionDragEnd}
           >
-            {/* Unicorn Studio Background */}
-            {section.unicornBackground?.enabled && section.unicornBackground.projectId && (
-              <Suspense fallback={<div className="absolute inset-0" style={{ zIndex: 0 }} />}>
-                <div className="absolute inset-0" style={{ zIndex: 0, pointerEvents: 'none' }}>
-                  <UnicornScene 
-                    projectId={section.unicornBackground.projectId}
-                    scale={section.unicornBackground.scale || 1}
-                    dpi={section.unicornBackground.dpi || 1.5}
-                    width="100%"
-                    height="100%"
-                    lazyLoad={false}
-                    production={true}
-                    showPlaceholderWhileLoading={true}
-                    showPlaceholderOnError={true}
-                    placeholderClassName="bg-black"
-                    onError={(err: Error) => {
-                      console.error('UnicornScene error:', err);
-                    }}
-                  />
-                </div>
-              </Suspense>
-            )}
 
             {/* Background overlay for images */}
             {section.backgroundImage && section.backgroundOverlay?.enabled && (
