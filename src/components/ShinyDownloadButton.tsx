@@ -107,11 +107,11 @@ export const ShinyDownloadButton = ({ onClick }: ShinyDownloadButtonProps) => {
         <div className="ink-splash" />
 
         <div className="wrapper-icones">
-          <Download className="w-5 h-5 text-[#A5F2F3] group-hover:text-black transition-colors" style={{ color: 'inherit' }} />
+          <Download className="w-5 h-5" style={{ color: 'inherit' }} />
         </div>
 
-        <span className="texto-principal text-sm">Download Page</span>
-        <span className="texto-hover text-sm">Download Page</span>
+        <span className="texto-principal">Download Page</span>
+        <span className="texto-hover">Download Page</span>
 
         <div ref={particleContainerRef} className="particle-container" />
       </button>
