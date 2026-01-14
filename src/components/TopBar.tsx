@@ -1,11 +1,11 @@
-import { Moon, Sun, Menu, Shield, LogOut, User } from 'lucide-react';
+import { Moon, Sun, Menu, Shield, LogOut, User, LayoutTemplate, Save, FolderOpen, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShinyDownloadButton } from './ShinyDownloadButton';
-import { SavedPagesManager } from './SavedPagesManager';
-import { TemplateSelector } from './TemplateSelector';
 import { useAuth } from '@/hooks/useAuth';
-import { PresellData } from '@/types/presell';
+import { PresellData, defaultPresellData } from '@/types/presell';
+import { useToast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,9 @@ interface TopBarProps {
   onLoadPage: (data: PresellData) => void;
   currentPageId?: string;
   onPageIdChange?: (id: string | undefined) => void;
+  onOpenTemplates: () => void;
+  onOpenSave: () => void;
+  onOpenLoad: () => void;
 }
 
 export const TopBar = ({
@@ -32,13 +35,121 @@ export const TopBar = ({
   onLoadPage,
   currentPageId,
   onPageIdChange,
+  onOpenTemplates,
+  onOpenSave,
+  onOpenLoad,
 }: TopBarProps) => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleLogout = async () => {
     await signOut();
     navigate('/auth');
+  };
+
+  const handleImportZip = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.zip')) {
+      toast({
+        title: "Formato inválido",
+        description: "Por favor, selecione um arquivo .zip exportado anteriormente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const JSZip = (await import('jszip')).default;
+      const zip = await JSZip.loadAsync(file);
+      
+      // Look for index.html to extract data
+      const indexHtml = zip.file('index.html');
+      if (indexHtml) {
+        const content = await indexHtml.async('string');
+        // Try to extract JSON data from HTML comment
+        const jsonMatch = content.match(/<!--PRESELL_DATA:(.*?)-->/s);
+        if (jsonMatch) {
+          const pageData = JSON.parse(jsonMatch[1]);
+          
+          // Validate the data has expected structure
+          if (!pageData.colors || !pageData.sections) {
+            throw new Error('Estrutura de dados inválida');
+          }
+
+          // Merge with defaults to ensure all properties exist
+          const mergedData: PresellData = {
+            ...defaultPresellData,
+            ...pageData,
+            colors: { ...defaultPresellData.colors, ...pageData.colors },
+            buttonStyle: { ...defaultPresellData.buttonStyle, ...pageData.buttonStyle },
+            fonts: { ...defaultPresellData.fonts, ...pageData.fonts },
+            fontSizes: { ...defaultPresellData.fontSizes, ...pageData.fontSizes },
+            floatingHeader: { ...defaultPresellData.floatingHeader, ...pageData.floatingHeader },
+            footerStyle: { ...defaultPresellData.footerStyle, ...pageData.footerStyle },
+          };
+
+          onLoadPage(mergedData);
+          onPageIdChange?.(undefined);
+          
+          toast({
+            title: "Arquivo importado!",
+            description: "O modelo foi carregado para edição.",
+          });
+          return;
+        }
+      }
+
+      // Try to find a JSON file
+      const jsonFiles = Object.keys(zip.files).filter(name => name.endsWith('.json'));
+      if (jsonFiles.length > 0) {
+        const jsonContent = await zip.file(jsonFiles[0])?.async('string');
+        if (jsonContent) {
+          const pageData = JSON.parse(jsonContent);
+          
+          if (!pageData.colors || !pageData.sections) {
+            throw new Error('Estrutura de dados inválida');
+          }
+
+          const mergedData: PresellData = {
+            ...defaultPresellData,
+            ...pageData,
+            colors: { ...defaultPresellData.colors, ...pageData.colors },
+            buttonStyle: { ...defaultPresellData.buttonStyle, ...pageData.buttonStyle },
+            fonts: { ...defaultPresellData.fonts, ...pageData.fonts },
+            fontSizes: { ...defaultPresellData.fontSizes, ...pageData.fontSizes },
+            floatingHeader: { ...defaultPresellData.floatingHeader, ...pageData.floatingHeader },
+            footerStyle: { ...defaultPresellData.footerStyle, ...pageData.footerStyle },
+          };
+
+          onLoadPage(mergedData);
+          onPageIdChange?.(undefined);
+          
+          toast({
+            title: "Arquivo importado!",
+            description: "O modelo foi carregado para edição.",
+          });
+          return;
+        }
+      }
+
+      throw new Error('Dados não encontrados no arquivo ZIP');
+    } catch (error: any) {
+      console.error('Error importing zip:', error);
+      toast({
+        title: "Erro ao importar",
+        description: error.message || "O arquivo não contém dados válidos.",
+        variant: "destructive",
+      });
+    }
+    
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -48,18 +159,15 @@ export const TopBar = ({
       </div>
       
       <div className="flex items-center gap-3">
-        <TemplateSelector onSelectTemplate={onLoadPage} />
-        
-        {user && (
-          <SavedPagesManager
-            currentData={currentData}
-            onLoadPage={onLoadPage}
-            currentPageId={currentPageId}
-            onPageIdChange={onPageIdChange}
-          />
-        )}
-        
         <ShinyDownloadButton onClick={onDownload} />
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".zip"
+          onChange={handleImportZip}
+          className="hidden"
+        />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -67,7 +175,29 @@ export const TopBar = ({
               <Menu className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={onOpenTemplates} className="cursor-pointer">
+              <LayoutTemplate className="h-4 w-4 mr-2" />
+              Templates
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={onOpenSave} className="cursor-pointer">
+              <Save className="h-4 w-4 mr-2" />
+              Salvar
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={onOpenLoad} className="cursor-pointer">
+              <FolderOpen className="h-4 w-4 mr-2" />
+              Abrir
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={() => fileInputRef.current?.click()} className="cursor-pointer">
+              <Upload className="h-4 w-4 mr-2" />
+              Importar ZIP
+            </DropdownMenuItem>
+            
+            <DropdownMenuSeparator />
+            
             <DropdownMenuItem onClick={onToggleDarkMode} className="cursor-pointer">
               {darkMode ? (
                 <>
