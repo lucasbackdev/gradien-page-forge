@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, ResponsiveSize, ResponsiveFontSize, ResponsiveAlign } from '@/types/sections';
+import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, ResponsiveSize, ResponsiveFontSize, ResponsiveAlign, LayoutDirection } from '@/types/sections';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -27,7 +27,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronDown, Bold, Link } from 'lucide-react';
+import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronDown, Bold, Link, Columns, ArrowLeftRight } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ResponsiveMediaSizeEditor, ResponsiveFontSizeEditor } from '@/components/ResponsiveSizeEditor';
 import { ResponsiveAlignEditor } from '@/components/ResponsiveAlignEditor';
@@ -181,23 +181,42 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      updateSection(section.id, { 
-                        layout: section.layout === 'vertical' ? 'horizontal' : 'vertical' 
-                      });
-                    }}
-                    title={section.layout === 'vertical' ? 'Mudar para Horizontal' : 'Mudar para Vertical'}
+                  <Select
+                    value={section.layout}
+                    onValueChange={(value: LayoutDirection) => updateSection(section.id, { layout: value })}
                   >
-                    {section.layout === 'vertical' ? (
-                      <AlignVerticalJustifyCenter className="w-4 h-4" />
-                    ) : (
-                      <AlignHorizontalJustifyCenter className="w-4 h-4" />
-                    )}
-                  </Button>
+                    <SelectTrigger className="w-10 h-8 p-0 justify-center" title="Layout da seção">
+                      {section.layout === 'vertical' && <AlignVerticalJustifyCenter className="w-4 h-4" />}
+                      {section.layout === 'horizontal' && <AlignHorizontalJustifyCenter className="w-4 h-4" />}
+                      {(section.layout === 'two-columns' || section.layout === 'two-columns-reverse') && <Columns className="w-4 h-4" />}
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="vertical">
+                        <div className="flex items-center gap-2">
+                          <AlignVerticalJustifyCenter className="w-4 h-4" />
+                          <span>Vertical</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="horizontal">
+                        <div className="flex items-center gap-2">
+                          <AlignHorizontalJustifyCenter className="w-4 h-4" />
+                          <span>Horizontal</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="two-columns">
+                        <div className="flex items-center gap-2">
+                          <Columns className="w-4 h-4" />
+                          <span>Duas Colunas</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="two-columns-reverse">
+                        <div className="flex items-center gap-2">
+                          <ArrowLeftRight className="w-4 h-4" />
+                          <span>Duas Colunas (invertido)</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                   <CollapsibleTrigger asChild>
                     <Button variant="ghost" size="sm">
                       <ChevronDown className={`w-4 h-4 transition-transform ${expandedSection === section.id ? 'rotate-180' : ''}`} />
@@ -219,6 +238,126 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
 
               <CollapsibleContent className="animate-accordion-down">
                 <div className="space-y-4 pt-4 border-t mt-3">
+                  
+                  {/* Two columns settings */}
+                  {(section.layout === 'two-columns' || section.layout === 'two-columns-reverse') && (
+                    <div className="space-y-3 p-3 bg-muted/50 rounded-lg">
+                      <Label className="font-semibold flex items-center gap-2">
+                        <Columns className="w-4 h-4" />
+                        Configurações de Colunas
+                      </Label>
+                      
+                      <div>
+                        <Label className="text-xs">Proporção das Colunas</Label>
+                        <Select
+                          value={section.columnWidthRatio || '50-50'}
+                          onValueChange={(value) => updateSection(section.id, { columnWidthRatio: value })}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="50-50">50% / 50%</SelectItem>
+                            <SelectItem value="40-60">40% / 60%</SelectItem>
+                            <SelectItem value="60-40">60% / 40%</SelectItem>
+                            <SelectItem value="30-70">30% / 70%</SelectItem>
+                            <SelectItem value="70-30">70% / 30%</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <Label className="text-xs">Espaçamento entre colunas</Label>
+                        <Select
+                          value={section.columnGap || '2rem'}
+                          onValueChange={(value) => updateSection(section.id, { columnGap: value })}
+                        >
+                          <SelectTrigger className="mt-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1rem">Pequeno</SelectItem>
+                            <SelectItem value="2rem">Médio</SelectItem>
+                            <SelectItem value="3rem">Grande</SelectItem>
+                            <SelectItem value="4rem">Extra Grande</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs">Coluna Esquerda</Label>
+                        <div className="flex flex-wrap gap-1">
+                          {section.elements.map((el) => (
+                            <Button
+                              key={el.id}
+                              variant={section.leftColumnElements?.includes(el.id) ? 'default' : 'outline'}
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => {
+                                const currentLeft = section.leftColumnElements || [];
+                                const currentRight = section.rightColumnElements || [];
+                                
+                                if (currentLeft.includes(el.id)) {
+                                  // Remove from left
+                                  updateSection(section.id, {
+                                    leftColumnElements: currentLeft.filter(id => id !== el.id)
+                                  });
+                                } else {
+                                  // Add to left, remove from right
+                                  updateSection(section.id, {
+                                    leftColumnElements: [...currentLeft, el.id],
+                                    rightColumnElements: currentRight.filter(id => id !== el.id)
+                                  });
+                                }
+                              }}
+                            >
+                              {el.type === 'text' ? '📝' : el.type === 'image' ? '🖼️' : el.type === 'video' ? '🎬' : '🔘'}
+                              {el.content?.slice(0, 10) || el.type}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-xs">Coluna Direita</Label>
+                        <div className="flex flex-wrap gap-1">
+                          {section.elements.map((el) => (
+                            <Button
+                              key={el.id}
+                              variant={section.rightColumnElements?.includes(el.id) ? 'default' : 'outline'}
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => {
+                                const currentLeft = section.leftColumnElements || [];
+                                const currentRight = section.rightColumnElements || [];
+                                
+                                if (currentRight.includes(el.id)) {
+                                  // Remove from right
+                                  updateSection(section.id, {
+                                    rightColumnElements: currentRight.filter(id => id !== el.id)
+                                  });
+                                } else {
+                                  // Add to right, remove from left
+                                  updateSection(section.id, {
+                                    rightColumnElements: [...currentRight, el.id],
+                                    leftColumnElements: currentLeft.filter(id => id !== el.id)
+                                  });
+                                }
+                              }}
+                            >
+                              {el.type === 'text' ? '📝' : el.type === 'image' ? '🖼️' : el.type === 'video' ? '🎬' : '🔘'}
+                              {el.content?.slice(0, 10) || el.type}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <p className="text-xs text-muted-foreground">
+                        Clique nos elementos para movê-los entre colunas. Elementos não selecionados serão divididos automaticamente.
+                      </p>
+                    </div>
+                  )}
+
                   {/* Background settings */}
                   <div className="space-y-3">
                     <Label className="font-semibold">Fundo da Seção</Label>

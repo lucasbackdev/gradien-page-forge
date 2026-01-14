@@ -17,7 +17,7 @@ export type SectionType =
   | 'map'
   | 'footer';
 
-export type LayoutDirection = 'vertical' | 'horizontal';
+export type LayoutDirection = 'vertical' | 'horizontal' | 'two-columns' | 'two-columns-reverse';
 export type GradientDirection = 'diagonal' | 'horizontal' | 'vertical' | 'radial';
 
 export type TextType = 'title' | 'subtitle' | 'description';
@@ -109,6 +109,11 @@ export interface PresellSection {
   elements: SectionElement[];
   padding?: string;
   minHeight?: string; // 'auto' | '100vh' | custom value like '500px'
+  // Two columns settings
+  leftColumnElements?: string[]; // IDs of elements in left column
+  rightColumnElements?: string[]; // IDs of elements in right column
+  columnGap?: string;
+  columnWidthRatio?: string; // e.g., '50-50', '40-60', '60-40', '30-70', '70-30'
 }
 
 export type HeaderPosition = 'left' | 'center' | 'right';
