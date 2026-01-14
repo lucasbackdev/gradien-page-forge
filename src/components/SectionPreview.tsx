@@ -436,15 +436,48 @@ export const SectionPreview = ({
 
   const t = translations[presellData.language || 'pt'];
 
-  // Use first section background for everything above footer
-  const firstSectionBg = sections.length > 0 
-    ? (sections[0].backgroundColor || '#1a1a2e')
-    : (presellData.footerStyle?.backgroundColor || '#0a0a0a');
   const footerBgColor = presellData.footerStyle?.backgroundColor || '#0a0a0a';
 
+  // Make the "page chrome" (space above the first section) match the first section background
+  const firstSectionBackgroundStyle: React.CSSProperties = (() => {
+    const first = sections[0];
+
+    // If there is no section yet, fall back to the page background settings (not the footer)
+    if (!first) {
+      const g4 = presellData.colors.backgroundGradient4;
+      const g3 = presellData.colors.backgroundGradient3;
+      const g2 = presellData.colors.backgroundGradient;
+
+      if (g4?.enabled) {
+        return { background: `linear-gradient(135deg, ${g4.color1}, ${g4.color2}, ${g4.color3}, ${g4.color4})` };
+      }
+      if (g3?.enabled) {
+        return { background: `linear-gradient(135deg, ${g3.color1}, ${g3.color2}, ${g3.color3})` };
+      }
+      if (g2?.enabled) {
+        return { background: `linear-gradient(135deg, ${g2.color1}, ${g2.color2})` };
+      }
+
+      return { backgroundColor: presellData.colors.background || footerBgColor };
+    }
+
+    if (first.backgroundImage) {
+      return {
+        backgroundImage: `url(${first.backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      };
+    }
+
+    if (first.backgroundGradient?.enabled) {
+      return { background: getGradientStyle(first.backgroundGradient) };
+    }
+
+    return { backgroundColor: first.backgroundColor || '#1a1a2e' };
+  })();
+
   return (
-    <div className="relative min-h-screen flex flex-col" style={{ backgroundColor: firstSectionBg }}>
-      {/* Main content area - inherits first section background */}
+    <div className="relative min-h-screen flex flex-col" style={firstSectionBackgroundStyle}>
       <div className="flex-1 flex flex-col">
       <style>
         {`
