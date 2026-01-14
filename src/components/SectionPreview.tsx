@@ -4,6 +4,7 @@ import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X, GripHorizontal } from 'lucide-react';
 import { ViewportSize } from '@/components/ResponsivePreview';
+import { LeadPopup } from '@/components/LeadPopup';
 
 interface SectionPreviewProps {
   sections: PresellSection[];
@@ -32,6 +33,7 @@ export const SectionPreview = ({
   const [resizeStartY, setResizeStartY] = useState(0);
   const [resizeStartHeight, setResizeStartHeight] = useState(0);
   const trashRef = useRef<HTMLDivElement>(null);
+  const [showLeadPopup, setShowLeadPopup] = useState(false);
 
   // No longer need the manual script loading - using unicornstudio-react package
 
@@ -397,15 +399,21 @@ export const SectionPreview = ({
       case 'button':
         const buttonClass = getButtonClass();
         const isShinyButton = presellData.buttonStyle.template === 'shiny-green';
+        const shouldOpenPopup = element.opensPopup && presellData.popupConfig?.enabled;
         return (
           <div key={element.id} className={`${widthClass} ${isInGroup ? '' : 'mb-4'} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
             <a
               {...dragProps}
-              href={presellData.affiliateLink || element.link || '#'}
+              href={shouldOpenPopup ? '#' : (presellData.affiliateLink || element.link || '#')}
               className={`${baseClass} ${animationClass} ${buttonClass} ${!isShinyButton && presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
               style={getButtonStyle()}
               onClick={(e) => {
-                if (!presellData.affiliateLink && !element.link) e.preventDefault();
+                if (shouldOpenPopup) {
+                  e.preventDefault();
+                  setShowLeadPopup(true);
+                } else if (!presellData.affiliateLink && !element.link) {
+                  e.preventDefault();
+                }
               }}
             >
               {isShinyButton ? <span>{element.content}</span> : element.content}
@@ -1032,6 +1040,17 @@ export const SectionPreview = ({
         >
           <Trash2 className="w-8 h-8 text-white" />
         </div>
+      )}
+
+      {/* Lead Capture Popup */}
+      {presellData.popupConfig?.enabled && (
+        <LeadPopup
+          isOpen={showLeadPopup}
+          onClose={() => setShowLeadPopup(false)}
+          config={presellData.popupConfig}
+          userId="preview"
+          sourcePage="preview"
+        />
       )}
     </div>
   );
