@@ -920,6 +920,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
                   onReorderSections={(sections) => setPresellData(prev => ({ ...prev, sections }))}
                   onUpdateSectionElements={handleUpdateSectionElements}
                   onUpdateSectionHeight={handleUpdateSectionHeight}
+                  viewportSize={viewportSize}
                 />
               ) : (
                 <PreviewPanel 

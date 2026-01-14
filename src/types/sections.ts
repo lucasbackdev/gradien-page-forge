@@ -42,6 +42,18 @@ export interface BackgroundOverlay {
   opacity2: number;
 }
 
+export interface ResponsiveSize {
+  desktop: number;
+  tablet: number;
+  mobile: number;
+}
+
+export interface ResponsiveFontSize {
+  desktop: string;
+  tablet: string;
+  mobile: string;
+}
+
 export interface SectionElement {
   id: string;
   type: 'text' | 'image' | 'button' | 'video';
@@ -60,6 +72,9 @@ export interface SectionElement {
   glowingBorder?: boolean;
   glowBorderColors?: string[];
   mediaWidth?: number;
+  // Responsive sizes
+  responsiveMediaWidth?: ResponsiveSize;
+  responsiveFontSize?: ResponsiveFontSize;
 }
 
 export interface PresellSection {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType } from '@/types/sections';
+import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, ResponsiveSize, ResponsiveFontSize } from '@/types/sections';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/collapsible';
 import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronDown, Bold } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ResponsiveMediaSizeEditor, ResponsiveFontSizeEditor } from '@/components/ResponsiveSizeEditor';
 
 interface SectionEditorProps {
   sections: PresellSection[];
@@ -525,11 +526,17 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                 <div className="flex gap-2 items-center">
                                   <Select
                                     value={element.textType || 'description'}
-                                    onValueChange={(value: TextType) => updateSectionElement(section.id, element.id, { 
-                                      textType: value,
-                                      fontSize: value === 'title' ? '36px' : value === 'subtitle' ? '24px' : '18px',
-                                      fontWeight: value === 'title' ? 'bold' : value === 'subtitle' ? '600' : 'normal',
-                                    })}
+                                    onValueChange={(value: TextType) => {
+                                      const newFontSize = value === 'title' ? '36px' : value === 'subtitle' ? '24px' : '18px';
+                                      const tabletSize = value === 'title' ? '28px' : value === 'subtitle' ? '20px' : '16px';
+                                      const mobileSize = value === 'title' ? '24px' : value === 'subtitle' ? '18px' : '14px';
+                                      updateSectionElement(section.id, element.id, { 
+                                        textType: value,
+                                        fontSize: newFontSize,
+                                        fontWeight: value === 'title' ? 'bold' : value === 'subtitle' ? '600' : 'normal',
+                                        responsiveFontSize: { desktop: newFontSize, tablet: tabletSize, mobile: mobileSize },
+                                      });
+                                    }}
                                   >
                                     <SelectTrigger className="w-32 h-8">
                                       <SelectValue />
@@ -554,6 +561,17 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                   onChange={(e) => updateSectionElement(section.id, element.id, { content: e.target.value })}
                                   rows={2}
                                   className="text-sm"
+                                />
+                                <ResponsiveFontSizeEditor
+                                  value={element.responsiveFontSize || { 
+                                    desktop: element.fontSize || '18px', 
+                                    tablet: element.fontSize || '16px', 
+                                    mobile: element.fontSize || '14px' 
+                                  }}
+                                  onChange={(value) => updateSectionElement(section.id, element.id, { 
+                                    responsiveFontSize: value,
+                                    fontSize: value.desktop 
+                                  })}
                                 />
                               </>
                             )}
@@ -598,17 +616,14 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                   <img src={element.imageUrl} className="mt-2 h-16 object-cover rounded" alt="" />
                                 )}
                                 
-                                <div>
-                                  <Label className="text-xs">Tamanho: {element.mediaWidth || 100}%</Label>
-                                  <Slider
-                                    value={[element.mediaWidth || 100]}
-                                    onValueChange={(value) => updateSectionElement(section.id, element.id, { mediaWidth: value[0] })}
-                                    min={20}
-                                    max={100}
-                                    step={5}
-                                    className="mt-1"
-                                  />
-                                </div>
+                                <ResponsiveMediaSizeEditor
+                                  value={element.responsiveMediaWidth || { desktop: element.mediaWidth || 100, tablet: element.mediaWidth || 100, mobile: element.mediaWidth || 100 }}
+                                  onChange={(value) => updateSectionElement(section.id, element.id, { 
+                                    responsiveMediaWidth: value,
+                                    mediaWidth: value.desktop 
+                                  })}
+                                  label="Tamanho da Imagem"
+                                />
                                 
                                 <div className="flex items-center gap-2">
                                   <Switch
@@ -692,17 +707,15 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                                   <video src={element.videoUrl} className="mt-2 h-16 rounded" controls={false} muted />
                                 )}
                                 
-                                <div>
-                                  <Label className="text-xs">Tamanho: {element.mediaWidth || 100}%</Label>
-                                  <Slider
-                                    value={[element.mediaWidth || 100]}
-                                    onValueChange={(value) => updateSectionElement(section.id, element.id, { mediaWidth: value[0] })}
-                                    min={20}
-                                    max={150}
-                                    step={5}
-                                    className="mt-1"
-                                  />
-                                </div>
+                                <ResponsiveMediaSizeEditor
+                                  value={element.responsiveMediaWidth || { desktop: element.mediaWidth || 100, tablet: element.mediaWidth || 100, mobile: element.mediaWidth || 100 }}
+                                  onChange={(value) => updateSectionElement(section.id, element.id, { 
+                                    responsiveMediaWidth: value,
+                                    mediaWidth: value.desktop 
+                                  })}
+                                  max={150}
+                                  label="Tamanho do Vídeo"
+                                />
                                 
                                 <div className="flex items-center gap-2">
                                   <Switch

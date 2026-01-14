@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react';
-import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay } from '@/types/sections';
+import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, ResponsiveSize, ResponsiveFontSize } from '@/types/sections';
 import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X, GripHorizontal } from 'lucide-react';
+import { ViewportSize } from '@/components/ResponsivePreview';
 
 interface SectionPreviewProps {
   sections: PresellSection[];
@@ -11,6 +12,7 @@ interface SectionPreviewProps {
   onReorderSections: (sections: PresellSection[]) => void;
   onUpdateSectionElements: (sectionId: string, elements: SectionElement[]) => void;
   onUpdateSectionHeight?: (sectionId: string, minHeight: string) => void;
+  viewportSize?: ViewportSize;
 }
 
 export const SectionPreview = ({ 
@@ -19,7 +21,8 @@ export const SectionPreview = ({
   floatingHeader, 
   onReorderSections,
   onUpdateSectionElements,
-  onUpdateSectionHeight
+  onUpdateSectionHeight,
+  viewportSize = 'desktop'
 }: SectionPreviewProps) => {
   const [draggedSectionIndex, setDraggedSectionIndex] = useState<number | null>(null);
   const [draggedElementInfo, setDraggedElementInfo] = useState<{ sectionId: string; elementIndex: number } | null>(null);
@@ -171,9 +174,26 @@ export const SectionPreview = ({
     return <span dangerouslySetInnerHTML={{ __html: result }} />;
   };
 
+  // Helper to get responsive media width
+  const getResponsiveMediaWidth = (element: SectionElement): number => {
+    if (element.responsiveMediaWidth) {
+      return element.responsiveMediaWidth[viewportSize];
+    }
+    return element.mediaWidth || 100;
+  };
+
+  // Helper to get responsive font size
+  const getResponsiveFontSize = (element: SectionElement): string => {
+    if (element.responsiveFontSize) {
+      return element.responsiveFontSize[viewportSize] || element.fontSize || '18px';
+    }
+    return element.fontSize || '18px';
+  };
+
   const getTextStyle = (element: SectionElement): React.CSSProperties => {
+    const fontSize = getResponsiveFontSize(element);
     const baseStyle: React.CSSProperties = {
-      fontSize: element.fontSize,
+      fontSize,
       fontWeight: element.bold ? 'bold' : element.fontWeight,
     };
 
@@ -383,6 +403,7 @@ export const SectionPreview = ({
           backgroundOrigin: 'border-box',
           backgroundClip: 'padding-box, border-box',
         } : {};
+        const imageMediaWidth = getResponsiveMediaWidth(element);
         return element.imageUrl ? (
           <a
             key={element.id}
@@ -398,7 +419,7 @@ export const SectionPreview = ({
               style={{ 
                 maxHeight: '500px', 
                 objectFit: 'cover',
-                width: `${element.mediaWidth || 100}%`,
+                width: `${imageMediaWidth}%`,
                 maxWidth: '100%',
                 ...imageGlowStyle,
               }}
@@ -417,6 +438,7 @@ export const SectionPreview = ({
           backgroundOrigin: 'border-box',
           backgroundClip: 'padding-box, border-box',
         } : {};
+        const videoMediaWidth = getResponsiveMediaWidth(element);
         return element.videoUrl ? (
           <video
             key={element.id}
@@ -425,7 +447,7 @@ export const SectionPreview = ({
             controls
             className={`rounded-lg shadow-lg mb-4 ${baseClass} ${animationClass}`}
             style={{ 
-              width: `${element.mediaWidth || 100}%`,
+              width: `${videoMediaWidth}%`,
               maxWidth: '150%',
               ...videoGlowStyle,
             }}
