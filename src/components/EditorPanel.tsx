@@ -268,11 +268,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
               <div className="grid grid-cols-1 gap-3">
                 {/* Aurora Waves Background */}
                 <div 
-                  className="p-3 rounded-lg cursor-pointer transition-all border-2 border-border bg-muted hover:border-primary/50"
-                  onClick={() => {
-                    navigator.clipboard.writeText('d1f8eec5-b6cb-428e-b3e0-6f568dd0e853');
-                    // Show toast notification
-                  }}
+                  className="p-3 rounded-lg transition-all border-2 border-border bg-muted"
                 >
                   <div className="text-[10px] text-muted-foreground uppercase tracking-wide mb-2">Aurora Waves</div>
                   <div className="relative h-24 rounded-lg overflow-hidden">

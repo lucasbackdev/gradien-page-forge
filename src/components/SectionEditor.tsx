@@ -441,12 +441,14 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                         <Switch
                           checked={section.unicornBackground?.enabled || false}
                           onCheckedChange={(checked) => updateSection(section.id, {
-                            unicornBackground: { 
-                              enabled: checked,
-                              projectId: section.unicornBackground?.projectId || 'd1f8eec5-b6cb-428e-b3e0-6f568dd0e853',
-                              scale: section.unicornBackground?.scale || 1,
-                              dpi: section.unicornBackground?.dpi || 1,
-                            }
+                            unicornBackground: checked
+                              ? {
+                                  enabled: true,
+                                  projectId: section.unicornBackground?.projectId || '',
+                                  scale: section.unicornBackground?.scale || 1,
+                                  dpi: section.unicornBackground?.dpi || 1.5,
+                                }
+                              : undefined,
                           })}
                         />
                         <Label className="text-sm flex items-center gap-1">
@@ -458,8 +460,24 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                       {section.unicornBackground?.enabled && (
                         <div className="space-y-2 pl-4">
                           <p className="text-xs text-muted-foreground">
-                            Aurora Waves - Background 3D animado
+                            Cole aqui o <strong>Project ID</strong> do Embed do Unicorn Studio.
                           </p>
+
+                          <div className="space-y-1">
+                            <Label className="text-xs">Project ID</Label>
+                            <Input
+                              value={section.unicornBackground.projectId}
+                              onChange={(e) => updateSection(section.id, {
+                                unicornBackground: { ...section.unicornBackground!, projectId: e.target.value.trim() }
+                              })}
+                              placeholder="Ex: JoBbhn1dDuRwdTcqZFPc"
+                              className="h-8 text-xs"
+                            />
+                            <p className="text-[11px] text-muted-foreground">
+                              Se aparecer “NoSuchKey / 404”, o ID está errado ou o projeto não foi publicado.
+                            </p>
+                          </div>
+
                           <div className="flex items-center gap-2">
                             <Label className="text-xs">Escala:</Label>
                             <Slider
@@ -467,13 +485,30 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                               onValueChange={(value) => updateSection(section.id, {
                                 unicornBackground: { ...section.unicornBackground!, scale: value[0] }
                               })}
-                              min={0.5}
+                              min={0.25}
+                              max={1}
+                              step={0.05}
+                              className="flex-1"
+                            />
+                            <span className="text-xs text-muted-foreground w-10">
+                              {(section.unicornBackground.scale || 1).toFixed(2)}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs">DPI:</Label>
+                            <Slider
+                              value={[section.unicornBackground.dpi || 1.5]}
+                              onValueChange={(value) => updateSection(section.id, {
+                                unicornBackground: { ...section.unicornBackground!, dpi: value[0] }
+                              })}
+                              min={1}
                               max={2}
                               step={0.1}
                               className="flex-1"
                             />
-                            <span className="text-xs text-muted-foreground w-8">
-                              {section.unicornBackground.scale || 1}x
+                            <span className="text-xs text-muted-foreground w-10">
+                              {(section.unicornBackground.dpi || 1.5).toFixed(1)}
                             </span>
                           </div>
                         </div>
