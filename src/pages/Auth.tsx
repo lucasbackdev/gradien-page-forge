@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Mail, Lock, User } from "lucide-react";
+import { LogoBrand } from "@/components/LogoBrand";
 
 declare global {
   interface Window {
@@ -166,9 +167,9 @@ const Auth = () => {
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-purple-900/20 via-black to-blue-900/20" />
       
       <Card className="w-full max-w-md relative z-10 bg-card/90 backdrop-blur-xl border-border/50 shadow-2xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gradient">Gradien Page Forge</CardTitle>
-          <CardDescription>Acesse sua conta ou crie uma nova</CardDescription>
+        <CardHeader className="text-center flex flex-col items-center">
+          <LogoBrand size="lg" />
+          <CardDescription className="mt-2">Acesse sua conta ou crie uma nova</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">

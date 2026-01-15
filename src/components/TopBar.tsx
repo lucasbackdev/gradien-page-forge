@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShinyDownloadButton } from './ShinyDownloadButton';
+import { LogoBrand } from './LogoBrand';
 import { useAuth } from '@/hooks/useAuth';
 import { PresellData, defaultPresellData } from '@/types/presell';
 import { useToast } from '@/hooks/use-toast';
@@ -155,7 +156,7 @@ export const TopBar = ({
   return (
     <header className="h-16 bg-background border-b border-border shadow-sm flex items-center justify-between px-6">
       <div className="flex items-center gap-3">
-        <img src="/logo.png" alt="Presell Gads" className="h-10 object-contain" />
+        <LogoBrand size="md" />
       </div>
       
       <div className="flex items-center gap-3">
