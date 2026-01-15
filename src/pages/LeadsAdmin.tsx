@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { AuraButton } from "@/components/ui/aura-button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Search, Trash2, Download, Users, Mail, Phone, RefreshCw } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { LogoBrand } from "@/components/LogoBrand";
 
 interface Lead {
   id: string;
@@ -122,21 +124,22 @@ export default function LeadsAdmin() {
             <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <div>
-              <h1 className="text-2xl font-bold">Gerenciador de Leads</h1>
-              <p className="text-muted-foreground">Gerencie os cadastros capturados nas suas páginas</p>
-            </div>
+            <LogoBrand size="md" />
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={loadLeads}>
-              <RefreshCw className="h-4 w-4 mr-2" />
+            <AuraButton onClick={loadLeads}>
               Atualizar
-            </Button>
-            <Button onClick={exportToCSV} disabled={leads.length === 0}>
-              <Download className="h-4 w-4 mr-2" />
+            </AuraButton>
+            <AuraButton onClick={exportToCSV} disabled={leads.length === 0}>
               Exportar CSV
-            </Button>
+            </AuraButton>
           </div>
+        </div>
+        
+        {/* Title */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">Gerenciador de Leads</h1>
+          <p className="text-muted-foreground">Gerencie os cadastros capturados nas suas páginas</p>
         </div>
 
         {/* Stats Cards */}
