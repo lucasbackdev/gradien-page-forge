@@ -122,6 +122,12 @@ All colors MUST be HSL.
   51% { opacity: 0; }
 }
 
+/* Aura Button border rotation */
+@keyframes borderRotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @keyframes implodeAnim {
   0% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
   15% { opacity: 1; }
