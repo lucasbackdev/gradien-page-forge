@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
+import { AuraButton } from "@/components/ui/aura-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -214,9 +214,9 @@ const Auth = () => {
                   {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                 </div>
                 
-                <Button type="submit" className="w-full gradient-vibrant" disabled={loading}>
+                <AuraButton type="submit" className="w-full" disabled={loading}>
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
-                </Button>
+                </AuraButton>
               </form>
             </TabsContent>
             
@@ -271,9 +271,9 @@ const Auth = () => {
                   {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                 </div>
                 
-                <Button type="submit" className="w-full gradient-vibrant" disabled={loading}>
+                <AuraButton type="submit" className="w-full" disabled={loading}>
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Criar Conta"}
-                </Button>
+                </AuraButton>
               </form>
             </TabsContent>
           </Tabs>
