@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { ShinyButton } from '@/components/ui/shiny-button';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -148,9 +149,11 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
     <div className="space-y-3">
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
-          <Button className="w-full gradient-vibrant text-white">
-            <Plus className="w-4 h-4 mr-2" /> Adicionar Seção
-          </Button>
+          <div>
+            <ShinyButton onClick={() => setDialogOpen(true)} icon={<Plus className="w-4 h-4" />}>
+              Adicionar Seção
+            </ShinyButton>
+          </div>
         </DialogTrigger>
         <DialogContent className="max-w-2xl max-h-[80vh]">
           <DialogHeader>

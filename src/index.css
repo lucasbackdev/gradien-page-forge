@@ -314,3 +314,156 @@ All colors MUST be HSL.
   box-shadow: 0 0 10px rgba(255, 255, 255, 1);
   animation: floatOutAnim var(--life, 1.5s) ease-out forwards;
 }
+
+/* Shiny Button Styles (off-white to black) */
+.shiny-ink-button {
+  --speed: 4s;
+  --off-white: #F5F5F0;
+  min-width: 180px;
+  height: 44px;
+  background-color: var(--off-white);
+  border-radius: 9999px;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  border: none;
+  outline: none;
+  transition: transform 0.3s ease;
+}
+
+.shiny-ink-button:hover {
+  --speed: 2s;
+  transform: scale(1.03) translateZ(0);
+}
+
+.shiny-ink-button:active {
+  transform: scale(0.96) translateZ(0);
+}
+
+.shimmer-container-shiny {
+  position: absolute;
+  inset: -200%;
+  width: 400%;
+  height: 400%;
+  animation: rotate-gradient var(--speed) linear infinite;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.2;
+  transition: opacity 0.5s ease;
+}
+
+.shiny-ink-button:hover .shimmer-container-shiny {
+  opacity: 0.5;
+}
+
+.shimmer-gradient-shiny {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    from 225deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.3) 10%,
+    transparent 20%
+  );
+}
+
+.ink-splash-shiny {
+  position: absolute;
+  top: var(--y, 50%);
+  left: var(--x, 50%);
+  width: 0;
+  height: 0;
+  background: #1a1a1a;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  filter: url(#ink-filter-shiny);
+  transition: width 0.5s ease, height 0.5s ease;
+  pointer-events: none;
+  will-change: width, height;
+}
+
+.shiny-ink-button:hover .ink-splash-shiny {
+  width: 550%;
+  height: 550%;
+}
+
+.wrapper-icones-shiny {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  margin-top: -16px;
+  width: 32px;
+  height: 32px;
+  background: #1a1a1a;
+  border-radius: 50%;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 1.2s cubic-bezier(0.23, 1, 0.32, 1), background-color 0.4s ease;
+  will-change: transform;
+  color: var(--off-white);
+}
+
+.shiny-ink-button:hover .wrapper-icones-shiny {
+  transform: translateX(calc(100% + 100px));
+  background: var(--off-white);
+  color: #1a1a1a;
+}
+
+.texto-principal-shiny {
+  transition: all 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+  opacity: 1;
+  transform: translateX(14px);
+  z-index: 10;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  font-family: 'Sora', sans-serif;
+}
+
+.texto-hover-shiny {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) translateX(20px);
+  opacity: 0;
+  transition: all 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+  color: var(--off-white);
+  font-weight: 700;
+  font-size: 13px;
+  z-index: 10;
+  letter-spacing: 0.3px;
+  font-family: 'Sora', sans-serif;
+}
+
+.shiny-ink-button:hover .texto-principal-shiny {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+
+.shiny-ink-button:hover .texto-hover-shiny {
+  opacity: 1;
+  transform: translate(-50%, -50%) translateX(-10px);
+}
+
+/* Particles for shiny button */
+.p-dark {
+  background: #1a1a1a;
+  box-shadow: 0 0 12px rgba(26, 26, 26, 0.8), 0 0 20px rgba(26, 26, 26, 0.5);
+  animation: implodeAnim var(--life, 0.6s) ease-in forwards;
+}
+
+.p-offwhite {
+  background: #F5F5F0;
+  box-shadow: 0 0 10px rgba(245, 245, 240, 1);
+  animation: floatOutAnim var(--life, 1.5s) ease-out forwards;
+}
