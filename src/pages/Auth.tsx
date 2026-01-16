@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { AuraButton } from "@/components/ui/aura-button";
+import { ShinyButton } from "@/components/ui/shiny-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -214,9 +214,9 @@ const Auth = () => {
                   {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                 </div>
                 
-                <AuraButton type="submit" className="w-full" disabled={loading}>
+                <ShinyButton type="submit" className="w-full" disabled={loading}>
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
-                </AuraButton>
+                </ShinyButton>
               </form>
             </TabsContent>
             
@@ -271,9 +271,9 @@ const Auth = () => {
                   {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
                 </div>
                 
-                <AuraButton type="submit" className="w-full" disabled={loading}>
+                <ShinyButton type="submit" className="w-full" disabled={loading}>
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Criar Conta"}
-                </AuraButton>
+                </ShinyButton>
               </form>
             </TabsContent>
           </Tabs>

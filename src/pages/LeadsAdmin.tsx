@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { AuraButton } from "@/components/ui/aura-button";
+import { ShinyButton } from "@/components/ui/shiny-button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -127,12 +127,12 @@ export default function LeadsAdmin() {
             <LogoBrand size="md" />
           </div>
           <div className="flex gap-2">
-            <AuraButton onClick={loadLeads}>
+            <ShinyButton onClick={loadLeads} icon={<RefreshCw className="w-4 h-4" />}>
               Atualizar
-            </AuraButton>
-            <AuraButton onClick={exportToCSV} disabled={leads.length === 0}>
+            </ShinyButton>
+            <ShinyButton onClick={exportToCSV} disabled={leads.length === 0} icon={<Download className="w-4 h-4" />}>
               Exportar CSV
-            </AuraButton>
+            </ShinyButton>
           </div>
         </div>
         
