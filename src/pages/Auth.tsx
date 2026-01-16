@@ -154,131 +154,159 @@ const Auth = () => {
     setLoading(false);
   };
 
-  return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Unicorn Studio Background */}
-      <div 
-        data-us-project="wLUFdNmXvNcG2dFwwTnN" 
-        className="absolute inset-0 z-0 pointer-events-none"
-        style={{ width: '100%', height: '100%' }}
-      />
-      
-      {/* Fallback gradient background */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-purple-900/20 via-black to-blue-900/20" />
-      
-      <Card className="w-full max-w-md relative z-10 bg-card/90 backdrop-blur-xl border-border/50 shadow-2xl">
-        <CardHeader className="text-center flex flex-col items-center">
-          <LogoBrand size="lg" />
-          <CardDescription className="mt-2">Acesse sua conta ou crie uma nova</CardDescription>
-        </CardHeader>
-        <CardContent>
+return (
+    <div className="min-h-screen bg-black flex flex-col relative overflow-hidden">
+      {/* Black Top Bar with Logo */}
+      <header className="h-14 bg-black border-b border-white/10 flex items-center px-6 relative z-20">
+        <LogoBrand size="md" />
+      </header>
+
+      {/* Main content area */}
+      <div className="flex-1 flex items-center justify-center p-4 relative">
+        {/* Animated blurred background blobs */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-pink-500/40 rounded-full blur-[120px] animate-pulse" 
+               style={{ animation: 'float1 8s ease-in-out infinite' }} />
+          <div className="absolute top-1/2 right-1/4 w-80 h-80 bg-purple-600/40 rounded-full blur-[100px]" 
+               style={{ animation: 'float2 10s ease-in-out infinite' }} />
+          <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-blue-500/40 rounded-full blur-[90px]" 
+               style={{ animation: 'float3 12s ease-in-out infinite' }} />
+          <div className="absolute top-1/3 right-1/3 w-64 h-64 bg-pink-400/30 rounded-full blur-[80px]" 
+               style={{ animation: 'float4 9s ease-in-out infinite' }} />
+        </div>
+        
+        {/* Card with animated border */}
+        <div className="relative z-10 w-full max-w-sm">
+          {/* Animated border container */}
+          <div className="absolute inset-[-2px] rounded-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500" />
+            <div className="absolute inset-0 animate-spin-slow"
+                 style={{ 
+                   background: 'conic-gradient(from 0deg, transparent, rgba(255,255,255,0.4), transparent, transparent)',
+                   animation: 'spin 4s linear infinite'
+                 }} />
+          </div>
+          
+          {/* Card content */}
+          <Card className="relative bg-black/90 backdrop-blur-xl border-0 shadow-2xl rounded-2xl">
+            <CardHeader className="text-center flex flex-col items-center pt-6 pb-4">
+              <CardTitle className="text-xl font-bold text-white">Bem-vindo</CardTitle>
+              <CardDescription className="mt-1 text-gray-400 text-sm">Acesse sua conta ou crie uma nova</CardDescription>
+            </CardHeader>
+        <CardContent className="px-5 pb-6">
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Entrar</TabsTrigger>
-              <TabsTrigger value="signup">Criar Conta</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-white/5 mb-4">
+              <TabsTrigger value="login" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-500 data-[state=active]:text-white text-gray-400">Entrar</TabsTrigger>
+              <TabsTrigger value="signup" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-blue-500 data-[state=active]:text-white text-gray-400">Criar Conta</TabsTrigger>
             </TabsList>
             
             <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
+              <form onSubmit={handleLogin} className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="login-email" className="text-gray-300 text-xs">Email</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                     <Input
                       id="login-email"
                       type="email"
                       placeholder="seu@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 h-10"
                       required
                     />
                   </div>
-                  {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+                  {errors.email && <p className="text-sm text-red-400">{errors.email}</p>}
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="login-password">Senha</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="login-password" className="text-gray-300 text-xs">Senha</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                     <Input
                       id="login-password"
                       type="password"
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 h-10"
                       required
                     />
                   </div>
-                  {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+                  {errors.password && <p className="text-sm text-red-400">{errors.password}</p>}
                 </div>
                 
-                <ShinyButton type="submit" className="w-full" disabled={loading}>
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
-                </ShinyButton>
+                <div className="flex justify-center pt-2">
+                  <ShinyButton type="submit" className="w-full" disabled={loading}>
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
+                  </ShinyButton>
+                </div>
               </form>
             </TabsContent>
             
             <TabsContent value="signup">
-              <form onSubmit={handleSignup} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-name">Nome Completo</Label>
+              <form onSubmit={handleSignup} className="space-y-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="signup-name" className="text-gray-300 text-xs">Nome Completo</Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                     <Input
                       id="signup-name"
                       type="text"
                       placeholder="Seu nome"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 h-10"
                     />
                   </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="signup-email" className="text-gray-300 text-xs">Email</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                     <Input
                       id="signup-email"
                       type="email"
                       placeholder="seu@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 h-10"
                       required
                     />
                   </div>
-                  {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+                  {errors.email && <p className="text-sm text-red-400">{errors.email}</p>}
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Senha</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="signup-password" className="text-gray-300 text-xs">Senha</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                     <Input
                       id="signup-password"
                       type="password"
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 h-10"
                       required
                     />
                   </div>
-                  {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+                  {errors.password && <p className="text-sm text-red-400">{errors.password}</p>}
                 </div>
                 
-                <ShinyButton type="submit" className="w-full" disabled={loading}>
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Criar Conta"}
-                </ShinyButton>
+                <div className="flex justify-center pt-2">
+                  <ShinyButton type="submit" className="w-full" disabled={loading}>
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Criar Conta"}
+                  </ShinyButton>
+                </div>
               </form>
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
+        </div>
+      </div>
     </div>
   );
 };
