@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, LayoutDirection, ResponsiveLayout, ResponsiveColumnSettings } from '@/types/sections';
+import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, LayoutDirection, ResponsiveLayout, ResponsiveColumnSettings, ButtonColorConfig } from '@/types/sections';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -520,6 +520,115 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                     rows={1}
                     className="mt-1"
                   />
+                </div>
+                
+                {/* Individual Button Color Config */}
+                <div className="space-y-3 p-3 border rounded-lg bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={selectedElement.buttonColor?.useCustomColor || false}
+                      onCheckedChange={(checked) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                        buttonColor: {
+                          useCustomColor: checked,
+                          colorType: selectedElement.buttonColor?.colorType || 'solid',
+                          solidColor: selectedElement.buttonColor?.solidColor || '#000000',
+                          gradientColor1: selectedElement.buttonColor?.gradientColor1 || '#FF6A00',
+                          gradientColor2: selectedElement.buttonColor?.gradientColor2 || '#FF2D55',
+                          gradientColor3: selectedElement.buttonColor?.gradientColor3,
+                        }
+                      })}
+                    />
+                    <Label className="text-xs font-medium">Cor Individual</Label>
+                  </div>
+                  
+                  {selectedElement.buttonColor?.useCustomColor && (
+                    <div className="space-y-2">
+                      <Select
+                        value={selectedElement.buttonColor.colorType || 'solid'}
+                        onValueChange={(value: 'solid' | 'gradient') => updateSectionElement(selectedSection.id, selectedElement.id, {
+                          buttonColor: { ...selectedElement.buttonColor!, colorType: value }
+                        })}
+                      >
+                        <SelectTrigger className="h-8">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="solid">Cor Sólida</SelectItem>
+                          <SelectItem value="gradient">Gradiente</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      {selectedElement.buttonColor.colorType === 'solid' ? (
+                        <div className="flex gap-2 items-center">
+                          <Input
+                            type="color"
+                            value={selectedElement.buttonColor.solidColor || '#000000'}
+                            onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                              buttonColor: { ...selectedElement.buttonColor!, solidColor: e.target.value }
+                            })}
+                            className="w-12 h-8"
+                          />
+                          <Input
+                            value={selectedElement.buttonColor.solidColor || '#000000'}
+                            onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                              buttonColor: { ...selectedElement.buttonColor!, solidColor: e.target.value }
+                            })}
+                            className="flex-1 h-8 text-xs"
+                          />
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="flex gap-1">
+                            <div className="flex-1">
+                              <Label className="text-[10px]">Cor 1</Label>
+                              <Input
+                                type="color"
+                                value={selectedElement.buttonColor.gradientColor1 || '#FF6A00'}
+                                onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                                  buttonColor: { ...selectedElement.buttonColor!, gradientColor1: e.target.value }
+                                })}
+                                className="w-full h-8"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <Label className="text-[10px]">Cor 2</Label>
+                              <Input
+                                type="color"
+                                value={selectedElement.buttonColor.gradientColor2 || '#FF2D55'}
+                                onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                                  buttonColor: { ...selectedElement.buttonColor!, gradientColor2: e.target.value }
+                                })}
+                                className="w-full h-8"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <Label className="text-[10px]">Cor 3</Label>
+                              <Input
+                                type="color"
+                                value={selectedElement.buttonColor.gradientColor3 || '#8B5CF6'}
+                                onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                                  buttonColor: { ...selectedElement.buttonColor!, gradientColor3: e.target.value }
+                                })}
+                                className="w-full h-8"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Switch
+                              checked={!!selectedElement.buttonColor.gradientColor3}
+                              onCheckedChange={(checked) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                                buttonColor: { 
+                                  ...selectedElement.buttonColor!, 
+                                  gradientColor3: checked ? '#8B5CF6' : undefined 
+                                }
+                              })}
+                            />
+                            <Label className="text-[10px]">Usar 3ª cor</Label>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 
                 {/* Popup toggle */}

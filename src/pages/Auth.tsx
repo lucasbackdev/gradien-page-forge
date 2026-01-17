@@ -236,8 +236,8 @@ return (
                   {errors.password && <p className="text-sm text-red-400">{errors.password}</p>}
                 </div>
                 
-                <div className="flex justify-center pt-2">
-                  <ShinyButton type="submit" className="w-full" disabled={loading}>
+                <div className="flex justify-center pt-2 w-full">
+                  <ShinyButton type="submit" className="w-full mx-auto" disabled={loading}>
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
                   </ShinyButton>
                 </div>
@@ -295,8 +295,8 @@ return (
                   {errors.password && <p className="text-sm text-red-400">{errors.password}</p>}
                 </div>
                 
-                <div className="flex justify-center pt-2">
-                  <ShinyButton type="submit" className="w-full" disabled={loading}>
+                <div className="flex justify-center pt-2 w-full">
+                  <ShinyButton type="submit" className="w-full mx-auto" disabled={loading}>
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Criar Conta"}
                   </ShinyButton>
                 </div>
