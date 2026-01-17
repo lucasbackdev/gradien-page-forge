@@ -63,6 +63,15 @@ export interface ResponsiveAlign {
   mobile: HorizontalAlign;
 }
 
+export interface ButtonColorConfig {
+  useCustomColor: boolean;
+  colorType: 'solid' | 'gradient';
+  solidColor: string;
+  gradientColor1: string;
+  gradientColor2: string;
+  gradientColor3?: string;
+}
+
 export interface SectionElement {
   id: string;
   type: 'text' | 'image' | 'button' | 'video';
@@ -90,6 +99,8 @@ export interface SectionElement {
   inlineGroup?: string;
   // Opens lead popup instead of navigating to link
   opensPopup?: boolean;
+  // Individual button color configuration
+  buttonColor?: ButtonColorConfig;
 }
 
 export interface ResponsiveLayout {

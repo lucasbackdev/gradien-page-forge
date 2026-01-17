@@ -125,6 +125,32 @@ ${presellData.whatsappEnabled && presellData.whatsappLink ? `
   </svg>
 </a>
 ` : ''}
+${presellData.popupConfig?.enabled ? `
+<!-- Lead Popup -->
+<div id="leadPopup" class="lead-popup-overlay" style="display: none;">
+  <div class="lead-popup-content">
+    <button class="lead-popup-close" onclick="closeLeadPopup()">&times;</button>
+    <h2 class="lead-popup-title">${presellData.popupConfig.title || 'Cadastre-se'}</h2>
+    <form id="leadForm" class="lead-form">
+      <input type="hidden" name="user_id" value="${user?.id || ''}" />
+      <input type="hidden" name="source_page" value="${presellData.pageTitle || 'Página'}" />
+      <div class="lead-field">
+        <label>Nome Completo ${presellData.popupConfig.fullNameRequired ? '<span class="required">*</span>' : ''}</label>
+        <input type="text" name="full_name" ${presellData.popupConfig.fullNameRequired ? 'required' : ''} placeholder="Digite seu nome completo" />
+      </div>
+      <div class="lead-field">
+        <label>Email ${presellData.popupConfig.emailRequired ? '<span class="required">*</span>' : ''}</label>
+        <input type="email" name="email" ${presellData.popupConfig.emailRequired ? 'required' : ''} placeholder="Digite seu email" />
+      </div>
+      <div class="lead-field">
+        <label>Telefone ${presellData.popupConfig.phoneRequired ? '<span class="required">*</span>' : ''}</label>
+        <input type="tel" name="phone" ${presellData.popupConfig.phoneRequired ? 'required' : ''} placeholder="Digite seu telefone" />
+      </div>
+      <button type="submit" class="lead-submit-btn" style="background: ${presellData.popupConfig.buttonColor || '#8B5CF6'};">${presellData.popupConfig.buttonText || 'Enviar'}</button>
+    </form>
+  </div>
+</div>
+` : ''}
 ${ipTrackingPixel}
 <script>
 // Mobile menu toggle
@@ -135,6 +161,40 @@ document.addEventListener('DOMContentLoaded', function() {
     menuBtn.addEventListener('click', function() {
       mobileNav.classList.toggle('hidden');
     });
+  }
+});
+
+// Lead popup functions
+function openLeadPopup() {
+  document.getElementById('leadPopup').style.display = 'flex';
+}
+function closeLeadPopup() {
+  document.getElementById('leadPopup').style.display = 'none';
+}
+document.getElementById('leadForm')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData);
+  
+  try {
+    const response = await fetch('https://cdytjekegrlhstpkzkeb.supabase.co/rest/v1/leads', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkeXRqZWtlZ3JsaHN0cGt6a2ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNTM0NjcsImV4cCI6MjA4MzkyOTQ2N30.73kcGWAnpNw6VvbVmLdfiVABdc02XyEtpY5kOX1t1zg',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(data)
+    });
+    if (response.ok) {
+      alert('Cadastro realizado com sucesso!');
+      closeLeadPopup();
+      ${presellData.popupConfig?.redirectUrl ? `window.open('${presellData.popupConfig.redirectUrl}', '_blank');` : ''}
+    } else {
+      alert('Erro ao enviar cadastro.');
+    }
+  } catch(err) {
+    alert('Erro ao enviar cadastro.');
   }
 });
 </script>
@@ -209,6 +269,80 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 
+  // Helper function to render a single element as HTML
+  const renderElementHTML = (el: SectionElement, sectionIndex: number, elIndex: number, data: PresellData): string => {
+    if (el.type === 'text') {
+      const textStyle = el.gradientText?.enabled && el.gradientText.colors?.length
+        ? `background: linear-gradient(135deg, ${el.gradientText.colors.join(', ')}); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block;`
+        : `color: ${el.color || '#ffffff'};`;
+      
+      let content = el.content || '';
+      if (el.highlightWords?.enabled && el.highlightWords.words) {
+        const words = el.highlightWords.words.split(',').map(w => w.trim()).filter(Boolean);
+        words.forEach(word => {
+          const regex = new RegExp(`(${word})`, 'gi');
+          content = content.replace(regex, `<span style="color: ${el.highlightWords!.color}">\$1</span>`);
+        });
+      }
+      
+      return `<div class="element-text" style="${textStyle} font-size: ${el.fontSize || '18px'}; font-weight: ${el.fontWeight || 'normal'}; margin-bottom: 1rem;">${content}</div>`;
+    }
+    if (el.type === 'button') {
+      const isShinyButton = data.buttonStyle.template === 'shiny-green';
+      const shouldOpenPopup = el.opensPopup && data.popupConfig?.enabled;
+      
+      // Get button background style
+      let buttonBgStyle = '';
+      if (el.buttonColor?.useCustomColor) {
+        if (el.buttonColor.colorType === 'gradient') {
+          const colors = el.buttonColor.gradientColor3
+            ? `${el.buttonColor.gradientColor1}, ${el.buttonColor.gradientColor2}, ${el.buttonColor.gradientColor3}`
+            : `${el.buttonColor.gradientColor1}, ${el.buttonColor.gradientColor2}`;
+          buttonBgStyle = `background: linear-gradient(135deg, ${colors});`;
+        } else {
+          buttonBgStyle = `background-color: ${el.buttonColor.solidColor};`;
+        }
+      }
+      
+      if (isShinyButton) {
+        const buttonContent = `<span>${el.content || 'Botão'}</span>`;
+        if (shouldOpenPopup) {
+          return `<a href="#" class="shiny-cta" onclick="event.preventDefault(); openLeadPopup();">${buttonContent}</a>`;
+        }
+        return `<a href="${data.affiliateLink || el.link || '#'}" class="shiny-cta">${buttonContent}</a>`;
+      }
+      
+      const buttonContent = el.content || 'Botão';
+      const customStyle = buttonBgStyle ? ` style="${buttonBgStyle}"` : '';
+      if (shouldOpenPopup) {
+        return `<a href="#" class="element-button"${customStyle} onclick="event.preventDefault(); openLeadPopup();">${buttonContent}</a>`;
+      }
+      return `<a href="${data.affiliateLink || el.link || '#'}" class="element-button"${customStyle}>${buttonContent}</a>`;
+    }
+    if (el.type === 'image' && el.imageUrl) {
+      const glowClass = el.glowingBorder ? 'glow-border' : '';
+      const colors = el.glowBorderColors || ['#FF6A00', '#FF2D55'];
+      const glowStyle = el.glowingBorder 
+        ? `box-shadow: 0 0 15px ${colors[0]}, 0 0 30px ${colors[1] || colors[0]}${colors[2] ? `, 0 0 45px ${colors[2]}` : ''}${colors[3] ? `, 0 0 60px ${colors[3]}` : ''}; border: 3px solid transparent; background-image: linear-gradient(#1a1a2e, #1a1a2e), linear-gradient(135deg, ${colors.join(', ')}); background-origin: border-box; background-clip: padding-box, border-box;`
+        : '';
+      const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
+      const imgTag = `<img src="public/section-${sectionIndex}-element-${elIndex}.png" alt="${el.content || 'Imagem'}" class="element-image ${glowClass}" style="${glowStyle} ${widthStyle}">`;
+      return data.affiliateLink 
+        ? `<a href="${data.affiliateLink}" class="image-link">${imgTag}</a>`
+        : imgTag;
+    }
+    if (el.type === 'video' && el.videoUrl) {
+      const glowClass = el.glowingBorder ? 'glow-border' : '';
+      const colors = el.glowBorderColors || ['#FF6A00', '#FF2D55'];
+      const glowStyle = el.glowingBorder 
+        ? `box-shadow: 0 0 15px ${colors[0]}, 0 0 30px ${colors[1] || colors[0]}${colors[2] ? `, 0 0 45px ${colors[2]}` : ''}${colors[3] ? `, 0 0 60px ${colors[3]}` : ''}; border: 3px solid transparent; background-image: linear-gradient(#1a1a2e, #1a1a2e), linear-gradient(135deg, ${colors.join(', ')}); background-origin: border-box; background-clip: padding-box, border-box;`
+        : '';
+      const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
+      return `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video ${glowClass}" style="${glowStyle} ${widthStyle}"></video>`;
+    }
+    return '';
+  };
+
   const generateSectionsHTML = (data: PresellData): string => {
     if (data.sections.length === 0) return '<div class="empty-message">Nenhuma seção adicionada</div>';
 
@@ -252,58 +386,54 @@ document.addEventListener('DOMContentLoaded', function() {
 
       const minHeightStyle = section.minHeight ? `min-height: ${section.minHeight}; display: flex; flex-direction: column; justify-content: center;` : '';
 
+      // Get the desktop layout for export
+      const exportLayout = section.responsiveLayout?.desktop || section.layout;
+      const columnSettings = section.responsiveColumnSettings?.desktop || {
+        leftColumnElements: section.leftColumnElements,
+        rightColumnElements: section.rightColumnElements,
+        columnGap: section.columnGap,
+        columnWidthRatio: section.columnWidthRatio,
+      };
+      const isColumnsLayout = exportLayout === 'two-columns' || exportLayout === 'two-columns-reverse';
+
       html += `
-<section id="section-${section.id}" class="section section-${section.layout}" style="${bgStyle} ${minHeightStyle} color: ${section.textColor || '#ffffff'}; padding: ${section.padding || '4rem 2rem'}; position: relative;">
+<section id="section-${section.id}" class="section section-${exportLayout}" style="${bgStyle} ${minHeightStyle} color: ${section.textColor || '#ffffff'}; padding: ${section.padding || '4rem 2rem'}; position: relative;">
   ${section.backgroundImage ? `<div class="section-overlay" style="background: ${section.backgroundOverlay?.enabled ? getOverlayCSS(section.backgroundOverlay) : 'rgba(0,0,0,0.5)'}; position: absolute; inset: 0; z-index: 0;"></div>` : ''}
-  <div class="section-content" style="position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; justify-content: center;">
-    ${section.elements.map((el, elIndex) => {
-      if (el.type === 'text') {
-        const textStyle = el.gradientText?.enabled && el.gradientText.colors?.length
-          ? `background: linear-gradient(135deg, ${el.gradientText.colors.join(', ')}); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block;`
-          : `color: ${el.color || '#ffffff'};`;
+  <div class="section-content" style="position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; justify-content: center;">`;
+
+      if (isColumnsLayout) {
+        // Render two columns layout
+        const ratio = columnSettings.columnWidthRatio || '50-50';
+        const leftWidth = ratio === '40-60' ? '40%' : ratio === '60-40' ? '60%' : ratio === '30-70' ? '30%' : ratio === '70-30' ? '70%' : '50%';
+        const rightWidth = ratio === '40-60' ? '60%' : ratio === '60-40' ? '40%' : ratio === '30-70' ? '70%' : ratio === '70-30' ? '30%' : '50%';
+        const flexDir = exportLayout === 'two-columns-reverse' ? 'flex-direction: row-reverse;' : '';
         
-        let content = el.content || '';
-        if (el.highlightWords?.enabled && el.highlightWords.words) {
-          const words = el.highlightWords.words.split(',').map(w => w.trim()).filter(Boolean);
-          words.forEach(word => {
-            const regex = new RegExp(`(${word})`, 'gi');
-            content = content.replace(regex, `<span style="color: ${el.highlightWords!.color}">\$1</span>`);
-          });
-        }
-        
-        return `<div class="element-text" style="${textStyle} font-size: ${el.fontSize || '18px'}; font-weight: ${el.fontWeight || 'normal'}; margin-bottom: 1rem;">${content}</div>`;
+        const leftElements = section.elements.filter(el => 
+          columnSettings.leftColumnElements?.includes(el.id) || 
+          (!columnSettings.leftColumnElements?.length && !columnSettings.rightColumnElements?.length && 
+            section.elements.indexOf(el) < Math.ceil(section.elements.length / 2))
+        );
+        const rightElements = section.elements.filter(el => 
+          columnSettings.rightColumnElements?.includes(el.id) ||
+          (!columnSettings.leftColumnElements?.length && !columnSettings.rightColumnElements?.length && 
+            section.elements.indexOf(el) >= Math.ceil(section.elements.length / 2))
+        );
+
+        html += `
+    <div class="columns-container" style="display: flex; gap: ${columnSettings.columnGap || '2rem'}; ${flexDir} flex-wrap: wrap;">
+      <div class="column-left" style="width: ${leftWidth}; min-width: 280px; flex: 1;">
+        ${leftElements.map((el, elIndex) => renderElementHTML(el, sectionIndex, section.elements.indexOf(el), data)).join('')}
+      </div>
+      <div class="column-right" style="width: ${rightWidth}; min-width: 280px; flex: 1;">
+        ${rightElements.map((el, elIndex) => renderElementHTML(el, sectionIndex, section.elements.indexOf(el), data)).join('')}
+      </div>
+    </div>`;
+      } else {
+        // Regular layout
+        html += section.elements.map((el, elIndex) => renderElementHTML(el, sectionIndex, elIndex, data)).join('');
       }
-      if (el.type === 'button') {
-        const isShinyButton = data.buttonStyle.template === 'shiny-green';
-        const buttonClass = isShinyButton ? 'shiny-cta' : 'element-button';
-        const buttonContent = isShinyButton 
-          ? `<span>${el.content || 'Botão'}</span>` 
-          : (el.content || 'Botão');
-        return `<a href="${data.affiliateLink || el.link || '#'}" class="${buttonClass}">${buttonContent}</a>`;
-      }
-      if (el.type === 'image' && el.imageUrl) {
-        const glowClass = el.glowingBorder ? 'glow-border' : '';
-        const colors = el.glowBorderColors || ['#FF6A00', '#FF2D55'];
-        const glowStyle = el.glowingBorder 
-          ? `box-shadow: 0 0 15px ${colors[0]}, 0 0 30px ${colors[1] || colors[0]}${colors[2] ? `, 0 0 45px ${colors[2]}` : ''}${colors[3] ? `, 0 0 60px ${colors[3]}` : ''}; border: 3px solid transparent; background-image: linear-gradient(#1a1a2e, #1a1a2e), linear-gradient(135deg, ${colors.join(', ')}); background-origin: border-box; background-clip: padding-box, border-box;`
-          : '';
-        const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
-        const imgTag = `<img src="public/section-${sectionIndex}-element-${elIndex}.png" alt="${el.content || 'Imagem'}" class="element-image ${glowClass}" style="${glowStyle} ${widthStyle}">`;
-        return data.affiliateLink 
-          ? `<a href="${data.affiliateLink}" class="image-link">${imgTag}</a>`
-          : imgTag;
-      }
-      if (el.type === 'video' && el.videoUrl) {
-        const glowClass = el.glowingBorder ? 'glow-border' : '';
-        const colors = el.glowBorderColors || ['#FF6A00', '#FF2D55'];
-        const glowStyle = el.glowingBorder 
-          ? `box-shadow: 0 0 15px ${colors[0]}, 0 0 30px ${colors[1] || colors[0]}${colors[2] ? `, 0 0 45px ${colors[2]}` : ''}${colors[3] ? `, 0 0 60px ${colors[3]}` : ''}; border: 3px solid transparent; background-image: linear-gradient(#1a1a2e, #1a1a2e), linear-gradient(135deg, ${colors.join(', ')}); background-origin: border-box; background-clip: padding-box, border-box;`
-          : '';
-        const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
-        return `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video ${glowClass}" style="${glowStyle} ${widthStyle}"></video>`;
-      }
-      return '';
-    }).join('')}
+
+      html += `
   </div>
 </section>`;
     });
@@ -872,6 +1002,78 @@ ${data.buttonStyle.template === 'shiny-green' ? `
     bottom: 1rem;
     right: 1rem;
   }
+  .columns-container {
+    flex-direction: column !important;
+  }
+  .column-left, .column-right {
+    width: 100% !important;
+  }
+}
+
+/* Lead Popup Styles */
+.lead-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.lead-popup-content {
+  background: #1a1a2e;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+}
+.lead-popup-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.lead-popup-title {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+}
+.lead-field {
+  margin-bottom: 1rem;
+}
+.lead-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+.lead-field .required {
+  color: #ef4444;
+}
+.lead-field input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+.lead-submit-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 0.5rem;
 }
 `;
   };

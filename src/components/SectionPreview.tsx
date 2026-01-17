@@ -106,7 +106,7 @@ export const SectionPreview = ({
     return style;
   };
 
-  const getButtonStyle = (): React.CSSProperties => {
+  const getButtonStyle = (element?: SectionElement): React.CSSProperties => {
     // If using shiny template, return minimal style as CSS classes will handle it
     if (presellData.buttonStyle.template === 'shiny-green') {
       return {};
@@ -122,7 +122,17 @@ export const SectionPreview = ({
       cursor: 'pointer',
     };
 
-    if (presellData.colors.buttonGradient.enabled) {
+    // Check if element has custom button color
+    if (element?.buttonColor?.useCustomColor) {
+      if (element.buttonColor.colorType === 'gradient') {
+        const colors = element.buttonColor.gradientColor3
+          ? `${element.buttonColor.gradientColor1}, ${element.buttonColor.gradientColor2}, ${element.buttonColor.gradientColor3}`
+          : `${element.buttonColor.gradientColor1}, ${element.buttonColor.gradientColor2}`;
+        style.background = `linear-gradient(135deg, ${colors})`;
+      } else {
+        style.backgroundColor = element.buttonColor.solidColor;
+      }
+    } else if (presellData.colors.buttonGradient.enabled) {
       style.background = `linear-gradient(135deg, ${presellData.colors.buttonGradient.color1}, ${presellData.colors.buttonGradient.color2})`;
     } else {
       style.backgroundColor = presellData.colors.button;
@@ -408,7 +418,7 @@ export const SectionPreview = ({
               {...dragProps}
               href={shouldOpenPopup ? '#' : (presellData.affiliateLink || element.link || '#')}
               className={`${baseClass} ${animationClass} ${buttonClass} ${!isShinyButton && presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
-              style={getButtonStyle()}
+              style={getButtonStyle(element)}
               onClick={(e) => {
                 if (shouldOpenPopup) {
                   e.preventDefault();
