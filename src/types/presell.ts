@@ -51,6 +51,14 @@ export interface PopupConfig {
   buttonText: string;
   redirectUrl: string;
   buttonColor: string;
+  // Popup styling
+  popupBackgroundColor: string;
+  popupTextColor: string;
+  // Privacy/Terms in footer
+  privacyTextColor: string;
+  privacyLink: string;
+  termsLink: string;
+  showPrivacyTerms: boolean;
 }
 
 export interface FooterStyle {
@@ -259,6 +267,12 @@ export const defaultPresellData: PresellData = {
     buttonText: 'Enviar',
     redirectUrl: '',
     buttonColor: '#8B5CF6',
+    popupBackgroundColor: '#1a1a2e',
+    popupTextColor: '#ffffff',
+    privacyTextColor: '#888888',
+    privacyLink: '',
+    termsLink: '',
+    showPrivacyTerms: true,
   },
 };
 

@@ -53,6 +53,47 @@ export function PopupConfigEditor({ config, onChange }: PopupConfigEditorProps) 
         </div>
       </div>
 
+      {/* Popup Style */}
+      <div className="space-y-3 border rounded-lg p-3 bg-muted/30">
+        <Label className="text-sm font-medium">Estilo do Popup</Label>
+        
+        <div className="space-y-2">
+          <Label className="text-xs">Cor de Fundo do Popup</Label>
+          <div className="flex gap-2">
+            <Input
+              type="color"
+              value={config.popupBackgroundColor || '#1a1a2e'}
+              onChange={(e) => updateConfig({ popupBackgroundColor: e.target.value })}
+              className="w-12 h-10 p-1 cursor-pointer"
+            />
+            <Input
+              value={config.popupBackgroundColor || '#1a1a2e'}
+              onChange={(e) => updateConfig({ popupBackgroundColor: e.target.value })}
+              placeholder="#1a1a2e"
+              className="flex-1"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-xs">Cor do Texto do Popup</Label>
+          <div className="flex gap-2">
+            <Input
+              type="color"
+              value={config.popupTextColor || '#ffffff'}
+              onChange={(e) => updateConfig({ popupTextColor: e.target.value })}
+              className="w-12 h-10 p-1 cursor-pointer"
+            />
+            <Input
+              value={config.popupTextColor || '#ffffff'}
+              onChange={(e) => updateConfig({ popupTextColor: e.target.value })}
+              placeholder="#ffffff"
+              className="flex-1"
+            />
+          </div>
+        </div>
+      </div>
+
       <div className="space-y-2">
         <Label>Estilo do Botão</Label>
         <Select
@@ -105,6 +146,57 @@ export function PopupConfigEditor({ config, onChange }: PopupConfigEditorProps) 
           onChange={(e) => updateConfig({ redirectUrl: e.target.value })}
           placeholder="https://exemplo.com/obrigado"
         />
+      </div>
+
+      {/* Privacy & Terms */}
+      <div className="space-y-3 border rounded-lg p-3 bg-muted/30">
+        <div className="flex items-center justify-between">
+          <Label className="text-sm font-medium">Políticas e Termos no Rodapé</Label>
+          <Switch
+            checked={config.showPrivacyTerms !== false}
+            onCheckedChange={(checked) => updateConfig({ showPrivacyTerms: checked })}
+          />
+        </div>
+
+        {config.showPrivacyTerms !== false && (
+          <>
+            <div className="space-y-2">
+              <Label className="text-xs">Cor do Texto de Políticas</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="color"
+                  value={config.privacyTextColor || '#888888'}
+                  onChange={(e) => updateConfig({ privacyTextColor: e.target.value })}
+                  className="w-12 h-10 p-1 cursor-pointer"
+                />
+                <Input
+                  value={config.privacyTextColor || '#888888'}
+                  onChange={(e) => updateConfig({ privacyTextColor: e.target.value })}
+                  placeholder="#888888"
+                  className="flex-1"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs">Link de Política de Privacidade</Label>
+              <Input
+                value={config.privacyLink || ''}
+                onChange={(e) => updateConfig({ privacyLink: e.target.value })}
+                placeholder="https://seusite.com/privacidade"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs">Link de Termos de Uso</Label>
+              <Input
+                value={config.termsLink || ''}
+                onChange={(e) => updateConfig({ termsLink: e.target.value })}
+                placeholder="https://seusite.com/termos"
+              />
+            </div>
+          </>
+        )}
       </div>
 
       {/* Preview do botão */}

@@ -74,7 +74,7 @@ export interface ButtonColorConfig {
 
 export interface SectionElement {
   id: string;
-  type: 'text' | 'image' | 'button' | 'video';
+  type: 'text' | 'image' | 'button' | 'video' | 'lead-form';
   content: string;
   textType?: TextType;
   bold?: boolean;

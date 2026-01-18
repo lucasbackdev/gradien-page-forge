@@ -128,25 +128,32 @@ ${presellData.whatsappEnabled && presellData.whatsappLink ? `
 ${presellData.popupConfig?.enabled ? `
 <!-- Lead Popup -->
 <div id="leadPopup" class="lead-popup-overlay" style="display: none;">
-  <div class="lead-popup-content">
+  <div class="lead-popup-content" style="background: ${presellData.popupConfig.popupBackgroundColor || '#1a1a2e'}; color: ${presellData.popupConfig.popupTextColor || '#ffffff'};">
     <button class="lead-popup-close" onclick="closeLeadPopup()">&times;</button>
-    <h2 class="lead-popup-title">${presellData.popupConfig.title || 'Cadastre-se'}</h2>
+    <h2 class="lead-popup-title" style="color: ${presellData.popupConfig.popupTextColor || '#ffffff'};">${presellData.popupConfig.title || 'Cadastre-se'}</h2>
     <form id="leadForm" class="lead-form">
       <input type="hidden" name="user_id" value="${user?.id || ''}" />
       <input type="hidden" name="source_page" value="${presellData.pageTitle || 'Página'}" />
       <div class="lead-field">
-        <label>Nome Completo ${presellData.popupConfig.fullNameRequired ? '<span class="required">*</span>' : ''}</label>
+        <label style="color: ${presellData.popupConfig.popupTextColor || '#ffffff'};">Nome Completo ${presellData.popupConfig.fullNameRequired ? '<span class="required">*</span>' : ''}</label>
         <input type="text" name="full_name" ${presellData.popupConfig.fullNameRequired ? 'required' : ''} placeholder="Digite seu nome completo" />
       </div>
       <div class="lead-field">
-        <label>Email ${presellData.popupConfig.emailRequired ? '<span class="required">*</span>' : ''}</label>
+        <label style="color: ${presellData.popupConfig.popupTextColor || '#ffffff'};">Email ${presellData.popupConfig.emailRequired ? '<span class="required">*</span>' : ''}</label>
         <input type="email" name="email" ${presellData.popupConfig.emailRequired ? 'required' : ''} placeholder="Digite seu email" />
       </div>
       <div class="lead-field">
-        <label>Telefone ${presellData.popupConfig.phoneRequired ? '<span class="required">*</span>' : ''}</label>
+        <label style="color: ${presellData.popupConfig.popupTextColor || '#ffffff'};">Telefone ${presellData.popupConfig.phoneRequired ? '<span class="required">*</span>' : ''}</label>
         <input type="tel" name="phone" ${presellData.popupConfig.phoneRequired ? 'required' : ''} placeholder="Digite seu telefone" />
       </div>
       <button type="submit" class="lead-submit-btn" style="background: ${presellData.popupConfig.buttonColor || '#8B5CF6'};">${presellData.popupConfig.buttonText || 'Enviar'}</button>
+      ${presellData.popupConfig.showPrivacyTerms !== false && (presellData.popupConfig.privacyLink || presellData.popupConfig.termsLink) ? `
+      <div class="lead-popup-footer" style="color: ${presellData.popupConfig.privacyTextColor || '#888888'};">
+        ${presellData.popupConfig.termsLink ? `<a href="${presellData.popupConfig.termsLink}" target="_blank" style="color: ${presellData.popupConfig.privacyTextColor || '#888888'};">Termos de Uso</a>` : ''}
+        ${presellData.popupConfig.termsLink && presellData.popupConfig.privacyLink ? '<span class="separator">|</span>' : ''}
+        ${presellData.popupConfig.privacyLink ? `<a href="${presellData.popupConfig.privacyLink}" target="_blank" style="color: ${presellData.popupConfig.privacyTextColor || '#888888'};">Política de Privacidade</a>` : ''}
+      </div>
+      ` : ''}
     </form>
   </div>
 </div>
@@ -197,6 +204,34 @@ document.getElementById('leadForm')?.addEventListener('submit', async function(e
     alert('Erro ao enviar cadastro.');
   }
 });
+
+// Inline lead form handler
+async function handleInlineLeadSubmit(e) {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData);
+  
+  try {
+    const response = await fetch('https://cdytjekegrlhstpkzkeb.supabase.co/rest/v1/leads', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkeXRqZWtlZ3JsaHN0cGt6a2ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNTM0NjcsImV4cCI6MjA4MzkyOTQ2N30.73kcGWAnpNw6VvbVmLdfiVABdc02XyEtpY5kOX1t1zg',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(data)
+    });
+    if (response.ok) {
+      alert('Cadastro realizado com sucesso!');
+      e.target.reset();
+      ${presellData.popupConfig?.redirectUrl ? `window.open('${presellData.popupConfig.redirectUrl}', '_blank');` : ''}
+    } else {
+      alert('Erro ao enviar cadastro.');
+    }
+  } catch(err) {
+    alert('Erro ao enviar cadastro.');
+  }
+}
 </script>
 </body>
 </html>`;
@@ -339,6 +374,40 @@ document.getElementById('leadForm')?.addEventListener('submit', async function(e
         : '';
       const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
       return `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video ${glowClass}" style="${glowStyle} ${widthStyle}"></video>`;
+    }
+    if (el.type === 'lead-form') {
+      const popupConfig = data.popupConfig;
+      const bgColor = popupConfig?.popupBackgroundColor || '#1a1a2e';
+      const textColor = popupConfig?.popupTextColor || '#ffffff';
+      const privacyColor = popupConfig?.privacyTextColor || '#888888';
+      return `
+<div class="inline-lead-form" style="background: ${bgColor}; color: ${textColor};">
+  <h3 style="color: ${textColor};">${popupConfig?.title || 'Cadastre-se'}</h3>
+  <form class="inline-lead-form-form" onsubmit="handleInlineLeadSubmit(event)">
+    <input type="hidden" name="user_id" value="${user?.id || ''}" />
+    <input type="hidden" name="source_page" value="${data.pageTitle || 'Página'}" />
+    <div class="form-field">
+      <label style="color: ${textColor};">Nome Completo ${popupConfig?.fullNameRequired ? '<span class="required">*</span>' : ''}</label>
+      <input type="text" name="full_name" ${popupConfig?.fullNameRequired ? 'required' : ''} placeholder="Digite seu nome completo" />
+    </div>
+    <div class="form-field">
+      <label style="color: ${textColor};">Email ${popupConfig?.emailRequired ? '<span class="required">*</span>' : ''}</label>
+      <input type="email" name="email" ${popupConfig?.emailRequired ? 'required' : ''} placeholder="Digite seu email" />
+    </div>
+    <div class="form-field">
+      <label style="color: ${textColor};">Telefone ${popupConfig?.phoneRequired ? '<span class="required">*</span>' : ''}</label>
+      <input type="tel" name="phone" ${popupConfig?.phoneRequired ? 'required' : ''} placeholder="Digite seu telefone" />
+    </div>
+    <button type="submit" style="background: ${popupConfig?.buttonColor || '#8B5CF6'}; width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: none; color: white; font-weight: bold; cursor: pointer;">${popupConfig?.buttonText || 'Enviar'}</button>
+    ${popupConfig?.showPrivacyTerms !== false && (popupConfig?.privacyLink || popupConfig?.termsLink) ? `
+    <div class="form-footer" style="color: ${privacyColor};">
+      ${popupConfig?.termsLink ? `<a href="${popupConfig.termsLink}" target="_blank" style="color: ${privacyColor};">Termos de Uso</a>` : ''}
+      ${popupConfig?.termsLink && popupConfig?.privacyLink ? ' | ' : ''}
+      ${popupConfig?.privacyLink ? `<a href="${popupConfig.privacyLink}" target="_blank" style="color: ${privacyColor};">Política de Privacidade</a>` : ''}
+    </div>
+    ` : ''}
+  </form>
+</div>`;
     }
     return '';
   };
@@ -1024,7 +1093,6 @@ ${data.buttonStyle.template === 'shiny-green' ? `
   z-index: 9999;
 }
 .lead-popup-content {
-  background: #1a1a2e;
   border-radius: 1rem;
   padding: 2rem;
   max-width: 400px;
@@ -1037,7 +1105,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
   right: 1rem;
   background: none;
   border: none;
-  color: white;
+  color: inherit;
   font-size: 1.5rem;
   cursor: pointer;
 }
@@ -1063,7 +1131,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
   border-radius: 0.5rem;
   border: 1px solid rgba(255,255,255,0.2);
   background: rgba(255,255,255,0.1);
-  color: white;
+  color: inherit;
 }
 .lead-submit-btn {
   width: 100%;
@@ -1074,6 +1142,58 @@ ${data.buttonStyle.template === 'shiny-green' ? `
   font-weight: bold;
   cursor: pointer;
   margin-top: 0.5rem;
+}
+.lead-popup-footer {
+  text-align: center;
+  font-size: 0.75rem;
+  margin-top: 1rem;
+}
+.lead-popup-footer a {
+  text-decoration: none;
+}
+.lead-popup-footer a:hover {
+  text-decoration: underline;
+}
+.lead-popup-footer .separator {
+  margin: 0 0.5rem;
+}
+
+/* Inline Lead Form Styles */
+.inline-lead-form {
+  border-radius: 1rem;
+  padding: 1.5rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+.inline-lead-form h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+.inline-lead-form .form-field {
+  margin-bottom: 1rem;
+}
+.inline-lead-form .form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+.inline-lead-form .form-field input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: inherit;
+}
+.inline-lead-form .form-footer {
+  text-align: center;
+  font-size: 0.75rem;
+  margin-top: 1rem;
+}
+.inline-lead-form .form-footer a {
+  text-decoration: none;
 }
 `;
   };
