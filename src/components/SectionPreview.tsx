@@ -495,6 +495,92 @@ export const SectionPreview = ({
             />
           </div>
         ) : null;
+      case 'lead-form':
+        // Render inline lead form
+        const popupConfig = presellData.popupConfig;
+        const bgColor = popupConfig?.popupBackgroundColor || '#1a1a2e';
+        const textColor = popupConfig?.popupTextColor || '#ffffff';
+        return (
+          <div 
+            key={element.id}
+            {...dragProps}
+            className={`${widthClass} ${isInGroup ? '' : 'mb-4'} ${baseClass} ${animationClass}`}
+            style={{ width: isInGroup ? '100%' : '100%', maxWidth: '400px', margin: '0 auto' }}
+          >
+            <div 
+              className="rounded-xl p-6 shadow-lg"
+              style={{ backgroundColor: bgColor, color: textColor }}
+            >
+              <h3 className="text-xl font-bold text-center mb-4" style={{ color: textColor }}>
+                {popupConfig?.title || 'Cadastre-se'}
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm mb-1" style={{ color: textColor }}>
+                    Nome Completo {popupConfig?.fullNameRequired && <span className="text-red-500">*</span>}
+                  </label>
+                  <input 
+                    type="text" 
+                    placeholder="Digite seu nome completo"
+                    className="w-full px-3 py-2 rounded-lg border"
+                    style={{ 
+                      backgroundColor: 'rgba(255,255,255,0.1)', 
+                      borderColor: 'rgba(255,255,255,0.2)',
+                      color: textColor 
+                    }}
+                    disabled
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1" style={{ color: textColor }}>
+                    Email {popupConfig?.emailRequired && <span className="text-red-500">*</span>}
+                  </label>
+                  <input 
+                    type="email" 
+                    placeholder="Digite seu email"
+                    className="w-full px-3 py-2 rounded-lg border"
+                    style={{ 
+                      backgroundColor: 'rgba(255,255,255,0.1)', 
+                      borderColor: 'rgba(255,255,255,0.2)',
+                      color: textColor 
+                    }}
+                    disabled
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm mb-1" style={{ color: textColor }}>
+                    Telefone {popupConfig?.phoneRequired && <span className="text-red-500">*</span>}
+                  </label>
+                  <input 
+                    type="tel" 
+                    placeholder="Digite seu telefone"
+                    className="w-full px-3 py-2 rounded-lg border"
+                    style={{ 
+                      backgroundColor: 'rgba(255,255,255,0.1)', 
+                      borderColor: 'rgba(255,255,255,0.2)',
+                      color: textColor 
+                    }}
+                    disabled
+                  />
+                </div>
+                <button 
+                  className="w-full py-3 rounded-lg font-semibold text-white"
+                  style={{ backgroundColor: popupConfig?.buttonColor || '#8B5CF6' }}
+                  disabled
+                >
+                  {popupConfig?.buttonText || 'Enviar'}
+                </button>
+                {popupConfig?.showPrivacyTerms !== false && (popupConfig?.privacyLink || popupConfig?.termsLink) && (
+                  <div className="text-center text-xs mt-2" style={{ color: popupConfig?.privacyTextColor || '#888888' }}>
+                    {popupConfig?.termsLink && <span>Termos de Uso</span>}
+                    {popupConfig?.termsLink && popupConfig?.privacyLink && <span className="mx-1">|</span>}
+                    {popupConfig?.privacyLink && <span>Política de Privacidade</span>}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
       default:
         return null;
     }

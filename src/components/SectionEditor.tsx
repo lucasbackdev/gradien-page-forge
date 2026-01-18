@@ -22,7 +22,7 @@ import {
   DialogTrigger,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronLeft, Bold, Link, Columns, ArrowLeftRight, Monitor, Tablet, Smartphone, Settings, GripVertical, MousePointerClick } from 'lucide-react';
+import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronLeft, Bold, Link, Columns, ArrowLeftRight, Monitor, Tablet, Smartphone, Settings, GripVertical, MousePointerClick, UserPlus } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveMediaSizeEditor, ResponsiveFontSizeEditor } from '@/components/ResponsiveSizeEditor';
@@ -97,7 +97,7 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
     const newElement: SectionElement = {
       id: Date.now().toString(),
       type,
-      content: type === 'text' ? 'Novo texto' : type === 'button' ? 'Novo botão' : '',
+      content: type === 'text' ? 'Novo texto' : type === 'button' ? 'Novo botão' : type === 'lead-form' ? 'Formulário de Lead' : '',
       fontSize: type === 'text' ? '18px' : '16px',
       color: '#ffffff',
       textType: type === 'text' ? 'description' : undefined,
@@ -287,6 +287,14 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
           >
             <MousePointerClick className="w-4 h-4 mr-1" /> Botão
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => addElementToSection(selectedSection.id, 'lead-form')}
+            className="col-span-2"
+          >
+            <UserPlus className="w-4 h-4 mr-1" /> Formulário de Lead
+          </Button>
         </div>
 
         {/* Elements list */}
@@ -307,13 +315,14 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                 <div className="flex items-center gap-3">
                   <GripVertical className="w-4 h-4 text-muted-foreground" />
                   <span className="text-lg">
-                    {element.type === 'text' ? '📝' : element.type === 'image' ? '🖼️' : element.type === 'video' ? '🎬' : '🔘'}
+                    {element.type === 'text' ? '📝' : element.type === 'image' ? '🖼️' : element.type === 'video' ? '🎬' : element.type === 'lead-form' ? '📋' : '🔘'}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">
                       {element.type === 'text' ? (element.textType === 'title' ? 'Título' : element.textType === 'subtitle' ? 'Subtítulo' : 'Texto') : 
                        element.type === 'image' ? 'Imagem' : 
-                       element.type === 'video' ? 'Vídeo' : 'Botão'}
+                       element.type === 'video' ? 'Vídeo' : 
+                       element.type === 'lead-form' ? 'Formulário Lead' : 'Botão'}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
                       {element.content?.slice(0, 30) || (element.type === 'image' ? 'Clique para editar' : 'Clique para editar')}
