@@ -10,10 +10,12 @@ import { PresellSection, SectionElement } from '@/types/sections';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useSavedPages, SavedPage } from '@/hooks/useSavedPages';
+import { usePublicTemplates, PublicTemplate } from '@/hooks/usePublicTemplates';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, FileText, Trash2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Loader2, FileText, Trash2, Globe, Lock, Upload, Eye } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -36,7 +38,9 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
-import { pageTemplates, PageTemplate } from '@/templates/pageTemplates';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LayoutTemplate, Star, Rocket } from 'lucide-react';
 import JSZip from 'jszip';
 
@@ -44,6 +48,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, isAdmin, subscription, signOut } = useAuth();
   const { savedPages, loading: pagesLoading, savePage, updatePage, deletePage } = useSavedPages();
+  const { templates: publicTemplates, loading: templatesLoading, createTemplate, updateTemplate, deleteTemplate, togglePublic } = usePublicTemplates();
   const [presellData, setPresellData] = useState<PresellData>(defaultPresellData);
   const [darkMode, setDarkMode] = useState(false);
   const [viewportSize, setViewportSize] = useState<ViewportSize>('desktop');
@@ -57,7 +62,17 @@ const Index = () => {
   const [pageName, setPageName] = useState('');
   const [saving, setSaving] = useState(false);
   const [pageToDelete, setPageToDelete] = useState<SavedPage | null>(null);
-
+  
+  // Template creation dialog states (for admin)
+  const [createTemplateOpen, setCreateTemplateOpen] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+  const [templateDesc, setTemplateDesc] = useState('');
+  const [templateLevel, setTemplateLevel] = useState<'simples' | 'intermediário' | 'avançado'>('simples');
+  const [templateIcon, setTemplateIcon] = useState('📄');
+  const [templateIsPublic, setTemplateIsPublic] = useState(false);
+  const [creatingTemplate, setCreatingTemplate] = useState(false);
+  const [templateToDelete, setTemplateToDelete] = useState<PublicTemplate | null>(null);
+  const [deleteTemplateDialogOpen, setDeleteTemplateDialogOpen] = useState(false);
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -320,7 +335,11 @@ async function handleInlineLeadSubmit(e) {
         });
       }
       
-      return `<div class="element-text" style="${textStyle} font-size: ${el.fontSize || '18px'}; font-weight: ${el.fontWeight || 'normal'}; margin-bottom: 1rem;">${content}</div>`;
+      // Get responsive alignment
+      const align = el.responsiveAlign?.desktop || 'center';
+      const alignStyle = `text-align: ${align};`;
+      
+      return `<div class="element-text element-align-${align}" style="${textStyle} ${alignStyle} font-size: ${el.fontSize || '18px'}; font-weight: ${el.fontWeight || 'normal'}; margin-bottom: 1rem;">${content}</div>`;
     }
     if (el.type === 'button') {
       const isShinyButton = data.buttonStyle.template === 'shiny-green';
@@ -339,20 +358,24 @@ async function handleInlineLeadSubmit(e) {
         }
       }
       
+      // Get responsive alignment
+      const align = el.responsiveAlign?.desktop || 'center';
+      const alignWrapperStyle = `text-align: ${align}; display: block; width: 100%;`;
+      
       if (isShinyButton) {
         const buttonContent = `<span>${el.content || 'Botão'}</span>`;
         if (shouldOpenPopup) {
-          return `<a href="#" class="shiny-cta" onclick="event.preventDefault(); openLeadPopup();">${buttonContent}</a>`;
+          return `<div style="${alignWrapperStyle}"><a href="#" class="shiny-cta" onclick="event.preventDefault(); openLeadPopup();">${buttonContent}</a></div>`;
         }
-        return `<a href="${data.affiliateLink || el.link || '#'}" class="shiny-cta">${buttonContent}</a>`;
+        return `<div style="${alignWrapperStyle}"><a href="${data.affiliateLink || el.link || '#'}" class="shiny-cta">${buttonContent}</a></div>`;
       }
       
       const buttonContent = el.content || 'Botão';
       const customStyle = buttonBgStyle ? ` style="${buttonBgStyle}"` : '';
       if (shouldOpenPopup) {
-        return `<a href="#" class="element-button"${customStyle} onclick="event.preventDefault(); openLeadPopup();">${buttonContent}</a>`;
+        return `<div style="${alignWrapperStyle}"><a href="#" class="element-button"${customStyle} onclick="event.preventDefault(); openLeadPopup();">${buttonContent}</a></div>`;
       }
-      return `<a href="${data.affiliateLink || el.link || '#'}" class="element-button"${customStyle}>${buttonContent}</a>`;
+      return `<div style="${alignWrapperStyle}"><a href="${data.affiliateLink || el.link || '#'}" class="element-button"${customStyle}>${buttonContent}</a></div>`;
     }
     if (el.type === 'image' && el.imageUrl) {
       const glowClass = el.glowingBorder ? 'glow-border' : '';
@@ -361,10 +384,16 @@ async function handleInlineLeadSubmit(e) {
         ? `box-shadow: 0 0 15px ${colors[0]}, 0 0 30px ${colors[1] || colors[0]}${colors[2] ? `, 0 0 45px ${colors[2]}` : ''}${colors[3] ? `, 0 0 60px ${colors[3]}` : ''}; border: 3px solid transparent; background-image: linear-gradient(#1a1a2e, #1a1a2e), linear-gradient(135deg, ${colors.join(', ')}); background-origin: border-box; background-clip: padding-box, border-box;`
         : '';
       const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
+      
+      // Get responsive alignment
+      const align = el.responsiveAlign?.desktop || 'center';
+      const alignWrapperStyle = `text-align: ${align}; display: block; width: 100%;`;
+      
       const imgTag = `<img src="public/section-${sectionIndex}-element-${elIndex}.png" alt="${el.content || 'Imagem'}" class="element-image ${glowClass}" style="${glowStyle} ${widthStyle}">`;
-      return data.affiliateLink 
+      const wrappedImg = data.affiliateLink 
         ? `<a href="${data.affiliateLink}" class="image-link">${imgTag}</a>`
         : imgTag;
+      return `<div style="${alignWrapperStyle}">${wrappedImg}</div>`;
     }
     if (el.type === 'video' && el.videoUrl) {
       const glowClass = el.glowingBorder ? 'glow-border' : '';
@@ -373,7 +402,13 @@ async function handleInlineLeadSubmit(e) {
         ? `box-shadow: 0 0 15px ${colors[0]}, 0 0 30px ${colors[1] || colors[0]}${colors[2] ? `, 0 0 45px ${colors[2]}` : ''}${colors[3] ? `, 0 0 60px ${colors[3]}` : ''}; border: 3px solid transparent; background-image: linear-gradient(#1a1a2e, #1a1a2e), linear-gradient(135deg, ${colors.join(', ')}); background-origin: border-box; background-clip: padding-box, border-box;`
         : '';
       const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
-      return `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video ${glowClass}" style="${glowStyle} ${widthStyle}"></video>`;
+      
+      // Get responsive alignment
+      const align = el.responsiveAlign?.desktop || 'center';
+      const alignWrapperStyle = `text-align: ${align}; display: block; width: 100%;`;
+      
+      const videoTag = `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video ${glowClass}" style="${glowStyle} ${widthStyle}"></video>`;
+      return `<div style="${alignWrapperStyle}">${videoTag}</div>`;
     }
     if (el.type === 'lead-form') {
       const popupConfig = data.popupConfig;
@@ -1297,7 +1332,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
     setDeleteDialogOpen(false);
   };
 
-  const handleSelectTemplate = (template: PageTemplate) => {
+  const handleSelectTemplate = (template: PublicTemplate) => {
     const clonedData = JSON.parse(JSON.stringify(template.data));
     setPresellData(clonedData);
     setCurrentPageId(undefined);
@@ -1308,7 +1343,39 @@ ${data.buttonStyle.template === 'shiny-green' ? `
     });
   };
 
-  const getLevelColor = (level: PageTemplate['level']) => {
+  const handleCreateTemplate = async () => {
+    if (!templateName.trim() || !user) return;
+    
+    setCreatingTemplate(true);
+    const result = await createTemplate(
+      templateName.trim(),
+      templateDesc.trim(),
+      templateLevel,
+      presellData,
+      templateIcon,
+      templateIsPublic,
+      user.id
+    );
+    setCreatingTemplate(false);
+    
+    if (result) {
+      setCreateTemplateOpen(false);
+      setTemplateName('');
+      setTemplateDesc('');
+      setTemplateLevel('simples');
+      setTemplateIcon('📄');
+      setTemplateIsPublic(false);
+    }
+  };
+
+  const handleDeleteTemplate = async () => {
+    if (!templateToDelete) return;
+    await deleteTemplate(templateToDelete.id);
+    setTemplateToDelete(null);
+    setDeleteTemplateDialogOpen(false);
+  };
+
+  const getLevelColor = (level: 'simples' | 'intermediário' | 'avançado') => {
     switch (level) {
       case 'simples':
         return 'bg-green-500/20 text-green-400 border-green-500/30';
@@ -1319,7 +1386,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
     }
   };
 
-  const getLevelIcon = (level: PageTemplate['level']) => {
+  const getLevelIcon = (level: 'simples' | 'intermediário' | 'avançado') => {
     switch (level) {
       case 'simples':
         return <FileText className="w-4 h-4" />;
@@ -1392,75 +1459,296 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         </div>
       </div>
 
-      {/* Templates Dialog */}
+      {/* Templates Dialog - Área de Transferência */}
       <Dialog open={templatesOpen} onOpenChange={setTemplatesOpen}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <LayoutTemplate className="w-5 h-5" />
-              Modelos de Página Prontos
+              Área de Transferência
             </DialogTitle>
             <DialogDescription>
-              Escolha um modelo para começar. Você pode editar tudo depois.
+              {isAdmin ? 'Gerencie e publique modelos para todos os usuários.' : 'Escolha um modelo para começar.'}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
-            {pageTemplates.map((template) => (
-              <div
-                key={template.id}
-                className="group relative border border-border rounded-xl p-5 hover:border-primary/50 hover:bg-accent/30 transition-all cursor-pointer"
-                onClick={() => handleSelectTemplate(template)}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-16 h-16 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-3xl">
-                    {template.preview}
+          <Tabs defaultValue="public" className="flex-1 overflow-hidden flex flex-col">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="public" className="gap-2">
+                <Globe className="w-4 h-4" />
+                Templates Públicos
+              </TabsTrigger>
+              {isAdmin && (
+                <TabsTrigger value="manage" className="gap-2">
+                  <Lock className="w-4 h-4" />
+                  Gerenciar (Admin)
+                </TabsTrigger>
+              )}
+            </TabsList>
+            
+            <TabsContent value="public" className="flex-1 overflow-auto mt-4">
+              <ScrollArea className="h-[50vh]">
+                {templatesLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                   </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-lg text-foreground">
-                        {template.name}
-                      </h3>
-                      <Badge 
-                        variant="outline" 
-                        className={`text-xs ${getLevelColor(template.level)}`}
+                ) : publicTemplates.filter(t => t.is_public).length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <LayoutTemplate className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>Nenhum template público disponível ainda.</p>
+                    {isAdmin && <p className="text-sm mt-2">Crie templates na aba "Gerenciar" e torne-os públicos.</p>}
+                  </div>
+                ) : (
+                  <div className="grid gap-3 pr-4">
+                    {publicTemplates.filter(t => t.is_public).map((template) => (
+                      <div
+                        key={template.id}
+                        className="group relative border border-border rounded-xl p-4 hover:border-primary/50 hover:bg-accent/30 transition-all cursor-pointer"
+                        onClick={() => handleSelectTemplate(template)}
                       >
-                        {getLevelIcon(template.level)}
-                        <span className="ml-1 capitalize">{template.level}</span>
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {template.description}
-                    </p>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span>📄 {template.data.sections.length} seções</span>
-                      <span>
-                        {template.data.floatingHeader.enabled ? '🔝 Com header fixo' : '📜 Sem header fixo'}
-                      </span>
-                    </div>
-                  </div>
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 w-14 h-14 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-2xl">
+                            {template.preview_icon || '📄'}
+                          </div>
 
-                  <Button 
-                    size="sm" 
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleSelectTemplate(template);
-                    }}
-                  >
-                    Usar
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-foreground">
+                                {template.name}
+                              </h3>
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs ${getLevelColor(template.level)}`}
+                              >
+                                {getLevelIcon(template.level)}
+                                <span className="ml-1 capitalize">{template.level}</span>
+                              </Badge>
+                            </div>
+                            {template.description && (
+                              <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+                                {template.description}
+                              </p>
+                            )}
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                              <span>📄 {template.data.sections?.length || 0} seções</span>
+                            </div>
+                          </div>
+
+                          <Button 
+                            size="sm" 
+                            className="opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectTemplate(template);
+                            }}
+                          >
+                            Usar
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </TabsContent>
+            
+            {isAdmin && (
+              <TabsContent value="manage" className="flex-1 overflow-auto mt-4">
+                <div className="mb-4">
+                  <Button onClick={() => setCreateTemplateOpen(true)} className="gap-2">
+                    <Upload className="w-4 h-4" />
+                    Publicar Página Atual como Template
                   </Button>
                 </div>
-              </div>
-            ))}
-          </div>
+                
+                <ScrollArea className="h-[45vh]">
+                  {templatesLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : publicTemplates.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <LayoutTemplate className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                      <p>Nenhum template criado ainda.</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-3 pr-4">
+                      {publicTemplates.map((template) => (
+                        <div
+                          key={template.id}
+                          className="border border-border rounded-xl p-4"
+                        >
+                          <div className="flex items-start gap-4">
+                            <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center text-xl">
+                              {template.preview_icon || '📄'}
+                            </div>
 
-          <div className="text-xs text-muted-foreground text-center pt-2 border-t border-border">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-medium text-foreground">
+                                  {template.name}
+                                </h3>
+                                <Badge 
+                                  variant="outline" 
+                                  className={`text-xs ${getLevelColor(template.level)}`}
+                                >
+                                  {template.level}
+                                </Badge>
+                                <Badge variant={template.is_public ? "default" : "secondary"} className="text-xs">
+                                  {template.is_public ? <><Globe className="w-3 h-3 mr-1" /> Público</> : <><Lock className="w-3 h-3 mr-1" /> Privado</>}
+                                </Badge>
+                              </div>
+                              {template.description && (
+                                <p className="text-sm text-muted-foreground line-clamp-1">
+                                  {template.description}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2">
+                                <Switch
+                                  checked={template.is_public}
+                                  onCheckedChange={(checked) => togglePublic(template.id, checked)}
+                                />
+                                <span className="text-xs text-muted-foreground">Público</span>
+                              </div>
+                              <Button 
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleSelectTemplate(template)}
+                              >
+                                <Eye className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                onClick={() => {
+                                  setTemplateToDelete(template);
+                                  setDeleteTemplateDialogOpen(true);
+                                }}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </TabsContent>
+            )}
+          </Tabs>
+
+          <div className="text-xs text-muted-foreground text-center pt-2 border-t border-border mt-4">
             💡 Dica: Após selecionar um template, você pode editar todos os textos, cores, imagens e seções.
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Create Template Dialog (Admin only) */}
+      <Dialog open={createTemplateOpen} onOpenChange={setCreateTemplateOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Publicar como Template</DialogTitle>
+            <DialogDescription>
+              Salve a página atual como um template que outros usuários podem usar.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="template-name">Nome do Template</Label>
+              <Input
+                id="template-name"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                placeholder="Ex: Landing Page Moderna"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="template-desc">Descrição</Label>
+              <Textarea
+                id="template-desc"
+                value={templateDesc}
+                onChange={(e) => setTemplateDesc(e.target.value)}
+                placeholder="Descreva o template..."
+                className="mt-1"
+                rows={3}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Nível</Label>
+                <Select value={templateLevel} onValueChange={(v) => setTemplateLevel(v as any)}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="simples">Simples</SelectItem>
+                    <SelectItem value="intermediário">Intermediário</SelectItem>
+                    <SelectItem value="avançado">Avançado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Ícone</Label>
+                <Input
+                  value={templateIcon}
+                  onChange={(e) => setTemplateIcon(e.target.value)}
+                  placeholder="📄"
+                  className="mt-1"
+                  maxLength={2}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-3 border rounded-lg bg-muted/30">
+              <Switch
+                checked={templateIsPublic}
+                onCheckedChange={setTemplateIsPublic}
+              />
+              <div>
+                <Label className="text-sm font-medium">Tornar Público</Label>
+                <p className="text-xs text-muted-foreground">
+                  Todos os usuários poderão ver e usar este template
+                </p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateTemplateOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleCreateTemplate} disabled={creatingTemplate || !templateName.trim()}>
+              {creatingTemplate ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Publicar Template
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Template Confirmation */}
+      <AlertDialog open={deleteTemplateDialogOpen} onOpenChange={setDeleteTemplateDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir template?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. O template "{templateToDelete?.name}" será permanentemente excluído.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteTemplate}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Save Dialog */}
       <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>

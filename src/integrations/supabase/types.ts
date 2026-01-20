@@ -71,6 +71,45 @@ export type Database = {
         }
         Relationships: []
       }
+      public_templates: {
+        Row: {
+          created_at: string
+          created_by: string
+          data: Json
+          description: string | null
+          id: string
+          is_public: boolean
+          level: string
+          name: string
+          preview_icon: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          data: Json
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          level?: string
+          name: string
+          preview_icon?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          data?: Json
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          level?: string
+          name?: string
+          preview_icon?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       saved_pages: {
         Row: {
           created_at: string
