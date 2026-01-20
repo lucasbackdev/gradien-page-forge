@@ -785,6 +785,40 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                   />
                   <Label className="text-xs">Borda Brilhante</Label>
                 </div>
+                
+                {selectedElement.glowingBorder && (
+                  <div className="flex gap-1">
+                    {(selectedElement.glowBorderColors || ['#FF6A00', '#FF2D55']).map((color, idx) => (
+                      <Input
+                        key={idx}
+                        type="color"
+                        value={color}
+                        onChange={(e) => {
+                          const newColors = [...(selectedElement.glowBorderColors || ['#FF6A00', '#FF2D55'])];
+                          newColors[idx] = e.target.value;
+                          updateSectionElement(selectedSection.id, selectedElement.id, { glowBorderColors: newColors });
+                        }}
+                        className="h-8 w-10"
+                      />
+                    ))}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => {
+                        const currentColors = selectedElement.glowBorderColors || ['#FF6A00', '#FF2D55'];
+                        if (currentColors.length < 4) {
+                          updateSectionElement(selectedSection.id, selectedElement.id, { 
+                            glowBorderColors: [...currentColors, '#8B5CF6'] 
+                          });
+                        }
+                      }}
+                      disabled={(selectedElement.glowBorderColors?.length || 2) >= 4}
+                    >
+                      +
+                    </Button>
+                  </div>
+                )}
               </>
             )}
 
