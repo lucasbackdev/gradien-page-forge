@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, LayoutDirection, ResponsiveLayout, ResponsiveColumnSettings, ButtonColorConfig } from '@/types/sections';
+import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, LayoutDirection, ResponsiveLayout, ResponsiveColumnSettings, CardConfig } from '@/types/sections';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -22,7 +22,7 @@ import {
   DialogTrigger,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronLeft, Bold, Link, Columns, ArrowLeftRight, Monitor, Tablet, Smartphone, Settings, GripVertical, MousePointerClick, UserPlus } from 'lucide-react';
+import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronLeft, Bold, Link, Columns, ArrowLeftRight, Monitor, Tablet, Smartphone, Settings, GripVertical, MousePointerClick, UserPlus, LayoutGrid } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveMediaSizeEditor, ResponsiveFontSizeEditor } from '@/components/ResponsiveSizeEditor';
@@ -97,11 +97,20 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
     const newElement: SectionElement = {
       id: Date.now().toString(),
       type,
-      content: type === 'text' ? 'Novo texto' : type === 'button' ? 'Novo botão' : type === 'lead-form' ? 'Formulário de Lead' : '',
+      content: type === 'text' ? 'Novo texto' : type === 'button' ? 'Novo botão' : type === 'lead-form' ? 'Formulário de Lead' : type === 'card' ? 'Card' : '',
       fontSize: type === 'text' ? '18px' : '16px',
       color: '#ffffff',
       textType: type === 'text' ? 'description' : undefined,
       animation: false,
+      cardConfig: type === 'card' ? {
+        title: 'Título do Card',
+        subtitle: 'Subtítulo',
+        description: 'Descrição do card com mais detalhes sobre o conteúdo.',
+        showButton: true,
+        buttonText: 'Saiba Mais',
+        buttonLink: '#',
+        theme: 'dark',
+      } : undefined,
     };
     onUpdateSections(sections.map(s => {
       if (s.id !== sectionId) return s;
@@ -291,9 +300,15 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
             variant="outline"
             size="sm"
             onClick={() => addElementToSection(selectedSection.id, 'lead-form')}
-            className="col-span-2"
           >
-            <UserPlus className="w-4 h-4 mr-1" /> Formulário de Lead
+            <UserPlus className="w-4 h-4 mr-1" /> Form Lead
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => addElementToSection(selectedSection.id, 'card')}
+          >
+            <LayoutGrid className="w-4 h-4 mr-1" /> Card
           </Button>
         </div>
 
@@ -315,14 +330,15 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                 <div className="flex items-center gap-3">
                   <GripVertical className="w-4 h-4 text-muted-foreground" />
                   <span className="text-lg">
-                    {element.type === 'text' ? '📝' : element.type === 'image' ? '🖼️' : element.type === 'video' ? '🎬' : element.type === 'lead-form' ? '📋' : '🔘'}
+                    {element.type === 'text' ? '📝' : element.type === 'image' ? '🖼️' : element.type === 'video' ? '🎬' : element.type === 'lead-form' ? '📋' : element.type === 'card' ? '🃏' : '🔘'}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">
                       {element.type === 'text' ? (element.textType === 'title' ? 'Título' : element.textType === 'subtitle' ? 'Subtítulo' : 'Texto') : 
                        element.type === 'image' ? 'Imagem' : 
                        element.type === 'video' ? 'Vídeo' : 
-                       element.type === 'lead-form' ? 'Formulário Lead' : 'Botão'}
+                       element.type === 'lead-form' ? 'Formulário Lead' :
+                       element.type === 'card' ? 'Card' : 'Botão'}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
                       {element.content?.slice(0, 30) || (element.type === 'image' ? 'Clique para editar' : 'Clique para editar')}
@@ -361,10 +377,10 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
             <ChevronLeft className="w-4 h-4" />
           </Button>
           <span className="text-lg">
-            {selectedElement.type === 'text' ? '📝' : selectedElement.type === 'image' ? '🖼️' : selectedElement.type === 'video' ? '🎬' : '🔘'}
+            {selectedElement.type === 'text' ? '📝' : selectedElement.type === 'image' ? '🖼️' : selectedElement.type === 'video' ? '🎬' : selectedElement.type === 'card' ? '🃏' : '🔘'}
           </span>
           <span className="font-semibold">
-            Editar {selectedElement.type === 'text' ? 'Texto' : selectedElement.type === 'image' ? 'Imagem' : selectedElement.type === 'video' ? 'Vídeo' : 'Botão'}
+            Editar {selectedElement.type === 'text' ? 'Texto' : selectedElement.type === 'image' ? 'Imagem' : selectedElement.type === 'video' ? 'Vídeo' : selectedElement.type === 'card' ? 'Card' : 'Botão'}
           </span>
         </div>
 
@@ -820,6 +836,161 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                     </Button>
                   </div>
                 )}
+              </>
+            )}
+
+            {/* Card element settings */}
+            {selectedElement.type === 'card' && (
+              <>
+                <div>
+                  <Label className="text-xs">Título do Card</Label>
+                  <Input
+                    value={selectedElement.cardConfig?.title || ''}
+                    onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, { 
+                      cardConfig: { ...selectedElement.cardConfig!, title: e.target.value }
+                    })}
+                    className="mt-1 h-8"
+                    placeholder="Título"
+                  />
+                </div>
+                
+                <div>
+                  <Label className="text-xs">Subtítulo</Label>
+                  <Input
+                    value={selectedElement.cardConfig?.subtitle || ''}
+                    onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, { 
+                      cardConfig: { ...selectedElement.cardConfig!, subtitle: e.target.value }
+                    })}
+                    className="mt-1 h-8"
+                    placeholder="Subtítulo"
+                  />
+                </div>
+                
+                <div>
+                  <Label className="text-xs">Descrição</Label>
+                  <Textarea
+                    value={selectedElement.cardConfig?.description || ''}
+                    onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, { 
+                      cardConfig: { ...selectedElement.cardConfig!, description: e.target.value }
+                    })}
+                    className="mt-1"
+                    rows={3}
+                    placeholder="Descrição do card"
+                  />
+                </div>
+
+                {/* Theme selector */}
+                <div className="space-y-2">
+                  <Label className="text-xs">Tema do Card</Label>
+                  <Select
+                    value={selectedElement.cardConfig?.theme || 'dark'}
+                    onValueChange={(value: 'light' | 'dark' | 'custom') => updateSectionElement(selectedSection.id, selectedElement.id, {
+                      cardConfig: { ...selectedElement.cardConfig!, theme: value }
+                    })}
+                  >
+                    <SelectTrigger className="h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="dark">🌙 Escuro</SelectItem>
+                      <SelectItem value="light">☀️ Claro</SelectItem>
+                      <SelectItem value="custom">🎨 Personalizado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {selectedElement.cardConfig?.theme === 'custom' && (
+                  <div className="space-y-2 p-3 border rounded-lg bg-muted/30">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs w-20">Fundo:</Label>
+                      <Input
+                        type="color"
+                        value={selectedElement.cardConfig?.customBgColor || '#1a1a2e'}
+                        onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                          cardConfig: { ...selectedElement.cardConfig!, customBgColor: e.target.value }
+                        })}
+                        className="w-10 h-8"
+                      />
+                      <Input
+                        value={selectedElement.cardConfig?.customBgColor || '#1a1a2e'}
+                        onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                          cardConfig: { ...selectedElement.cardConfig!, customBgColor: e.target.value }
+                        })}
+                        className="flex-1 h-8 text-xs"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs w-20">Texto:</Label>
+                      <Input
+                        type="color"
+                        value={selectedElement.cardConfig?.customTextColor || '#ffffff'}
+                        onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                          cardConfig: { ...selectedElement.cardConfig!, customTextColor: e.target.value }
+                        })}
+                        className="w-10 h-8"
+                      />
+                      <Input
+                        value={selectedElement.cardConfig?.customTextColor || '#ffffff'}
+                        onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                          cardConfig: { ...selectedElement.cardConfig!, customTextColor: e.target.value }
+                        })}
+                        className="flex-1 h-8 text-xs"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs w-20">Destaque:</Label>
+                      <Input
+                        type="color"
+                        value={selectedElement.cardConfig?.customAccentColor || '#3b82f6'}
+                        onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                          cardConfig: { ...selectedElement.cardConfig!, customAccentColor: e.target.value }
+                        })}
+                        className="w-10 h-8"
+                      />
+                      <Input
+                        value={selectedElement.cardConfig?.customAccentColor || '#3b82f6'}
+                        onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                          cardConfig: { ...selectedElement.cardConfig!, customAccentColor: e.target.value }
+                        })}
+                        className="flex-1 h-8 text-xs"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Button settings */}
+                <div className="space-y-2 p-3 border rounded-lg bg-muted/30">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={selectedElement.cardConfig?.showButton !== false}
+                      onCheckedChange={(checked) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                        cardConfig: { ...selectedElement.cardConfig!, showButton: checked }
+                      })}
+                    />
+                    <Label className="text-xs font-medium">Mostrar Botão</Label>
+                  </div>
+                  
+                  {selectedElement.cardConfig?.showButton !== false && (
+                    <div className="space-y-2 mt-2">
+                      <Input
+                        value={selectedElement.cardConfig?.buttonText || 'Saiba Mais'}
+                        onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                          cardConfig: { ...selectedElement.cardConfig!, buttonText: e.target.value }
+                        })}
+                        className="h-8"
+                        placeholder="Texto do botão"
+                      />
+                      <Input
+                        value={selectedElement.cardConfig?.buttonLink || '#'}
+                        onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, {
+                          cardConfig: { ...selectedElement.cardConfig!, buttonLink: e.target.value }
+                        })}
+                        className="h-8"
+                        placeholder="Link do botão"
+                      />
+                    </div>
+                  )}
+                </div>
               </>
             )}
 

@@ -475,6 +475,50 @@ async function handleInlineLeadSubmit(e) {
   </form>
 </div>`;
     }
+    if (el.type === 'card') {
+      const cardConfig = el.cardConfig || {
+        title: 'Título',
+        subtitle: 'Subtítulo',
+        description: 'Descrição',
+        showButton: true,
+        buttonText: 'Saiba Mais',
+        buttonLink: '#',
+        theme: 'dark',
+      };
+      
+      const getCardStyles = () => {
+        if (cardConfig.theme === 'light') {
+          return { bg: '#ffffff', text: '#1a1a2e', accent: '#3b82f6', border: 'rgba(0,0,0,0.1)' };
+        } else if (cardConfig.theme === 'custom') {
+          return { 
+            bg: cardConfig.customBgColor || '#1a1a2e', 
+            text: cardConfig.customTextColor || '#ffffff', 
+            accent: cardConfig.customAccentColor || '#3b82f6',
+            border: 'rgba(255,255,255,0.1)'
+          };
+        }
+        return { bg: '#1a1a2e', text: '#ffffff', accent: '#3b82f6', border: 'rgba(255,255,255,0.1)' };
+      };
+      
+      const styles = getCardStyles();
+      
+      return `
+<div class="element-card" style="max-width: 380px; margin: 0 auto 1rem;">
+  <div class="card-inner" style="background-color: ${styles.bg}; border: 1px solid ${styles.border}; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.3s; color: ${styles.text};">
+    <div class="card-header" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+      <div class="card-icon" style="width: 2rem; height: 2rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; background-color: ${styles.accent}20;">
+        <svg width="16" height="16" fill="${styles.accent}" viewBox="0 0 24 24">
+          <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+        </svg>
+      </div>
+      <span class="card-title" style="font-size: 1.125rem; font-weight: 600; color: ${styles.accent};">${cardConfig.title}</span>
+    </div>
+    ${cardConfig.subtitle ? `<p class="card-subtitle" style="font-size: 0.875rem; opacity: 0.6; margin-bottom: 0.5rem;">${cardConfig.subtitle}</p>` : ''}
+    <p class="card-description" style="font-size: 0.875rem; opacity: 0.8; margin-bottom: 1rem;">${cardConfig.description}</p>
+    ${cardConfig.showButton ? `<a href="${cardConfig.buttonLink || '#'}" class="card-button" style="display: inline-block; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 500; color: white; background-color: ${styles.accent}; text-decoration: none; transition: opacity 0.2s;">${cardConfig.buttonText || 'Saiba Mais'}</a>` : ''}
+  </div>
+</div>`;
+    }
     return '';
   };
 
@@ -813,7 +857,9 @@ body {
 }
 
 .section-vertical .section-content {
-  max-width: 72rem;
+  max-width: 100%;
+  width: 100%;
+  padding: 0 1rem;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -822,13 +868,23 @@ body {
 }
 
 .section-horizontal .section-content {
-  max-width: 72rem;
+  max-width: 100%;
+  width: 100%;
+  padding: 0 1rem;
   margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .section-vertical .section-content,
+  .section-horizontal .section-content {
+    max-width: 72rem;
+    padding: 0 2rem;
+  }
 }
 
 .element-button {
@@ -1131,6 +1187,19 @@ ${data.buttonStyle.template === 'shiny-green' ? `
   justify-content: center;
   color: #888;
   font-size: 1.25rem;
+}
+
+/* Card styles */
+.element-card {
+  width: 100%;
+}
+
+.card-inner:hover {
+  transform: translateY(-8px);
+}
+
+.card-button:hover {
+  opacity: 0.9;
 }
 
 @media (max-width: 768px) {

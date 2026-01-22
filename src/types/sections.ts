@@ -72,9 +72,22 @@ export interface ButtonColorConfig {
   gradientColor3?: string;
 }
 
+export interface CardConfig {
+  title: string;
+  subtitle: string;
+  description: string;
+  showButton: boolean;
+  buttonText: string;
+  buttonLink: string;
+  theme: 'light' | 'dark' | 'custom';
+  customBgColor?: string;
+  customTextColor?: string;
+  customAccentColor?: string;
+}
+
 export interface SectionElement {
   id: string;
-  type: 'text' | 'image' | 'button' | 'video' | 'lead-form';
+  type: 'text' | 'image' | 'button' | 'video' | 'lead-form' | 'card';
   content: string;
   textType?: TextType;
   bold?: boolean;
@@ -101,6 +114,8 @@ export interface SectionElement {
   opensPopup?: boolean;
   // Individual button color configuration
   buttonColor?: ButtonColorConfig;
+  // Card configuration
+  cardConfig?: CardConfig;
 }
 
 export interface ResponsiveLayout {
