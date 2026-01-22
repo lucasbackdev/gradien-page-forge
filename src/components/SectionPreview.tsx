@@ -581,6 +581,94 @@ export const SectionPreview = ({
             </div>
           </div>
         );
+      case 'card':
+        const cardConfig = element.cardConfig || {
+          title: 'Título',
+          subtitle: 'Subtítulo',
+          description: 'Descrição',
+          showButton: true,
+          buttonText: 'Saiba Mais',
+          buttonLink: '#',
+          theme: 'dark' as const,
+        };
+        
+        const getCardStyles = () => {
+          if (cardConfig.theme === 'light') {
+            return {
+              bg: '#ffffff',
+              text: '#1a1a2e',
+              accent: '#3b82f6',
+              border: 'rgba(0,0,0,0.1)',
+            };
+          } else if (cardConfig.theme === 'custom') {
+            return {
+              bg: cardConfig.customBgColor || '#1a1a2e',
+              text: cardConfig.customTextColor || '#ffffff',
+              accent: cardConfig.customAccentColor || '#3b82f6',
+              border: 'rgba(255,255,255,0.1)',
+            };
+          }
+          return {
+            bg: '#1a1a2e',
+            text: '#ffffff',
+            accent: '#3b82f6',
+            border: 'rgba(255,255,255,0.1)',
+          };
+        };
+        
+        const cardStyles = getCardStyles();
+        
+        return (
+          <div
+            key={element.id}
+            {...dragProps}
+            className={`${widthClass} ${isInGroup ? '' : 'mb-4'} ${baseClass} ${animationClass}`}
+            style={{ maxWidth: '380px', margin: '0 auto' }}
+          >
+            <div
+              className="rounded-xl p-6 shadow-lg transition-all duration-300 hover:-translate-y-2"
+              style={{
+                backgroundColor: cardStyles.bg,
+                border: `1px solid ${cardStyles.border}`,
+                color: cardStyles.text,
+              }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <div 
+                  className="w-8 h-8 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: `${cardStyles.accent}20` }}
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" style={{ color: cardStyles.accent }}>
+                    <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                  </svg>
+                </div>
+                <span 
+                  className="text-lg font-semibold"
+                  style={{ color: cardStyles.accent }}
+                >
+                  {cardConfig.title}
+                </span>
+              </div>
+              
+              {cardConfig.subtitle && (
+                <p className="text-sm opacity-60 mb-2">{cardConfig.subtitle}</p>
+              )}
+              
+              <p className="text-sm opacity-80 mb-4">{cardConfig.description}</p>
+              
+              {cardConfig.showButton && (
+                <a
+                  href={cardConfig.buttonLink || '#'}
+                  className="inline-block px-4 py-2 rounded-lg text-sm font-medium text-white transition-all hover:opacity-90"
+                  style={{ backgroundColor: cardStyles.accent }}
+                  onClick={(e) => { if (!cardConfig.buttonLink || cardConfig.buttonLink === '#') e.preventDefault(); }}
+                >
+                  {cardConfig.buttonText || 'Saiba Mais'}
+                </a>
+              )}
+            </div>
+          </div>
+        );
       default:
         return null;
     }
