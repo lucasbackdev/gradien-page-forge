@@ -175,6 +175,23 @@ ${presellData.popupConfig?.enabled ? `
 ` : ''}
 ${ipTrackingPixel}
 <script>
+// Responsive media sizing
+function applyResponsiveMediaSizes() {
+  const width = window.innerWidth;
+  const device = width <= 768 ? 'mobile' : width <= 1024 ? 'tablet' : 'desktop';
+  
+  document.querySelectorAll('[data-desktop-width]').forEach(function(el) {
+    const size = el.getAttribute('data-' + device + '-width');
+    if (size) {
+      el.style.width = size + '%';
+    }
+  });
+}
+
+// Apply on load and resize
+document.addEventListener('DOMContentLoaded', applyResponsiveMediaSizes);
+window.addEventListener('resize', applyResponsiveMediaSizes);
+
 // Mobile menu toggle
 document.addEventListener('DOMContentLoaded', function() {
   const menuBtn = document.querySelector('.mobile-menu-btn');
@@ -383,13 +400,20 @@ async function handleInlineLeadSubmit(e) {
       const glowStyle = el.glowingBorder 
         ? `box-shadow: 0 0 15px ${colors[0]}, 0 0 30px ${colors[1] || colors[0]}${colors[2] ? `, 0 0 45px ${colors[2]}` : ''}${colors[3] ? `, 0 0 60px ${colors[3]}` : ''}; border: 3px solid transparent; background-image: linear-gradient(#1a1a2e, #1a1a2e), linear-gradient(135deg, ${colors.join(', ')}); background-origin: border-box; background-clip: padding-box, border-box;`
         : '';
-      const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
+      
+      // Get responsive media widths
+      const desktopWidth = el.responsiveMediaWidth?.desktop || el.mediaWidth || 100;
+      const tabletWidth = el.responsiveMediaWidth?.tablet || desktopWidth;
+      const mobileWidth = el.responsiveMediaWidth?.mobile || tabletWidth;
+      
+      // Generate unique class name for this element
+      const elementClass = `media-s${sectionIndex}-e${elIndex}`;
       
       // Get responsive alignment
       const align = el.responsiveAlign?.desktop || 'center';
       const alignWrapperStyle = `text-align: ${align}; display: block; width: 100%;`;
       
-      const imgTag = `<img src="public/section-${sectionIndex}-element-${elIndex}.png" alt="${el.content || 'Imagem'}" class="element-image ${glowClass}" style="${glowStyle} ${widthStyle}">`;
+      const imgTag = `<img src="public/section-${sectionIndex}-element-${elIndex}.png" alt="${el.content || 'Imagem'}" class="element-image ${glowClass} ${elementClass}" style="${glowStyle}" data-desktop-width="${desktopWidth}" data-tablet-width="${tabletWidth}" data-mobile-width="${mobileWidth}">`;
       const wrappedImg = data.affiliateLink 
         ? `<a href="${data.affiliateLink}" class="image-link">${imgTag}</a>`
         : imgTag;
@@ -401,13 +425,20 @@ async function handleInlineLeadSubmit(e) {
       const glowStyle = el.glowingBorder 
         ? `box-shadow: 0 0 15px ${colors[0]}, 0 0 30px ${colors[1] || colors[0]}${colors[2] ? `, 0 0 45px ${colors[2]}` : ''}${colors[3] ? `, 0 0 60px ${colors[3]}` : ''}; border: 3px solid transparent; background-image: linear-gradient(#1a1a2e, #1a1a2e), linear-gradient(135deg, ${colors.join(', ')}); background-origin: border-box; background-clip: padding-box, border-box;`
         : '';
-      const widthStyle = el.mediaWidth ? `width: ${el.mediaWidth}%;` : '';
+      
+      // Get responsive media widths
+      const desktopWidth = el.responsiveMediaWidth?.desktop || el.mediaWidth || 100;
+      const tabletWidth = el.responsiveMediaWidth?.tablet || desktopWidth;
+      const mobileWidth = el.responsiveMediaWidth?.mobile || tabletWidth;
+      
+      // Generate unique class name for this element
+      const elementClass = `media-s${sectionIndex}-e${elIndex}`;
       
       // Get responsive alignment
       const align = el.responsiveAlign?.desktop || 'center';
       const alignWrapperStyle = `text-align: ${align}; display: block; width: 100%;`;
       
-      const videoTag = `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video ${glowClass}" style="${glowStyle} ${widthStyle}"></video>`;
+      const videoTag = `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video ${glowClass} ${elementClass}" style="${glowStyle}" data-desktop-width="${desktopWidth}" data-tablet-width="${tabletWidth}" data-mobile-width="${mobileWidth}"></video>`;
       return `<div style="${alignWrapperStyle}">${videoTag}</div>`;
     }
     if (el.type === 'lead-form') {
@@ -980,7 +1011,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
 ` : ''}
 
 .element-image {
-  max-width: 100%;
+  max-width: 150%;
   max-height: 400px;
   object-fit: cover;
   border-radius: 0.5rem;
@@ -989,8 +1020,9 @@ ${data.buttonStyle.template === 'shiny-green' ? `
 }
 
 .image-link {
-  display: block;
+  display: inline-block;
   transition: opacity 0.3s;
+  max-width: 100%;
 }
 
 .image-link:hover {
