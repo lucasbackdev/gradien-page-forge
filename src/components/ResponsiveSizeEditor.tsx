@@ -19,7 +19,7 @@ export const ResponsiveMediaSizeEditor = ({
   value, 
   onChange, 
   min = 20, 
-  max = 100,
+  max = 150,
   step = 5,
   label = 'Tamanho'
 }: ResponsiveMediaSizeEditorProps) => {

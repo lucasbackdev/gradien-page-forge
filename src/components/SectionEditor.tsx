@@ -699,11 +699,12 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                 </div>
                 
                 <ResponsiveMediaSizeEditor
-                  value={selectedElement.responsiveMediaWidth || { desktop: selectedElement.mediaWidth || 100, tablet: selectedElement.mediaWidth || 100, mobile: selectedElement.mediaWidth || 100 }}
+                  value={selectedElement.responsiveMediaWidth || { desktop: 100, tablet: 100, mobile: 100 }}
                   onChange={(value) => updateSectionElement(selectedSection.id, selectedElement.id, { 
                     responsiveMediaWidth: value,
                     mediaWidth: value.desktop 
                   })}
+                  max={150}
                   label="Tamanho da Imagem"
                 />
                 
@@ -766,7 +767,7 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                 </div>
                 
                 <ResponsiveMediaSizeEditor
-                  value={selectedElement.responsiveMediaWidth || { desktop: selectedElement.mediaWidth || 100, tablet: selectedElement.mediaWidth || 100, mobile: selectedElement.mediaWidth || 100 }}
+                  value={selectedElement.responsiveMediaWidth || { desktop: 100, tablet: 100, mobile: 100 }}
                   onChange={(value) => updateSectionElement(selectedSection.id, selectedElement.id, { 
                     responsiveMediaWidth: value,
                     mediaWidth: value.desktop 
