@@ -175,7 +175,7 @@ ${presellData.popupConfig?.enabled ? `
 ` : ''}
 ${ipTrackingPixel}
 <script>
-// Responsive sizing for media and text
+// Responsive sizing for media, text and spacing
 function applyResponsiveSizes() {
   const width = window.innerWidth;
   const device = width <= 768 ? 'mobile' : width <= 1024 ? 'tablet' : 'desktop';
@@ -202,6 +202,14 @@ function applyResponsiveSizes() {
     const align = el.getAttribute('data-' + device + '-align');
     if (align) {
       el.style.textAlign = align;
+    }
+  });
+  
+  // Apply responsive spacing (margin-bottom)
+  document.querySelectorAll('[data-desktop-spacing]').forEach(function(el) {
+    const spacing = el.getAttribute('data-' + device + '-spacing');
+    if (spacing) {
+      el.style.marginBottom = spacing + 'rem';
     }
   });
 }
@@ -429,14 +437,20 @@ async function handleInlineLeadSubmit(e) {
       const tabletWidth = el.responsiveMediaWidth?.tablet || desktopWidth;
       const mobileWidth = el.responsiveMediaWidth?.mobile || tabletWidth;
       
-      // Generate unique class name for this element
-      const elementClass = `media-s${sectionIndex}-e${elIndex}`;
+      // Get responsive spacing
+      const desktopSpacing = el.responsiveSpacing?.desktop ?? 1;
+      const tabletSpacing = el.responsiveSpacing?.tablet ?? 0.75;
+      const mobileSpacing = el.responsiveSpacing?.mobile ?? 0.5;
+      
+      // Shadow control
+      const showShadow = el.showShadow !== false;
+      const shadowClass = showShadow ? 'element-image-shadow' : '';
       
       // Get responsive alignment
       const align = el.responsiveAlign?.desktop || 'center';
       const alignWrapperStyle = `text-align: ${align}; display: block; width: 100%;`;
       
-      const imgTag = `<img src="public/section-${sectionIndex}-element-${elIndex}.png" alt="${el.content || 'Imagem'}" class="element-image ${glowClass} ${elementClass}" style="${glowStyle}" data-desktop-width="${desktopWidth}" data-tablet-width="${tabletWidth}" data-mobile-width="${mobileWidth}">`;
+      const imgTag = `<img src="public/section-${sectionIndex}-element-${elIndex}.png" alt="${el.content || 'Imagem'}" class="element-image ${glowClass} ${shadowClass}" style="${glowStyle}" data-desktop-width="${desktopWidth}" data-tablet-width="${tabletWidth}" data-mobile-width="${mobileWidth}" data-desktop-spacing="${desktopSpacing}" data-tablet-spacing="${tabletSpacing}" data-mobile-spacing="${mobileSpacing}">`;
       const wrappedImg = data.affiliateLink 
         ? `<a href="${data.affiliateLink}" class="image-link">${imgTag}</a>`
         : imgTag;
@@ -454,14 +468,20 @@ async function handleInlineLeadSubmit(e) {
       const tabletWidth = el.responsiveMediaWidth?.tablet || desktopWidth;
       const mobileWidth = el.responsiveMediaWidth?.mobile || tabletWidth;
       
-      // Generate unique class name for this element
-      const elementClass = `media-s${sectionIndex}-e${elIndex}`;
+      // Get responsive spacing
+      const desktopSpacing = el.responsiveSpacing?.desktop ?? 1;
+      const tabletSpacing = el.responsiveSpacing?.tablet ?? 0.75;
+      const mobileSpacing = el.responsiveSpacing?.mobile ?? 0.5;
+      
+      // Shadow control
+      const showShadow = el.showShadow !== false;
+      const shadowClass = showShadow ? 'element-video-shadow' : '';
       
       // Get responsive alignment
       const align = el.responsiveAlign?.desktop || 'center';
       const alignWrapperStyle = `text-align: ${align}; display: block; width: 100%;`;
       
-      const videoTag = `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video ${glowClass} ${elementClass}" style="${glowStyle}" data-desktop-width="${desktopWidth}" data-tablet-width="${tabletWidth}" data-mobile-width="${mobileWidth}"></video>`;
+      const videoTag = `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video ${glowClass} ${shadowClass}" style="${glowStyle}" data-desktop-width="${desktopWidth}" data-tablet-width="${tabletWidth}" data-mobile-width="${mobileWidth}" data-desktop-spacing="${desktopSpacing}" data-tablet-spacing="${tabletSpacing}" data-mobile-spacing="${mobileSpacing}"></video>`;
       return `<div style="${alignWrapperStyle}">${videoTag}</div>`;
     }
     if (el.type === 'lead-form') {
@@ -1134,8 +1154,11 @@ ${data.buttonStyle.template === 'shiny-green' ? `
   max-height: 500px;
   object-fit: cover;
   border-radius: 0.5rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   margin-bottom: 0.75rem;
+}
+
+.element-image-shadow {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 .image-link {
@@ -1153,8 +1176,11 @@ ${data.buttonStyle.template === 'shiny-green' ? `
   max-width: 100%;
   width: 100%;
   border-radius: 0.5rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   margin-bottom: 0.75rem;
+}
+
+.element-video-shadow {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
 .element-text {

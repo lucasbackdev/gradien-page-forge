@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Monitor, Tablet, Smartphone, ChevronUp, ChevronDown } from 'lucide-react';
-import { ResponsiveSize, ResponsiveFontSize } from '@/types/sections';
+import { ResponsiveSize, ResponsiveFontSize, ResponsiveSpacing } from '@/types/sections';
 
 interface ResponsiveMediaSizeEditorProps {
   value: ResponsiveSize;
@@ -157,6 +157,94 @@ export const ResponsiveFontSizeEditor = ({
   return (
     <div className="space-y-2">
       <Label className="text-xs font-medium">{label} Responsivo</Label>
+      <Tabs defaultValue="desktop" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 h-8">
+          <TabsTrigger value="desktop" className="text-xs px-2 h-6">
+            <Monitor className="w-3 h-3 mr-1" />
+            PC
+          </TabsTrigger>
+          <TabsTrigger value="tablet" className="text-xs px-2 h-6">
+            <Tablet className="w-3 h-3 mr-1" />
+            Tablet
+          </TabsTrigger>
+          <TabsTrigger value="mobile" className="text-xs px-2 h-6">
+            <Smartphone className="w-3 h-3 mr-1" />
+            Mobile
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="desktop" className="mt-2">
+          {renderDeviceControls('desktop')}
+        </TabsContent>
+        
+        <TabsContent value="tablet" className="mt-2">
+          {renderDeviceControls('tablet')}
+        </TabsContent>
+        
+        <TabsContent value="mobile" className="mt-2">
+          {renderDeviceControls('mobile')}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+interface ResponsiveSpacingEditorProps {
+  value: ResponsiveSpacing;
+  onChange: (value: ResponsiveSpacing) => void;
+  label?: string;
+}
+
+export const ResponsiveSpacingEditor = ({ 
+  value, 
+  onChange, 
+  label = 'Espaçamento Vertical' 
+}: ResponsiveSpacingEditorProps) => {
+  const handleIncrement = (device: keyof ResponsiveSpacing) => {
+    const newValue = Math.min(10, value[device] + 0.25);
+    onChange({ ...value, [device]: newValue });
+  };
+
+  const handleDecrement = (device: keyof ResponsiveSpacing) => {
+    const newValue = Math.max(0, value[device] - 0.25);
+    onChange({ ...value, [device]: newValue });
+  };
+
+  const renderDeviceControls = (device: keyof ResponsiveSpacing) => (
+    <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-6 w-6 p-0"
+          onClick={() => handleIncrement(device)}
+        >
+          <ChevronUp className="w-3 h-3" />
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-6 w-6 p-0"
+          onClick={() => handleDecrement(device)}
+        >
+          <ChevronDown className="w-3 h-3" />
+        </Button>
+      </div>
+      <Slider
+        value={[value[device]]}
+        onValueChange={(v) => onChange({ ...value, [device]: v[0] })}
+        min={0}
+        max={10}
+        step={0.25}
+        className="flex-1"
+      />
+      <span className="text-xs w-12 text-right">{value[device]}rem</span>
+    </div>
+  );
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs font-medium">{label}</Label>
       <Tabs defaultValue="desktop" className="w-full">
         <TabsList className="grid w-full grid-cols-3 h-8">
           <TabsTrigger value="desktop" className="text-xs px-2 h-6">
