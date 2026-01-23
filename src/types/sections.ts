@@ -54,6 +54,13 @@ export interface ResponsiveFontSize {
   mobile: string;
 }
 
+// Responsive vertical spacing (margin-bottom in rem)
+export interface ResponsiveSpacing {
+  desktop: number;
+  tablet: number;
+  mobile: number;
+}
+
 // Horizontal alignment per viewport
 export type HorizontalAlign = 'left' | 'center' | 'right';
 
@@ -108,6 +115,8 @@ export interface SectionElement {
   responsiveFontSize?: ResponsiveFontSize;
   // Responsive horizontal alignment
   responsiveAlign?: ResponsiveAlign;
+  // Responsive vertical spacing (margin-bottom)
+  responsiveSpacing?: ResponsiveSpacing;
   // Inline group - elements with same group stay on same line
   inlineGroup?: string;
   // Opens lead popup instead of navigating to link
@@ -116,6 +125,8 @@ export interface SectionElement {
   buttonColor?: ButtonColorConfig;
   // Card configuration
   cardConfig?: CardConfig;
+  // Image shadow control
+  showShadow?: boolean;
 }
 
 export interface ResponsiveLayout {

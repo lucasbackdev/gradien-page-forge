@@ -25,7 +25,7 @@ import {
 import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronLeft, Bold, Link, Columns, ArrowLeftRight, Monitor, Tablet, Smartphone, Settings, GripVertical, MousePointerClick, UserPlus, LayoutGrid } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ResponsiveMediaSizeEditor, ResponsiveFontSizeEditor } from '@/components/ResponsiveSizeEditor';
+import { ResponsiveMediaSizeEditor, ResponsiveFontSizeEditor, ResponsiveSpacingEditor } from '@/components/ResponsiveSizeEditor';
 import { ResponsiveAlignEditor } from '@/components/ResponsiveAlignEditor';
 
 type EditorView = 'sections' | 'section-elements' | 'element-edit' | 'section-settings';
@@ -724,6 +724,24 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                   label="Tamanho da Imagem"
                 />
                 
+                <ResponsiveSpacingEditor
+                  value={selectedElement.responsiveSpacing || { desktop: 1, tablet: 0.75, mobile: 0.5 }}
+                  onChange={(value) => updateSectionElement(selectedSection.id, selectedElement.id, { 
+                    responsiveSpacing: value
+                  })}
+                  label="Espaçamento Vertical"
+                />
+                
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={selectedElement.showShadow !== false}
+                    onCheckedChange={(checked) => updateSectionElement(selectedSection.id, selectedElement.id, { 
+                      showShadow: checked
+                    })}
+                  />
+                  <Label className="text-xs">Mostrar Sombra</Label>
+                </div>
+                
                 <div className="flex items-center gap-2">
                   <Switch
                     checked={selectedElement.glowingBorder || false}
@@ -791,6 +809,24 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                   max={150}
                   label="Tamanho do Vídeo"
                 />
+                
+                <ResponsiveSpacingEditor
+                  value={selectedElement.responsiveSpacing || { desktop: 1, tablet: 0.75, mobile: 0.5 }}
+                  onChange={(value) => updateSectionElement(selectedSection.id, selectedElement.id, { 
+                    responsiveSpacing: value
+                  })}
+                  label="Espaçamento Vertical"
+                />
+                
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={selectedElement.showShadow !== false}
+                    onCheckedChange={(checked) => updateSectionElement(selectedSection.id, selectedElement.id, { 
+                      showShadow: checked
+                    })}
+                  />
+                  <Label className="text-xs">Mostrar Sombra</Label>
+                </div>
                 
                 <div className="flex items-center gap-2">
                   <Switch

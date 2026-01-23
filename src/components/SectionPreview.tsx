@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, ResponsiveSize, ResponsiveFontSize, ResponsiveAlign, HorizontalAlign, LayoutDirection, ResponsiveColumnSettings } from '@/types/sections';
+import { PresellSection, GradientDirection, SectionElement, BackgroundOverlay, ResponsiveSize, ResponsiveFontSize, ResponsiveAlign, HorizontalAlign, LayoutDirection, ResponsiveColumnSettings, ResponsiveSpacing } from '@/types/sections';
 import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X, GripHorizontal } from 'lucide-react';
@@ -212,6 +212,17 @@ export const SectionPreview = ({
       return element.responsiveAlign[viewportSize] || 'center';
     }
     return 'center';
+  };
+
+  // Helper to get responsive vertical spacing
+  const getResponsiveSpacing = (element: SectionElement): number => {
+    if (element.responsiveSpacing) {
+      return element.responsiveSpacing[viewportSize];
+    }
+    // Default values based on viewport
+    if (viewportSize === 'mobile') return 0.5;
+    if (viewportSize === 'tablet') return 0.75;
+    return 1;
   };
 
   const getAlignmentClass = (align: HorizontalAlign): string => {
@@ -451,9 +462,14 @@ export const SectionPreview = ({
         const imageMediaWidth = getResponsiveMediaWidth(element);
         // On mobile, expand media to fill more of the screen
         const effectiveImageWidth = viewportSize === 'mobile' ? Math.max(imageMediaWidth, 100) : imageMediaWidth;
-        const imageMarginClass = viewportSize === 'mobile' ? 'mb-2' : 'mb-3';
+        const imageSpacing = getResponsiveSpacing(element);
+        const showImageShadow = element.showShadow !== false;
         return element.imageUrl ? (
-          <div key={element.id} className={`${widthClass} ${isInGroup ? '' : imageMarginClass} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
+          <div 
+            key={element.id} 
+            className={`${widthClass} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}
+            style={{ marginBottom: isInGroup ? 0 : `${imageSpacing}rem` }}
+          >
             <a
               {...dragProps}
               href={presellData.affiliateLink || '#'}
@@ -464,7 +480,7 @@ export const SectionPreview = ({
               <img
                 src={element.imageUrl}
                 alt={element.content || 'Imagem'}
-                className="rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity w-full"
+                className={`rounded-lg cursor-pointer hover:opacity-90 transition-opacity w-full ${showImageShadow ? 'shadow-lg' : ''}`}
                 style={{ 
                   maxHeight: '500px', 
                   objectFit: 'cover',
@@ -489,14 +505,19 @@ export const SectionPreview = ({
         const videoMediaWidth = getResponsiveMediaWidth(element);
         // On mobile, expand video to fill more of the screen
         const effectiveVideoWidth = viewportSize === 'mobile' ? Math.max(videoMediaWidth, 100) : videoMediaWidth;
-        const videoMarginClass = viewportSize === 'mobile' ? 'mb-2' : 'mb-3';
+        const videoSpacing = getResponsiveSpacing(element);
+        const showVideoShadow = element.showShadow !== false;
         return element.videoUrl ? (
-          <div key={element.id} className={`${widthClass} ${isInGroup ? '' : videoMarginClass} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
+          <div 
+            key={element.id} 
+            className={`${widthClass} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}
+            style={{ marginBottom: isInGroup ? 0 : `${videoSpacing}rem` }}
+          >
             <video
               {...dragProps}
               src={element.videoUrl}
               controls
-              className={`rounded-lg shadow-lg ${baseClass} ${animationClass}`}
+              className={`rounded-lg ${showVideoShadow ? 'shadow-lg' : ''} ${baseClass} ${animationClass}`}
               style={{ 
                 width: isInGroup ? '100%' : `${effectiveVideoWidth}%`,
                 maxWidth: viewportSize === 'mobile' ? '100%' : '150%',
