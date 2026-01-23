@@ -83,8 +83,10 @@ export const SectionPreview = ({
   };
 
   const getSectionStyle = (section: PresellSection): React.CSSProperties => {
+    // Reduce padding on mobile for fuller content display
+    const defaultPadding = viewportSize === 'mobile' ? '2rem 0.5rem' : (section.padding || '4rem 2rem');
     const style: React.CSSProperties = {
-      padding: section.padding || '4rem 2rem',
+      padding: defaultPadding,
       color: section.textColor || '#ffffff',
       position: 'relative',
       minHeight: section.minHeight || 'auto',
@@ -225,6 +227,7 @@ export const SectionPreview = ({
     const baseStyle: React.CSSProperties = {
       fontSize,
       fontWeight: element.bold ? 'bold' : element.fontWeight,
+      lineHeight: viewportSize === 'mobile' ? 1.3 : 1.4,
     };
 
     if (element.gradientText?.enabled && element.gradientText.colors?.length) {
@@ -398,12 +401,13 @@ export const SectionPreview = ({
 
     switch (element.type) {
       case 'text':
+        const textMarginClass = viewportSize === 'mobile' ? 'mb-2' : 'mb-3';
         return (
           <div 
             key={element.id} 
             {...dragProps}
             style={getTextStyle(element)} 
-            className={`${isInGroup ? '' : 'mb-4'} ${widthClass} ${baseClass} ${animationClass} ${alignClass}`}
+            className={`${isInGroup ? '' : textMarginClass} ${widthClass} ${baseClass} ${animationClass} ${alignClass}`}
           >
             {renderTextWithHighlight(element.content || '', element)}
           </div>
@@ -445,14 +449,17 @@ export const SectionPreview = ({
           backgroundClip: 'padding-box, border-box',
         } : {};
         const imageMediaWidth = getResponsiveMediaWidth(element);
+        // On mobile, expand media to fill more of the screen
+        const effectiveImageWidth = viewportSize === 'mobile' ? Math.max(imageMediaWidth, 100) : imageMediaWidth;
+        const imageMarginClass = viewportSize === 'mobile' ? 'mb-2' : 'mb-3';
         return element.imageUrl ? (
-          <div key={element.id} className={`${widthClass} ${isInGroup ? '' : 'mb-4'} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
+          <div key={element.id} className={`${widthClass} ${isInGroup ? '' : imageMarginClass} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
             <a
               {...dragProps}
               href={presellData.affiliateLink || '#'}
               onClick={(e) => { if (!presellData.affiliateLink) e.preventDefault(); }}
               className={`block ${baseClass} ${animationClass}`}
-              style={{ width: isInGroup ? '100%' : `${imageMediaWidth}%`, maxWidth: '100%' }}
+              style={{ width: isInGroup ? '100%' : `${effectiveImageWidth}%`, maxWidth: viewportSize === 'mobile' ? '100%' : '150%' }}
             >
               <img
                 src={element.imageUrl}
@@ -480,16 +487,19 @@ export const SectionPreview = ({
           backgroundClip: 'padding-box, border-box',
         } : {};
         const videoMediaWidth = getResponsiveMediaWidth(element);
+        // On mobile, expand video to fill more of the screen
+        const effectiveVideoWidth = viewportSize === 'mobile' ? Math.max(videoMediaWidth, 100) : videoMediaWidth;
+        const videoMarginClass = viewportSize === 'mobile' ? 'mb-2' : 'mb-3';
         return element.videoUrl ? (
-          <div key={element.id} className={`${widthClass} ${isInGroup ? '' : 'mb-4'} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
+          <div key={element.id} className={`${widthClass} ${isInGroup ? '' : videoMarginClass} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
             <video
               {...dragProps}
               src={element.videoUrl}
               controls
               className={`rounded-lg shadow-lg ${baseClass} ${animationClass}`}
               style={{ 
-                width: isInGroup ? '100%' : `${videoMediaWidth}%`,
-                maxWidth: '100%',
+                width: isInGroup ? '100%' : `${effectiveVideoWidth}%`,
+                maxWidth: viewportSize === 'mobile' ? '100%' : '150%',
                 ...videoGlowStyle,
               }}
             />
