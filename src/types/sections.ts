@@ -127,6 +127,8 @@ export interface SectionElement {
   cardConfig?: CardConfig;
   // Image shadow control
   showShadow?: boolean;
+  // Scroll to section - section id to scroll to when button is clicked
+  scrollToSection?: string;
 }
 
 export interface ResponsiveLayout {

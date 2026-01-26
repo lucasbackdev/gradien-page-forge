@@ -362,6 +362,11 @@ async function handleInlineLeadSubmit(e) {
     }
   };
 
+  // Helper function to escape special regex characters
+  const escapeRegExpExport = (string: string): string => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  };
+
   // Helper function to render a single element as HTML
   const renderElementHTML = (el: SectionElement, sectionIndex: number, elIndex: number, data: PresellData): string => {
     if (el.type === 'text') {
@@ -373,8 +378,10 @@ async function handleInlineLeadSubmit(e) {
       if (el.highlightWords?.enabled && el.highlightWords.words) {
         const words = el.highlightWords.words.split(',').map(w => w.trim()).filter(Boolean);
         words.forEach(word => {
-          const regex = new RegExp(`(${word})`, 'gi');
-          content = content.replace(regex, `<span style="color: ${el.highlightWords!.color}">\$1</span>`);
+          // Escape special regex characters to allow any character to be highlighted
+          const escapedWord = escapeRegExpExport(word);
+          const regex = new RegExp(`(${escapedWord})`, 'gi');
+          content = content.replace(regex, `<span style="color: ${el.highlightWords!.color}">$1</span>`);
         });
       }
       
@@ -392,6 +399,7 @@ async function handleInlineLeadSubmit(e) {
     if (el.type === 'button') {
       const isShinyButton = data.buttonStyle.template === 'shiny-green';
       const shouldOpenPopup = el.opensPopup && data.popupConfig?.enabled;
+      const scrollTargetSection = el.scrollToSection;
       
       // Get button background style
       let buttonBgStyle = '';
@@ -410,20 +418,26 @@ async function handleInlineLeadSubmit(e) {
       const align = el.responsiveAlign?.desktop || 'center';
       const alignWrapperStyle = `text-align: ${align}; display: block; width: 100%;`;
       
+      // Determine click action
+      let clickHandler = '';
+      let href = data.affiliateLink || el.link || '#';
+      
+      if (shouldOpenPopup) {
+        clickHandler = 'onclick="event.preventDefault(); openLeadPopup();"';
+        href = '#';
+      } else if (scrollTargetSection) {
+        clickHandler = `onclick="event.preventDefault(); document.getElementById('section-${scrollTargetSection}').scrollIntoView({behavior: 'smooth'});"`;
+        href = '#';
+      }
+      
       if (isShinyButton) {
         const buttonContent = `<span>${el.content || 'Botão'}</span>`;
-        if (shouldOpenPopup) {
-          return `<div style="${alignWrapperStyle}"><a href="#" class="shiny-cta" onclick="event.preventDefault(); openLeadPopup();">${buttonContent}</a></div>`;
-        }
-        return `<div style="${alignWrapperStyle}"><a href="${data.affiliateLink || el.link || '#'}" class="shiny-cta">${buttonContent}</a></div>`;
+        return `<div style="${alignWrapperStyle}"><a href="${href}" class="shiny-cta" ${clickHandler}>${buttonContent}</a></div>`;
       }
       
       const buttonContent = el.content || 'Botão';
       const customStyle = buttonBgStyle ? ` style="${buttonBgStyle}"` : '';
-      if (shouldOpenPopup) {
-        return `<div style="${alignWrapperStyle}"><a href="#" class="element-button"${customStyle} onclick="event.preventDefault(); openLeadPopup();">${buttonContent}</a></div>`;
-      }
-      return `<div style="${alignWrapperStyle}"><a href="${data.affiliateLink || el.link || '#'}" class="element-button"${customStyle}>${buttonContent}</a></div>`;
+      return `<div style="${alignWrapperStyle}"><a href="${href}" class="element-button"${customStyle} ${clickHandler}>${buttonContent}</a></div>`;
     }
     if (el.type === 'image' && el.imageUrl) {
       const glowClass = el.glowingBorder ? 'glow-border' : '';
@@ -545,8 +559,13 @@ async function handleInlineLeadSubmit(e) {
       
       const styles = getCardStyles();
       
+      // Get responsive spacing for vertical gap between cards
+      const desktopSpacing = el.responsiveSpacing?.desktop ?? 1;
+      const tabletSpacing = el.responsiveSpacing?.tablet ?? 0.75;
+      const mobileSpacing = el.responsiveSpacing?.mobile ?? 0.5;
+      
       return `
-<div class="element-card" style="max-width: 380px; margin: 0 auto 1rem;">
+<div class="element-card" style="max-width: 380px; margin: 0 auto;" data-desktop-spacing="${desktopSpacing}" data-tablet-spacing="${tabletSpacing}" data-mobile-spacing="${mobileSpacing}">
   <div class="card-inner" style="background-color: ${styles.bg}; border: 1px solid ${styles.border}; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.3s; color: ${styles.text};">
     <div class="card-header" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
       <div class="card-icon" style="width: 2rem; height: 2rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; background-color: ${styles.accent}20;">
@@ -1345,6 +1364,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
 /* Card styles */
 .element-card {
   width: 100%;
+  margin-bottom: 1rem;
 }
 
 .card-inner:hover {
