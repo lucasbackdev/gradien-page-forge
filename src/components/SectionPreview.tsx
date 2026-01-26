@@ -1064,7 +1064,9 @@ export const SectionPreview = ({
                 columnWidthRatio: section.columnWidthRatio,
               };
               
-              const isColumnsLayout = currentLayout === 'two-columns' || currentLayout === 'two-columns-reverse';
+              // DISABLE two-columns layout on mobile - force vertical
+              const isMobileViewport = viewportSize === 'mobile';
+              const isColumnsLayout = !isMobileViewport && (currentLayout === 'two-columns' || currentLayout === 'two-columns-reverse');
               
               const getWidthClass = (ratio: string | undefined, isLeft: boolean) => {
                 if (!ratio || ratio === '50-50') return 'w-1/2';
@@ -1085,7 +1087,7 @@ export const SectionPreview = ({
                         : 'flex flex-col items-stretch'
                   }`}
                 >
-                  {/* Two columns layout */}
+                  {/* Two columns layout - only for desktop/tablet */}
                   {isColumnsLayout ? (
                     <div 
                       className={`flex flex-row gap-6 w-full items-start ${currentLayout === 'two-columns-reverse' ? 'flex-row-reverse' : ''}`}
@@ -1118,8 +1120,9 @@ export const SectionPreview = ({
                   ) : (
                     /* Regular layout - Render grouped elements */
                     groupElements(section.elements).map((group, groupIndex) => {
-                      if (group.group && group.elements.length > 1) {
-                        // Render inline group - elements side by side
+                      // DISABLE inline grouping on mobile - render as individual elements
+                      if (!isMobileViewport && group.group && group.elements.length > 1) {
+                        // Render inline group - elements side by side (desktop/tablet only)
                         return (
                           <div key={`group-${groupIndex}`} className="flex flex-row flex-wrap items-center gap-6 w-full mb-4 md:flex-nowrap">
                             {group.elements.map((element) => {
@@ -1129,10 +1132,11 @@ export const SectionPreview = ({
                           </div>
                         );
                       } else {
-                        // Render single element
-                        const element = group.elements[0];
-                        const elIndex = section.elements.findIndex(e => e.id === element.id);
-                        return renderElement(element, section.id, elIndex, currentLayout, false);
+                        // Render elements individually (mobile or ungrouped elements)
+                        return group.elements.map((element) => {
+                          const elIndex = section.elements.findIndex(e => e.id === element.id);
+                          return renderElement(element, section.id, elIndex, currentLayout, false);
+                        });
                       }
                     })
                   )}

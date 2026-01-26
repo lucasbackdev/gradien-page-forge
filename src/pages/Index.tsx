@@ -565,6 +565,34 @@ async function handleInlineLeadSubmit(e) {
     return '';
   };
 
+  // Helper to group elements by inlineGroup for export
+  const groupElementsForExport = (elements: SectionElement[]) => {
+    const groups: { group: string | null; elements: SectionElement[] }[] = [];
+    let currentGroup: { group: string | null; elements: SectionElement[] } | null = null;
+
+    elements.forEach((element) => {
+      const group = element.inlineGroup || null;
+      
+      if (group) {
+        if (currentGroup && currentGroup.group === group) {
+          currentGroup.elements.push(element);
+        } else {
+          if (currentGroup) groups.push(currentGroup);
+          currentGroup = { group, elements: [element] };
+        }
+      } else {
+        if (currentGroup) {
+          groups.push(currentGroup);
+          currentGroup = null;
+        }
+        groups.push({ group: null, elements: [element] });
+      }
+    });
+
+    if (currentGroup) groups.push(currentGroup);
+    return groups;
+  };
+
   const generateSectionsHTML = (data: PresellData): string => {
     if (data.sections.length === 0) return '<div class="empty-message">Nenhuma seção adicionada</div>';
 
@@ -651,8 +679,19 @@ async function handleInlineLeadSubmit(e) {
       </div>
     </div>`;
       } else {
-        // Regular layout
-        html += section.elements.map((el, elIndex) => renderElementHTML(el, sectionIndex, elIndex, data)).join('');
+        // Regular layout - group elements by inlineGroup
+        const groupedElements = groupElementsForExport(section.elements);
+        html += groupedElements.map(group => {
+          if (group.group && group.elements.length > 1) {
+            // Render inline group with class for CSS targeting
+            return `<div class="inline-group" style="display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin-bottom: 1rem;">
+              ${group.elements.map((el) => renderElementHTML(el, sectionIndex, section.elements.indexOf(el), data)).join('')}
+            </div>`;
+          } else {
+            // Render single element
+            return group.elements.map((el) => renderElementHTML(el, sectionIndex, section.elements.indexOf(el), data)).join('');
+          }
+        }).join('');
       }
 
       html += `
@@ -944,6 +983,24 @@ body {
   }
   .card-inner {
     padding: 1rem !important;
+  }
+  /* DISABLE two-columns layout on mobile - stack vertically */
+  .columns-container {
+    flex-direction: column !important;
+  }
+  .columns-container .column-left,
+  .columns-container .column-right {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+  /* DISABLE inline grouping on mobile - stack vertically */
+  .inline-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  .inline-group > * {
+    width: 100% !important;
+    flex: none !important;
   }
 }
 
