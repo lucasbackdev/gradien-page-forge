@@ -173,6 +173,11 @@ export const SectionPreview = ({
     return '';
   };
 
+  // Helper function to escape special regex characters
+  const escapeRegExp = (string: string): string => {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  };
+
   const renderTextWithHighlight = (content: string, element: SectionElement) => {
     if (!element.highlightWords?.enabled || !element.highlightWords.words) {
       return content;
@@ -183,8 +188,10 @@ export const SectionPreview = ({
 
     let result = content;
     words.forEach(word => {
-      const regex = new RegExp(`(${word})`, 'gi');
-      result = result.replace(regex, `<span style="color: ${element.highlightWords!.color}">\$1</span>`);
+      // Escape special regex characters to allow any character to be highlighted
+      const escapedWord = escapeRegExp(word);
+      const regex = new RegExp(`(${escapedWord})`, 'gi');
+      result = result.replace(regex, `<span style="color: ${element.highlightWords!.color}">$1</span>`);
     });
 
     return <span dangerouslySetInnerHTML={{ __html: result }} />;
@@ -427,21 +434,31 @@ export const SectionPreview = ({
         const buttonClass = getButtonClass();
         const isShinyButton = presellData.buttonStyle.template === 'shiny-green';
         const shouldOpenPopup = element.opensPopup && presellData.popupConfig?.enabled;
+        const scrollTargetSection = element.scrollToSection;
+        
+        const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+          if (shouldOpenPopup) {
+            e.preventDefault();
+            setShowLeadPopup(true);
+          } else if (scrollTargetSection) {
+            e.preventDefault();
+            const targetElement = document.getElementById(`section-${scrollTargetSection}`);
+            if (targetElement) {
+              targetElement.scrollIntoView({ behavior: 'smooth' });
+            }
+          } else if (!presellData.affiliateLink && !element.link) {
+            e.preventDefault();
+          }
+        };
+        
         return (
           <div key={element.id} className={`${widthClass} ${isInGroup ? '' : 'mb-4'} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
             <a
               {...dragProps}
-              href={shouldOpenPopup ? '#' : (presellData.affiliateLink || element.link || '#')}
+              href={shouldOpenPopup || scrollTargetSection ? '#' : (presellData.affiliateLink || element.link || '#')}
               className={`${baseClass} ${animationClass} ${buttonClass} ${!isShinyButton && presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
               style={getButtonStyle(element)}
-              onClick={(e) => {
-                if (shouldOpenPopup) {
-                  e.preventDefault();
-                  setShowLeadPopup(true);
-                } else if (!presellData.affiliateLink && !element.link) {
-                  e.preventDefault();
-                }
-              }}
+              onClick={handleButtonClick}
             >
               {isShinyButton ? <span>{element.content}</span> : element.content}
             </a>
@@ -649,12 +666,14 @@ export const SectionPreview = ({
         
         const cardStyles = getCardStyles();
         
+        // Add margin-bottom for vertical spacing between cards
+        const cardSpacing = getResponsiveSpacing(element);
         return (
           <div
             key={element.id}
             {...dragProps}
-            className={`${widthClass} ${isInGroup ? '' : 'mb-4'} ${baseClass} ${animationClass}`}
-            style={{ maxWidth: '380px', margin: '0 auto' }}
+            className={`${widthClass} ${baseClass} ${animationClass}`}
+            style={{ maxWidth: '380px', margin: '0 auto', marginBottom: `${cardSpacing}rem` }}
           >
             <div
               className="rounded-xl p-6 shadow-lg transition-all duration-300 hover:-translate-y-2"

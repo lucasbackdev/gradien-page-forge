@@ -674,15 +674,48 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                 </div>
 
                 {!selectedElement.opensPopup && (
-                  <div>
-                    <Label className="text-xs">Link do Botão</Label>
-                    <Input
-                      value={selectedElement.link || ''}
-                      onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, { link: e.target.value })}
-                      placeholder="https://..."
-                      className="mt-1 h-8"
-                    />
-                  </div>
+                  <>
+                    {/* Scroll to section option */}
+                    <div className="space-y-2 p-3 border rounded-lg bg-muted/30">
+                      <Label className="text-xs font-medium flex items-center gap-1">
+                        <ChevronLeft className="w-3 h-3 rotate-90" /> Rolar para Seção
+                      </Label>
+                      <Select
+                        value={selectedElement.scrollToSection || 'none'}
+                        onValueChange={(value) => updateSectionElement(selectedSection.id, selectedElement.id, { 
+                          scrollToSection: value === 'none' ? undefined : value,
+                          link: value !== 'none' ? '' : selectedElement.link
+                        })}
+                      >
+                        <SelectTrigger className="h-8">
+                          <SelectValue placeholder="Selecione uma seção" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Nenhuma (usar link)</SelectItem>
+                          {sections.map(section => (
+                            <SelectItem key={section.id} value={section.id}>
+                              {section.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-[10px] text-muted-foreground">
+                        Ao clicar, a página rola até a seção escolhida
+                      </p>
+                    </div>
+
+                    {!selectedElement.scrollToSection && (
+                      <div>
+                        <Label className="text-xs">Link do Botão</Label>
+                        <Input
+                          value={selectedElement.link || ''}
+                          onChange={(e) => updateSectionElement(selectedSection.id, selectedElement.id, { link: e.target.value })}
+                          placeholder="https://..."
+                          className="mt-1 h-8"
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
