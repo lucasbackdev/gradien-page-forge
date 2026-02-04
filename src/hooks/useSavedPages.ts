@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { PresellData } from '@/types/presell';
@@ -18,9 +18,18 @@ export function useSavedPages() {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const fetchSavedPages = async () => {
+  const fetchSavedPages = useCallback(async () => {
     try {
       setLoading(true);
+      
+      // Check if user is authenticated first
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        setSavedPages([]);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('saved_pages')
         .select('*')
@@ -45,12 +54,12 @@ export function useSavedPages() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   const savePage = async (name: string, data: PresellData): Promise<SavedPage | null> => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Usuário não autenticado');
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) throw new Error('Usuário não autenticado');
 
       const { data: savedPage, error } = await supabase
         .from('saved_pages')
@@ -151,8 +160,21 @@ export function useSavedPages() {
   };
 
   useEffect(() => {
+    // Listen for auth state changes to refetch pages
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        fetchSavedPages();
+      } else if (event === 'SIGNED_OUT') {
+        setSavedPages([]);
+        setLoading(false);
+      }
+    });
+
+    // Initial fetch
     fetchSavedPages();
-  }, []);
+
+    return () => subscription.unsubscribe();
+  }, [fetchSavedPages]);
 
   return {
     savedPages,

@@ -26,19 +26,27 @@ export const useAuth = () => {
   });
 
   useEffect(() => {
+    let mounted = true;
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!mounted) return;
+        
+        console.log('Auth state change:', event);
+        
         setAuthState((prev) => ({
           ...prev,
           session,
           user: session?.user ?? null,
         }));
 
-        // Defer Supabase calls with setTimeout
+        // Defer Supabase calls with setTimeout to avoid deadlocks
         if (session?.user) {
           setTimeout(() => {
-            fetchUserData(session.user.id);
+            if (mounted) {
+              fetchUserData(session.user.id);
+            }
           }, 0);
         } else {
           setAuthState((prev) => ({
@@ -52,21 +60,52 @@ export const useAuth = () => {
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setAuthState((prev) => ({
-        ...prev,
-        session,
-        user: session?.user ?? null,
-      }));
+    const initSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session error:', error);
+          // Clear local state on session error
+          if (mounted) {
+            setAuthState({
+              user: null,
+              session: null,
+              loading: false,
+              isAdmin: false,
+              subscription: null,
+            });
+          }
+          return;
+        }
 
-      if (session?.user) {
-        fetchUserData(session.user.id);
-      } else {
-        setAuthState((prev) => ({ ...prev, loading: false }));
+        if (!mounted) return;
+
+        setAuthState((prev) => ({
+          ...prev,
+          session,
+          user: session?.user ?? null,
+        }));
+
+        if (session?.user) {
+          fetchUserData(session.user.id);
+        } else {
+          setAuthState((prev) => ({ ...prev, loading: false }));
+        }
+      } catch (err) {
+        console.error('Init session error:', err);
+        if (mounted) {
+          setAuthState((prev) => ({ ...prev, loading: false }));
+        }
       }
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    initSession();
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchUserData = async (userId: string) => {

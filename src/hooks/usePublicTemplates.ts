@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { PresellData } from '@/types/presell';
 import { toast } from '@/hooks/use-toast';
@@ -21,8 +21,13 @@ export const usePublicTemplates = () => {
   const [templates, setTemplates] = useState<PublicTemplate[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchTemplates = async () => {
+  const fetchTemplates = useCallback(async () => {
     try {
+      setLoading(true);
+      
+      // Wait for session to be ready
+      const { data: { session } } = await supabase.auth.getSession();
+      
       const { data, error } = await supabase
         .from('public_templates')
         .select('*')
@@ -42,11 +47,24 @@ export const usePublicTemplates = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        fetchTemplates();
+      } else if (event === 'SIGNED_OUT') {
+        // Keep public templates visible even when logged out
+        fetchTemplates();
+      }
+    });
+
+    // Initial fetch
     fetchTemplates();
-  }, []);
+
+    return () => subscription.unsubscribe();
+  }, [fetchTemplates]);
 
   const createTemplate = async (
     name: string,
