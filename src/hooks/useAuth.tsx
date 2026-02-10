@@ -27,6 +27,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     let mounted = true;
+    let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -34,6 +35,10 @@ export const useAuth = () => {
         if (!mounted) return;
         
         console.log('Auth state change:', event);
+
+        if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed successfully');
+        }
         
         setAuthState((prev) => ({
           ...prev,
@@ -48,7 +53,7 @@ export const useAuth = () => {
               fetchUserData(session.user.id);
             }
           }, 0);
-        } else {
+        } else if (event === 'SIGNED_OUT') {
           setAuthState((prev) => ({
             ...prev,
             isAdmin: false,
@@ -65,16 +70,31 @@ export const useAuth = () => {
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Session error:', error);
-          // Clear local state on session error
+          console.error('Session error, attempting refresh:', error);
+          // Try to refresh instead of giving up
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+          if (refreshError || !refreshData.session) {
+            if (mounted) {
+              setAuthState({
+                user: null,
+                session: null,
+                loading: false,
+                isAdmin: false,
+                subscription: null,
+              });
+            }
+            return;
+          }
+          // Refresh succeeded, use the new session
           if (mounted) {
-            setAuthState({
-              user: null,
-              session: null,
-              loading: false,
-              isAdmin: false,
-              subscription: null,
-            });
+            setAuthState((prev) => ({
+              ...prev,
+              session: refreshData.session,
+              user: refreshData.session?.user ?? null,
+            }));
+            if (refreshData.session?.user) {
+              fetchUserData(refreshData.session.user.id);
+            }
           }
           return;
         }
@@ -102,9 +122,29 @@ export const useAuth = () => {
 
     initSession();
 
+    // Proactively refresh session every 10 minutes to prevent expiration
+    refreshInterval = setInterval(async () => {
+      if (!mounted) return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          // Check if token expires within next 5 minutes
+          const expiresAt = session.expires_at ?? 0;
+          const now = Math.floor(Date.now() / 1000);
+          if (expiresAt - now < 300) {
+            console.log('Token expiring soon, refreshing...');
+            await supabase.auth.refreshSession();
+          }
+        }
+      } catch (err) {
+        console.error('Proactive refresh error:', err);
+      }
+    }, 10 * 60 * 1000); // every 10 minutes
+
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      if (refreshInterval) clearInterval(refreshInterval);
     };
   }, []);
 
