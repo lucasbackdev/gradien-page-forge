@@ -112,13 +112,7 @@ const Index = () => {
       const sectionsHtml = generateSectionsHTML(presellData);
       const sectionsCss = generateSectionsCSS(presellData);
       
-      // IP Tracking Pixel
-      const ipTrackingUrl = presellData.ipTracking?.enabled && 
-        presellData.ipTracking?.url && 
-        presellData.ipTracking.url.match(/^https?:\/\//)
-          ? presellData.ipTracking.url
-          : 'SUA_URL_DO_PIXEL_AQUI';
-      const ipTrackingPixel = `\n<!-- IP Tracking Pixel -->\n<img src="${ipTrackingUrl}" style="display:none;">\n`;
+      // IP Tracking removed for Google Ads compliance
 
       const fullHtml = `<!DOCTYPE html>
 <html lang="${presellData.language || 'pt'}">
@@ -140,88 +134,50 @@ ${presellData.whatsappEnabled && presellData.whatsappLink ? `
   </svg>
 </a>
 ` : ''}
-${presellData.popupConfig?.enabled ? `
-<!-- Lead Popup -->
-<div id="leadPopup" class="lead-popup-overlay" style="display: none;">
-  <div class="lead-popup-content" style="background: ${presellData.popupConfig.popupBackgroundColor || '#1a1a2e'}; color: ${presellData.popupConfig.popupTextColor || '#ffffff'};">
-    <button class="lead-popup-close" onclick="closeLeadPopup()">&times;</button>
-    <h2 class="lead-popup-title" style="color: ${presellData.popupConfig.popupTextColor || '#ffffff'};">${presellData.popupConfig.title || 'Cadastre-se'}</h2>
-    <form id="leadForm" class="lead-form">
-      <input type="hidden" name="user_id" value="${user?.id || ''}" />
-      <input type="hidden" name="source_page" value="${presellData.pageTitle || 'Página'}" />
-      <div class="lead-field">
-        <label style="color: ${presellData.popupConfig.popupTextColor || '#ffffff'};">Nome Completo ${presellData.popupConfig.fullNameRequired ? '<span class="required">*</span>' : ''}</label>
-        <input type="text" name="full_name" ${presellData.popupConfig.fullNameRequired ? 'required' : ''} placeholder="Digite seu nome completo" />
-      </div>
-      <div class="lead-field">
-        <label style="color: ${presellData.popupConfig.popupTextColor || '#ffffff'};">Email ${presellData.popupConfig.emailRequired ? '<span class="required">*</span>' : ''}</label>
-        <input type="email" name="email" ${presellData.popupConfig.emailRequired ? 'required' : ''} placeholder="Digite seu email" />
-      </div>
-      <div class="lead-field">
-        <label style="color: ${presellData.popupConfig.popupTextColor || '#ffffff'};">Telefone ${presellData.popupConfig.phoneRequired ? '<span class="required">*</span>' : ''}</label>
-        <input type="tel" name="phone" ${presellData.popupConfig.phoneRequired ? 'required' : ''} placeholder="Digite seu telefone" />
-      </div>
-      <button type="submit" class="lead-submit-btn" style="background: ${presellData.popupConfig.buttonColor || '#8B5CF6'};">${presellData.popupConfig.buttonText || 'Enviar'}</button>
-      ${presellData.popupConfig.showPrivacyTerms !== false && (presellData.popupConfig.privacyLink || presellData.popupConfig.termsLink) ? `
-      <div class="lead-popup-footer" style="color: ${presellData.popupConfig.privacyTextColor || '#888888'};">
-        ${presellData.popupConfig.termsLink ? `<a href="${presellData.popupConfig.termsLink}" target="_blank" style="color: ${presellData.popupConfig.privacyTextColor || '#888888'};">Termos de Uso</a>` : ''}
-        ${presellData.popupConfig.termsLink && presellData.popupConfig.privacyLink ? '<span class="separator">|</span>' : ''}
-        ${presellData.popupConfig.privacyLink ? `<a href="${presellData.popupConfig.privacyLink}" target="_blank" style="color: ${presellData.popupConfig.privacyTextColor || '#888888'};">Política de Privacidade</a>` : ''}
-      </div>
-      ` : ''}
-    </form>
+
+<!-- Cookie Consent Banner (GDPR / DSGVO) -->
+<div id="cookieConsent" style="position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:#fff;padding:1rem 2rem;z-index:10000;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;box-shadow:0 -4px 20px rgba(0,0,0,0.3);">
+  <p style="margin:0;font-size:0.875rem;flex:1;min-width:200px;">Este site utiliza cookies para melhorar sua experiência. Ao continuar navegando, você concorda com nossa <a href="${presellData.privacyLink || '#'}" target="_blank" style="color:#8B5CF6;text-decoration:underline;">Política de Privacidade</a>.</p>
+  <div style="display:flex;gap:0.5rem;">
+    <button onclick="acceptCookies()" style="background:#8B5CF6;color:#fff;border:none;padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-weight:bold;">Aceitar</button>
+    <button onclick="declineCookies()" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.3);padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;">Recusar</button>
   </div>
 </div>
-` : ''}
-${ipTrackingPixel}
+
 <script>
 // Responsive sizing for media, text and spacing
 function applyResponsiveSizes() {
-  const width = window.innerWidth;
-  const device = width <= 768 ? 'mobile' : width <= 1024 ? 'tablet' : 'desktop';
+  var width = window.innerWidth;
+  var device = width <= 768 ? 'mobile' : width <= 1024 ? 'tablet' : 'desktop';
   
-  // Apply media sizes
   document.querySelectorAll('[data-desktop-width]').forEach(function(el) {
-    const size = el.getAttribute('data-' + device + '-width');
-    if (size) {
-      el.style.width = size + '%';
-      el.style.maxWidth = size + '%';
-    }
+    var size = el.getAttribute('data-' + device + '-width');
+    if (size) { el.style.width = size + '%'; el.style.maxWidth = size + '%'; }
   });
   
-  // Apply text sizes
   document.querySelectorAll('[data-desktop-size]').forEach(function(el) {
-    const size = el.getAttribute('data-' + device + '-size');
-    if (size) {
-      el.style.fontSize = size;
-    }
+    var size = el.getAttribute('data-' + device + '-size');
+    if (size) { el.style.fontSize = size; }
   });
   
-  // Apply responsive alignment
   document.querySelectorAll('[data-desktop-align]').forEach(function(el) {
-    const align = el.getAttribute('data-' + device + '-align');
-    if (align) {
-      el.style.textAlign = align;
-    }
+    var align = el.getAttribute('data-' + device + '-align');
+    if (align) { el.style.textAlign = align; }
   });
   
-  // Apply responsive spacing (margin-bottom)
   document.querySelectorAll('[data-desktop-spacing]').forEach(function(el) {
-    const spacing = el.getAttribute('data-' + device + '-spacing');
-    if (spacing) {
-      el.style.marginBottom = spacing + 'rem';
-    }
+    var spacing = el.getAttribute('data-' + device + '-spacing');
+    if (spacing) { el.style.marginBottom = spacing + 'rem'; }
   });
 }
 
-// Apply on load and resize
 document.addEventListener('DOMContentLoaded', applyResponsiveSizes);
 window.addEventListener('resize', applyResponsiveSizes);
 
 // Mobile menu toggle
 document.addEventListener('DOMContentLoaded', function() {
-  const menuBtn = document.querySelector('.mobile-menu-btn');
-  const mobileNav = document.querySelector('.mobile-nav');
+  var menuBtn = document.querySelector('.mobile-menu-btn');
+  var mobileNav = document.querySelector('.mobile-nav');
   if (menuBtn && mobileNav) {
     menuBtn.addEventListener('click', function() {
       mobileNav.classList.toggle('hidden');
@@ -229,66 +185,22 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// Lead popup functions
-function openLeadPopup() {
-  document.getElementById('leadPopup').style.display = 'flex';
-}
-function closeLeadPopup() {
-  document.getElementById('leadPopup').style.display = 'none';
-}
-document.getElementById('leadForm')?.addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const data = Object.fromEntries(formData);
-  
-  try {
-    const response = await fetch('https://cdytjekegrlhstpkzkeb.supabase.co/rest/v1/leads', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkeXRqZWtlZ3JsaHN0cGt6a2ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNTM0NjcsImV4cCI6MjA4MzkyOTQ2N30.73kcGWAnpNw6VvbVmLdfiVABdc02XyEtpY5kOX1t1zg',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify(data)
-    });
-    if (response.ok) {
-      alert('Cadastro realizado com sucesso!');
-      closeLeadPopup();
-      ${presellData.popupConfig?.redirectUrl ? `window.open('${presellData.popupConfig.redirectUrl}', '_blank');` : ''}
-    } else {
-      alert('Erro ao enviar cadastro.');
-    }
-  } catch(err) {
-    alert('Erro ao enviar cadastro.');
+// Cookie Consent (GDPR/DSGVO compliant)
+document.addEventListener('DOMContentLoaded', function() {
+  var consent = localStorage.getItem('cookie_consent');
+  if (!consent) {
+    document.getElementById('cookieConsent').style.display = 'flex';
   }
 });
 
-// Inline lead form handler
-async function handleInlineLeadSubmit(e) {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const data = Object.fromEntries(formData);
-  
-  try {
-    const response = await fetch('https://cdytjekegrlhstpkzkeb.supabase.co/rest/v1/leads', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNkeXRqZWtlZ3JsaHN0cGt6a2ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNTM0NjcsImV4cCI6MjA4MzkyOTQ2N30.73kcGWAnpNw6VvbVmLdfiVABdc02XyEtpY5kOX1t1zg',
-        'Prefer': 'return=minimal'
-      },
-      body: JSON.stringify(data)
-    });
-    if (response.ok) {
-      alert('Cadastro realizado com sucesso!');
-      e.target.reset();
-      ${presellData.popupConfig?.redirectUrl ? `window.open('${presellData.popupConfig.redirectUrl}', '_blank');` : ''}
-    } else {
-      alert('Erro ao enviar cadastro.');
-    }
-  } catch(err) {
-    alert('Erro ao enviar cadastro.');
-  }
+function acceptCookies() {
+  localStorage.setItem('cookie_consent', 'accepted');
+  document.getElementById('cookieConsent').style.display = 'none';
+}
+
+function declineCookies() {
+  localStorage.setItem('cookie_consent', 'declined');
+  document.getElementById('cookieConsent').style.display = 'none';
 }
 </script>
 </body>
@@ -398,7 +310,6 @@ async function handleInlineLeadSubmit(e) {
     }
     if (el.type === 'button') {
       const isShinyButton = data.buttonStyle.template === 'shiny-green';
-      const shouldOpenPopup = el.opensPopup && data.popupConfig?.enabled;
       const scrollTargetSection = el.scrollToSection;
       
       // Get button background style
@@ -418,14 +329,11 @@ async function handleInlineLeadSubmit(e) {
       const align = el.responsiveAlign?.desktop || 'center';
       const alignWrapperStyle = `text-align: ${align}; display: block; width: 100%;`;
       
-      // Determine click action
+      // Determine click action (no lead popup in exported HTML)
       let clickHandler = '';
       let href = data.affiliateLink || el.link || '#';
       
-      if (shouldOpenPopup) {
-        clickHandler = 'onclick="event.preventDefault(); openLeadPopup();"';
-        href = '#';
-      } else if (scrollTargetSection) {
+      if (scrollTargetSection) {
         clickHandler = `onclick="event.preventDefault(); document.getElementById('section-${scrollTargetSection}').scrollIntoView({behavior: 'smooth'});"`;
         href = '#';
       }
@@ -499,38 +407,8 @@ async function handleInlineLeadSubmit(e) {
       return `<div style="${alignWrapperStyle}">${videoTag}</div>`;
     }
     if (el.type === 'lead-form') {
-      const popupConfig = data.popupConfig;
-      const bgColor = popupConfig?.popupBackgroundColor || '#1a1a2e';
-      const textColor = popupConfig?.popupTextColor || '#ffffff';
-      const privacyColor = popupConfig?.privacyTextColor || '#888888';
-      return `
-<div class="inline-lead-form" style="background: ${bgColor}; color: ${textColor};">
-  <h3 style="color: ${textColor};">${popupConfig?.title || 'Cadastre-se'}</h3>
-  <form class="inline-lead-form-form" onsubmit="handleInlineLeadSubmit(event)">
-    <input type="hidden" name="user_id" value="${user?.id || ''}" />
-    <input type="hidden" name="source_page" value="${data.pageTitle || 'Página'}" />
-    <div class="form-field">
-      <label style="color: ${textColor};">Nome Completo ${popupConfig?.fullNameRequired ? '<span class="required">*</span>' : ''}</label>
-      <input type="text" name="full_name" ${popupConfig?.fullNameRequired ? 'required' : ''} placeholder="Digite seu nome completo" />
-    </div>
-    <div class="form-field">
-      <label style="color: ${textColor};">Email ${popupConfig?.emailRequired ? '<span class="required">*</span>' : ''}</label>
-      <input type="email" name="email" ${popupConfig?.emailRequired ? 'required' : ''} placeholder="Digite seu email" />
-    </div>
-    <div class="form-field">
-      <label style="color: ${textColor};">Telefone ${popupConfig?.phoneRequired ? '<span class="required">*</span>' : ''}</label>
-      <input type="tel" name="phone" ${popupConfig?.phoneRequired ? 'required' : ''} placeholder="Digite seu telefone" />
-    </div>
-    <button type="submit" style="background: ${popupConfig?.buttonColor || '#8B5CF6'}; width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: none; color: white; font-weight: bold; cursor: pointer;">${popupConfig?.buttonText || 'Enviar'}</button>
-    ${popupConfig?.showPrivacyTerms !== false && (popupConfig?.privacyLink || popupConfig?.termsLink) ? `
-    <div class="form-footer" style="color: ${privacyColor};">
-      ${popupConfig?.termsLink ? `<a href="${popupConfig.termsLink}" target="_blank" style="color: ${privacyColor};">Termos de Uso</a>` : ''}
-      ${popupConfig?.termsLink && popupConfig?.privacyLink ? ' | ' : ''}
-      ${popupConfig?.privacyLink ? `<a href="${popupConfig.privacyLink}" target="_blank" style="color: ${privacyColor};">Política de Privacidade</a>` : ''}
-    </div>
-    ` : ''}
-  </form>
-</div>`;
+      // Lead forms removed from exported HTML for Google Ads compliance
+      return '<!-- Lead form removed for compliance -->';
     }
     if (el.type === 'card') {
       const cardConfig = el.cardConfig || {
@@ -1386,123 +1264,6 @@ ${data.buttonStyle.template === 'shiny-green' ? `
   .column-left, .column-right {
     width: 100% !important;
   }
-}
-
-/* Lead Popup Styles */
-.lead-popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-.lead-popup-content {
-  border-radius: 1rem;
-  padding: 2rem;
-  max-width: 400px;
-  width: 90%;
-  position: relative;
-}
-.lead-popup-close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  color: inherit;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-.lead-popup-title {
-  text-align: center;
-  margin-bottom: 1.5rem;
-  font-size: 1.25rem;
-}
-.lead-field {
-  margin-bottom: 1rem;
-}
-.lead-field label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-}
-.lead-field .required {
-  color: #ef4444;
-}
-.lead-field input {
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.1);
-  color: inherit;
-}
-.lead-submit-btn {
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border: none;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 0.5rem;
-}
-.lead-popup-footer {
-  text-align: center;
-  font-size: 0.75rem;
-  margin-top: 1rem;
-}
-.lead-popup-footer a {
-  text-decoration: none;
-}
-.lead-popup-footer a:hover {
-  text-decoration: underline;
-}
-.lead-popup-footer .separator {
-  margin: 0 0.5rem;
-}
-
-/* Inline Lead Form Styles */
-.inline-lead-form {
-  border-radius: 1rem;
-  padding: 1.5rem;
-  max-width: 400px;
-  margin: 0 auto;
-}
-.inline-lead-form h3 {
-  text-align: center;
-  margin-bottom: 1rem;
-  font-size: 1.25rem;
-  font-weight: bold;
-}
-.inline-lead-form .form-field {
-  margin-bottom: 1rem;
-}
-.inline-lead-form .form-field label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-}
-.inline-lead-form .form-field input {
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.1);
-  color: inherit;
-}
-.inline-lead-form .form-footer {
-  text-align: center;
-  font-size: 0.75rem;
-  margin-top: 1rem;
-}
-.inline-lead-form .form-footer a {
-  text-decoration: none;
 }
 `;
   };
