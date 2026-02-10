@@ -1,4 +1,4 @@
-import { PresellData, PresellElement, availableFonts, ButtonTemplate } from '@/types/presell';
+import { PresellData, PresellElement, availableFonts, ButtonTemplate, translations } from '@/types/presell';
 import { PresellSection } from '@/types/sections';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,6 +19,8 @@ import {
   Menu,
   LayoutTemplate,
   Users,
+  Globe,
+  Shield,
 } from 'lucide-react';
 import {
   Select,
@@ -135,6 +137,28 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                       <img src={data.favicon} alt="Favicon" className="h-6 w-6 object-cover rounded" />
                     )}
                   </div>
+                </div>
+
+                {/* Language */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Idioma da Página</Label>
+                  <Select 
+                    value={data.language || 'pt'} 
+                    onValueChange={(value: 'pt' | 'es' | 'en' | 'de') => onChange({ ...data, language: value })}
+                  >
+                    <SelectTrigger className="h-8 text-xs bg-muted border-border text-foreground">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border-border">
+                      <SelectItem value="pt" className="text-xs text-popover-foreground">🇧🇷 Português</SelectItem>
+                      <SelectItem value="en" className="text-xs text-popover-foreground">🇺🇸 English</SelectItem>
+                      <SelectItem value="es" className="text-xs text-popover-foreground">🇪🇸 Español</SelectItem>
+                      <SelectItem value="de" className="text-xs text-popover-foreground">🇩🇪 Deutsch</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[9px] text-muted-foreground">
+                    Define o atributo &lt;html lang=""&gt; do HTML exportado
+                  </p>
                 </div>
 
                 {/* Fonts */}
@@ -712,6 +736,28 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                     />
                   </div>
                 )}
+              </div>
+
+              {/* Consent Banner */}
+              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-4">
+                <Shield className="w-3.5 h-3.5" />
+                Banner de Consentimento (DSGVO)
+              </div>
+
+              <div className="space-y-2">
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Texto do Banner</Label>
+                  <Textarea
+                    value={data.consentBannerText || 'Utilizamos cookies apenas após o seu consentimento, conforme nossa'}
+                    onChange={(e) => onChange({ ...data, consentBannerText: e.target.value })}
+                    className="text-xs bg-muted border-border text-foreground placeholder:text-muted-foreground min-h-[60px]"
+                    placeholder="Utilizamos cookies apenas após o seu consentimento, conforme nossa"
+                    rows={2}
+                  />
+                  <p className="text-[9px] text-muted-foreground">
+                    O link de Política de Privacidade é adicionado automaticamente após este texto
+                  </p>
+                </div>
               </div>
 
               {/* IP Tracking */}

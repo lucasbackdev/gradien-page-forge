@@ -1,4 +1,4 @@
-import { Moon, Sun, Menu, Shield, LogOut, User, LayoutTemplate, Save, FolderOpen, Upload } from 'lucide-react';
+import { Moon, Sun, Menu, Shield, LogOut, User, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -23,9 +23,6 @@ interface TopBarProps {
   onLoadPage: (data: PresellData) => void;
   currentPageId?: string;
   onPageIdChange?: (id: string | undefined) => void;
-  onOpenTemplates: () => void;
-  onOpenSave: () => void;
-  onOpenLoad: () => void;
 }
 
 export const TopBar = ({
@@ -36,9 +33,6 @@ export const TopBar = ({
   onLoadPage,
   currentPageId,
   onPageIdChange,
-  onOpenTemplates,
-  onOpenSave,
-  onOpenLoad,
 }: TopBarProps) => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
@@ -177,21 +171,6 @@ export const TopBar = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={onOpenTemplates} className="cursor-pointer">
-              <LayoutTemplate className="h-4 w-4 mr-2" />
-              Templates
-            </DropdownMenuItem>
-            
-            <DropdownMenuItem onClick={onOpenSave} className="cursor-pointer">
-              <Save className="h-4 w-4 mr-2" />
-              Salvar
-            </DropdownMenuItem>
-            
-            <DropdownMenuItem onClick={onOpenLoad} className="cursor-pointer">
-              <FolderOpen className="h-4 w-4 mr-2" />
-              Abrir
-            </DropdownMenuItem>
-            
             <DropdownMenuItem onClick={() => fileInputRef.current?.click()} className="cursor-pointer">
               <Upload className="h-4 w-4 mr-2" />
               Importar ZIP

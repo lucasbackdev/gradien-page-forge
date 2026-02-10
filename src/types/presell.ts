@@ -163,6 +163,9 @@ export interface PresellData {
   // Language
   language: 'pt' | 'es' | 'en' | 'de';
   
+  // Consent Banner
+  consentBannerText: string;
+  
   // Lead Popup
   popupConfig: PopupConfig;
 }
@@ -257,6 +260,7 @@ export const defaultPresellData: PresellData = {
     linksColor: '#888888',
   },
   language: 'pt',
+  consentBannerText: 'Utilizamos cookies apenas após o seu consentimento, conforme nossa',
   popupConfig: {
     enabled: false,
     title: 'Cadastre-se',
