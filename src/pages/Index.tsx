@@ -137,7 +137,7 @@ ${presellData.whatsappEnabled && presellData.whatsappLink ? `
 
 <!-- Cookie Consent Banner (GDPR / DSGVO) -->
 <div id="cookieConsent" style="position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:#fff;padding:1rem 2rem;z-index:10000;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;box-shadow:0 -4px 20px rgba(0,0,0,0.3);">
-  <p style="margin:0;font-size:0.875rem;flex:1;min-width:200px;">Este site utiliza cookies para melhorar sua experiência. Ao continuar navegando, você concorda com nossa <a href="${presellData.privacyLink || '#'}" target="_blank" style="color:#8B5CF6;text-decoration:underline;">Política de Privacidade</a>.</p>
+  <p style="margin:0;font-size:0.875rem;flex:1;min-width:200px;">${presellData.consentBannerText || 'Utilizamos cookies apenas após o seu consentimento, conforme nossa'} <a href="${presellData.privacyLink || '#'}" target="_blank" style="color:#8B5CF6;text-decoration:underline;">${translations[presellData.language || 'pt'].privacy}</a>.</p>
   <div style="display:flex;gap:0.5rem;">
     <button onclick="acceptCookies()" style="background:#8B5CF6;color:#fff;border:none;padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-weight:bold;">Aceitar</button>
     <button onclick="declineCookies()" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.3);padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;">Recusar</button>
@@ -203,6 +203,7 @@ function declineCookies() {
   document.getElementById('cookieConsent').style.display = 'none';
 }
 </script>
+<!--PRESELL_DATA:${JSON.stringify(presellData)}-->
 </body>
 </html>`;
 
@@ -1446,9 +1447,6 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         onLoadPage={setPresellData}
         currentPageId={currentPageId}
         onPageIdChange={setCurrentPageId}
-        onOpenTemplates={() => setTemplatesOpen(true)}
-        onOpenSave={handleUpdateCurrent}
-        onOpenLoad={() => setLoadDialogOpen(true)}
       />
 
       <div className="flex-1 flex overflow-hidden">
