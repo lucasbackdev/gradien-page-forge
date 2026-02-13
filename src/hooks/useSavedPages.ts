@@ -45,17 +45,12 @@ export function useSavedPages() {
       
       setSavedPages(typedData);
     } catch (error: any) {
-      // Silently ignore JWT expired errors - auth will auto-refresh
-      if (error?.message === 'JWT expired' || error?.code === 'PGRST303') {
-        console.log('Session expired, waiting for refresh...');
+      // Silently ignore JWT expired and timeout errors
+      if (error?.message === 'JWT expired' || error?.code === 'PGRST303' || error?.code === '57014') {
+        console.log('Transient error fetching pages, ignoring:', error?.code);
         return;
       }
       console.error('Error fetching saved pages:', error);
-      toast({
-        title: "Erro ao carregar páginas",
-        description: error.message,
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
@@ -165,9 +160,8 @@ export function useSavedPages() {
   };
 
   useEffect(() => {
-    // Listen for auth state changes to refetch pages
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      if (event === 'SIGNED_IN') {
         fetchSavedPages();
       } else if (event === 'SIGNED_OUT') {
         setSavedPages([]);
