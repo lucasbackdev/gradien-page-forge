@@ -7,6 +7,7 @@ import { SectionPreview } from '@/components/SectionPreview';
 import { ResponsivePreview, ViewportSize, getViewportWidth } from '@/components/ResponsivePreview';
 import { PresellData, PresellElement, defaultPresellData, translations } from '@/types/presell';
 import { PresellSection, SectionElement } from '@/types/sections';
+import { TrackingPanel } from '@/components/TrackingPanel';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useSavedPages, SavedPage } from '@/hooks/useSavedPages';
@@ -54,6 +55,7 @@ const Index = () => {
   const [viewportSize, setViewportSize] = useState<ViewportSize>('desktop');
   const [currentPageId, setCurrentPageId] = useState<string | undefined>(undefined);
   const [highlightedElement, setHighlightedElement] = useState<{ sectionId: string; elementId: string } | null>(null);
+  const [trackingPanelOpen, setTrackingPanelOpen] = useState(false);
   
   // Dialog states
   const [templatesOpen, setTemplatesOpen] = useState(false);
@@ -104,6 +106,69 @@ const Index = () => {
     }));
   };
 
+  const generateTrackingHeadScripts = (data: PresellData): string => {
+    const scripts: string[] = [];
+    const tc = data.trackingConfig;
+    
+    // Google Tag Manager - head snippet
+    if (tc?.gtmId) {
+      scripts.push(`  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','${tc.gtmId}');</script>
+  <!-- End Google Tag Manager -->`);
+    }
+    
+    // Google Ads global site tag (gtag.js)
+    if (tc?.googleAdsId) {
+      scripts.push(`  <!-- Global site tag (gtag.js) - Google Ads -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=${tc.googleAdsId}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '${tc.googleAdsId}');
+  </script>`);
+    }
+    
+    return scripts.join('\n');
+  };
+
+  const generateTrackingBodyScripts = (data: PresellData): string => {
+    const scripts: string[] = [];
+    const tc = data.trackingConfig;
+    
+    // GTM noscript fallback
+    if (tc?.gtmId) {
+      scripts.push(`<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=${tc.gtmId}"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->`);
+    }
+    
+    // Conversion tracking script (fires on CTA clicks)
+    if (tc?.conversionId && tc?.conversionLabel) {
+      scripts.push(`<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var buttons = document.querySelectorAll('.element-button, .shiny-cta');
+  buttons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (typeof gtag === 'function') {
+        gtag('event', 'conversion', {
+          'send_to': '${tc.conversionId}/${tc.conversionLabel}'
+        });
+      }
+    });
+  });
+});
+</script>`);
+    }
+    
+    return scripts.join('\n');
+  };
+
   const handleDownload = async () => {
     try {
       const zip = new JSZip();
@@ -115,6 +180,9 @@ const Index = () => {
       
       // IP Tracking removed for Google Ads compliance
 
+      const trackingHeadScripts = generateTrackingHeadScripts(presellData);
+      const trackingBodyScripts = generateTrackingBodyScripts(presellData);
+
       const fullHtml = `<!DOCTYPE html>
 <html lang="${presellData.language || 'pt'}">
 <head>
@@ -122,11 +190,13 @@ const Index = () => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${presellData.pageTitle || 'Presell'}</title>
   ${presellData.favicon ? `<link rel="icon" href="public/favicon.png">` : ''}
+${trackingHeadScripts}
   <style>
 ${sectionsCss}
   </style>
 </head>
 <body>
+${trackingBodyScripts}
 ${sectionsHtml}
 ${presellData.whatsappEnabled && presellData.whatsappLink ? `
 <a href="${presellData.whatsappLink}" class="whatsapp-button" target="_blank">
@@ -1462,6 +1532,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         onLoadPage={setPresellData}
         currentPageId={currentPageId}
         onPageIdChange={setCurrentPageId}
+        onOpenTracking={() => setTrackingPanelOpen(true)}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -1910,6 +1981,14 @@ ${data.buttonStyle.template === 'shiny-green' ? `
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Tracking Panel */}
+      <TrackingPanel
+        open={trackingPanelOpen}
+        onOpenChange={setTrackingPanelOpen}
+        config={presellData.trackingConfig || { gtmId: '', googleAdsId: '', conversionId: '', conversionLabel: '' }}
+        onChange={(trackingConfig) => setPresellData(prev => ({ ...prev, trackingConfig }))}
+      />
     </div>
   );
 };

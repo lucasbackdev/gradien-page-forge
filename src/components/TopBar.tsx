@@ -1,4 +1,4 @@
-import { Moon, Sun, Menu, Shield, LogOut, User, Upload } from 'lucide-react';
+import { Moon, Sun, Menu, Shield, LogOut, User, Upload, Tag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ interface TopBarProps {
   onLoadPage: (data: PresellData) => void;
   currentPageId?: string;
   onPageIdChange?: (id: string | undefined) => void;
+  onOpenTracking?: () => void;
 }
 
 export const TopBar = ({
@@ -33,6 +34,7 @@ export const TopBar = ({
   onLoadPage,
   currentPageId,
   onPageIdChange,
+  onOpenTracking,
 }: TopBarProps) => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
@@ -174,6 +176,11 @@ export const TopBar = ({
             <DropdownMenuItem onClick={() => fileInputRef.current?.click()} className="cursor-pointer">
               <Upload className="h-4 w-4 mr-2" />
               Importar ZIP
+            </DropdownMenuItem>
+            
+            <DropdownMenuItem onClick={onOpenTracking} className="cursor-pointer">
+              <Tag className="h-4 w-4 mr-2" />
+              Tags & Rastreamento
             </DropdownMenuItem>
             
             <DropdownMenuSeparator />

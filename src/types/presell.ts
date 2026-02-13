@@ -90,6 +90,13 @@ export interface TopLogoConfig {
   position: 'left' | 'center' | 'right';
 }
 
+export interface TrackingConfig {
+  gtmId: string;           // GTM-XXXXXXX
+  googleAdsId: string;     // AW-XXXXXXXXXX
+  conversionId: string;    // AW-XXXXXXXXXX/XXXXXXXXXXXX
+  conversionLabel: string; // label for conversion event
+}
+
 export interface PresellData {
   // Images
   logoImage: string;
@@ -194,6 +201,9 @@ export interface PresellData {
   
   // Lead Popup
   popupConfig: PopupConfig;
+  
+  // Tracking / Tags
+  trackingConfig: TrackingConfig;
 }
 
 export const defaultPresellData: PresellData = {
@@ -321,6 +331,12 @@ export const defaultPresellData: PresellData = {
     privacyLink: '',
     termsLink: '',
     showPrivacyTerms: true,
+  },
+  trackingConfig: {
+    gtmId: '',
+    googleAdsId: '',
+    conversionId: '',
+    conversionLabel: '',
   },
 };
 
