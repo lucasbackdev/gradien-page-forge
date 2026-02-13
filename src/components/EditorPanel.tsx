@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { PresellData, PresellElement, availableFonts, ButtonTemplate, translations, CookieBannerConfig, TopLogoConfig } from '@/types/presell';
 import { PresellSection } from '@/types/sections';
 import { Input } from '@/components/ui/input';
@@ -42,9 +43,11 @@ import shinyButtonPreview from '@/assets/shiny-button-preview.gif';
 interface EditorPanelProps {
   data: PresellData;
   onChange: (data: PresellData) => void;
+  highlightedElement?: { sectionId: string; elementId: string } | null;
+  onClearHighlight?: () => void;
 }
 
-export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
+export const EditorPanel = ({ data, onChange, highlightedElement, onClearHighlight }: EditorPanelProps) => {
   const handleImageUpload = (field: 'logoImage' | 'favicon', file: File) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -61,6 +64,15 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
     reader.readAsDataURL(file);
   };
 
+  const [activeTab, setActiveTab] = useState('elements');
+
+  // When an element is highlighted from the preview, switch to elements tab
+  useEffect(() => {
+    if (highlightedElement) {
+      setActiveTab('elements');
+    }
+  }, [highlightedElement]);
+
   return (
     <div className="h-full flex flex-col bg-background">
       {/* Elementor-style Header */}
@@ -70,7 +82,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
         <Grid3X3 className="w-4 h-4 text-muted-foreground cursor-pointer hover:text-foreground" />
       </div>
 
-      <Tabs defaultValue="elements" className="flex-1 flex flex-col overflow-hidden">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
         {/* Elementor-style Tabs */}
         <div className="border-b border-border bg-background">
           <TabsList className="w-full h-10 bg-transparent rounded-none p-0 grid grid-cols-5">
@@ -303,6 +315,8 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                 <SectionEditor
                   sections={data.sections}
                   onUpdateSections={(sections) => onChange({ ...data, sections })}
+                  highlightedElement={highlightedElement}
+                  onClearHighlight={onClearHighlight}
                 />
               </div>
             </div>

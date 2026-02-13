@@ -15,6 +15,7 @@ interface SectionPreviewProps {
   onUpdateSectionHeight?: (sectionId: string, minHeight: string) => void;
   viewportSize?: ViewportSize;
   userId?: string;
+  onElementClick?: (sectionId: string, elementId: string) => void;
 }
 
 export const SectionPreview = ({ 
@@ -25,7 +26,8 @@ export const SectionPreview = ({
   onUpdateSectionElements,
   onUpdateSectionHeight,
   viewportSize = 'desktop',
-  userId
+  userId,
+  onElementClick
 }: SectionPreviewProps) => {
   const [draggedSectionIndex, setDraggedSectionIndex] = useState<number | null>(null);
   const [draggedElementInfo, setDraggedElementInfo] = useState<{ sectionId: string; elementIndex: number } | null>(null);
@@ -408,6 +410,11 @@ export const SectionPreview = ({
       onDragStart: (e: React.DragEvent) => handleElementDragStart(e, sectionId, elementIndex),
       onDragOver: (e: React.DragEvent) => handleElementDragOver(e, sectionId, elementIndex),
       onDragEnd: handleElementDragEnd,
+      onClick: (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onElementClick?.(sectionId, element.id);
+      },
     };
 
     const baseClass = `cursor-move transition-all ${isDragging ? 'opacity-50 scale-95' : 'hover:ring-2 hover:ring-primary/50 hover:ring-offset-2'}`;

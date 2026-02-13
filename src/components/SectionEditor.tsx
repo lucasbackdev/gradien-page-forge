@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PresellSection, SectionElement, sectionTemplates, sectionTypesList, SectionType, GradientDirection, TextType, LayoutDirection, ResponsiveLayout, ResponsiveColumnSettings, CardConfig } from '@/types/sections';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -33,9 +33,11 @@ type EditorView = 'sections' | 'section-elements' | 'element-edit' | 'section-se
 interface SectionEditorProps {
   sections: PresellSection[];
   onUpdateSections: (sections: PresellSection[]) => void;
+  highlightedElement?: { sectionId: string; elementId: string } | null;
+  onClearHighlight?: () => void;
 }
 
-export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps) => {
+export const SectionEditor = ({ sections, onUpdateSections, highlightedElement, onClearHighlight }: SectionEditorProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentView, setCurrentView] = useState<EditorView>('sections');
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
@@ -43,6 +45,15 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
 
   const selectedSection = sections.find(s => s.id === selectedSectionId);
   const selectedElement = selectedSection?.elements.find(e => e.id === selectedElementId);
+
+  // Navigate to highlighted element from preview click
+  useEffect(() => {
+    if (highlightedElement) {
+      setSelectedSectionId(highlightedElement.sectionId);
+      setCurrentView('section-elements');
+      setSelectedElementId(null);
+    }
+  }, [highlightedElement]);
 
   const addSection = (type: SectionType) => {
     const template = sectionTemplates[type];
@@ -313,11 +324,18 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
             </Card>
           )}
           
-          {selectedSection.elements.map((element) => (
+          {selectedSection.elements.map((element) => {
+            const isHighlighted = highlightedElement?.sectionId === selectedSection.id && highlightedElement?.elementId === element.id;
+            return (
             <Card
               key={element.id}
-              className="p-3 cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => handleSelectElement(element.id)}
+              className={`p-3 cursor-pointer hover:bg-accent/50 transition-colors ${isHighlighted ? 'animate-pulse-red-border' : ''}`}
+              onClick={() => {
+                if (isHighlighted) {
+                  onClearHighlight?.();
+                }
+                handleSelectElement(element.id);
+              }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -351,7 +369,8 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                 </Button>
               </div>
             </Card>
-          ))}
+            );
+          })}
         </div>
       </div>
     );

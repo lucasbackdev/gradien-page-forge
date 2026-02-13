@@ -1,3 +1,14 @@
+@keyframes pulse-red-border {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3); border-color: rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 1); }
+}
+
+.animate-pulse-red-border {
+  animation: pulse-red-border 1s ease-in-out infinite;
+  border: 2px solid rgba(239, 68, 68, 0.5);
+  border-radius: 0.5rem;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
