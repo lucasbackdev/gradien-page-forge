@@ -45,6 +45,11 @@ export function useSavedPages() {
       
       setSavedPages(typedData);
     } catch (error: any) {
+      // Silently ignore JWT expired errors - auth will auto-refresh
+      if (error?.message === 'JWT expired' || error?.code === 'PGRST303') {
+        console.log('Session expired, waiting for refresh...');
+        return;
+      }
       console.error('Error fetching saved pages:', error);
       toast({
         title: "Erro ao carregar páginas",

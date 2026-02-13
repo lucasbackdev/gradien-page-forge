@@ -459,6 +459,8 @@ export const SectionPreview = ({
             <a
               {...dragProps}
               href={scrollTargetSection ? '#' : (presellData.affiliateLink || element.link || '#')}
+              target={scrollTargetSection ? undefined : '_blank'}
+              rel={scrollTargetSection ? undefined : 'noopener noreferrer'}
               className={`${baseClass} ${animationClass} ${buttonClass} ${!isShinyButton && presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
               style={getButtonStyle(element)}
               onClick={handleButtonClick}
@@ -493,6 +495,8 @@ export const SectionPreview = ({
             <a
               {...dragProps}
               href={presellData.affiliateLink || '#'}
+              target={presellData.affiliateLink ? '_blank' : undefined}
+              rel={presellData.affiliateLink ? 'noopener noreferrer' : undefined}
               onClick={(e) => { if (!presellData.affiliateLink) e.preventDefault(); }}
               className={`block ${baseClass} ${animationClass}`}
               style={{ width: isInGroup ? '100%' : `${effectiveImageWidth}%`, maxWidth: viewportSize === 'mobile' ? '100%' : '150%' }}
