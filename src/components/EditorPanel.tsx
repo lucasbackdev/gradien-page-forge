@@ -18,7 +18,6 @@ import {
   Layers,
   Menu,
   LayoutTemplate,
-  Users,
   Globe,
   Shield,
 } from 'lucide-react';
@@ -32,7 +31,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SectionEditor } from './SectionEditor';
 import { FloatingHeaderEditor } from './FloatingHeaderEditor';
-import { PopupConfigEditor } from './PopupConfigEditor';
+
 import shinyButtonPreview from '@/assets/shiny-button-preview.gif';
 
 
@@ -62,7 +61,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
       <Tabs defaultValue="elements" className="flex-1 flex flex-col overflow-hidden">
         {/* Elementor-style Tabs */}
         <div className="border-b border-border bg-background">
-          <TabsList className="w-full h-10 bg-transparent rounded-none p-0 grid grid-cols-5">
+          <TabsList className="w-full h-10 bg-transparent rounded-none p-0 grid grid-cols-4">
             <TabsTrigger 
               value="elements" 
               className="h-full rounded-none border-b-2 border-transparent text-xs text-muted-foreground data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
@@ -76,13 +75,6 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
             >
               <LayoutTemplate className="w-3.5 h-3.5 mr-1" />
               Modelos
-            </TabsTrigger>
-            <TabsTrigger 
-              value="popup" 
-              className="h-full rounded-none border-b-2 border-transparent text-xs text-muted-foreground data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
-            >
-              <Users className="w-3.5 h-3.5 mr-1" />
-              Leads
             </TabsTrigger>
             <TabsTrigger 
               value="links" 
@@ -294,49 +286,6 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
             </div>
           </TabsContent>
 
-          {/* Popup/Leads Tab */}
-          <TabsContent value="popup" className="mt-0 h-full">
-            <div className="p-3 space-y-4">
-              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border">
-                <Users className="w-3.5 h-3.5" />
-                Captação de Leads
-              </div>
-
-              <div className="flex items-center justify-between py-2">
-                <div>
-                  <Label className="text-xs font-medium">Ativar Popup de Leads</Label>
-                  <p className="text-[9px] text-muted-foreground">
-                    Capture nome, email e telefone dos visitantes
-                  </p>
-                </div>
-                <Switch
-                  checked={data.popupConfig?.enabled || false}
-                  onCheckedChange={(checked) => onChange({
-                    ...data,
-                    popupConfig: { ...data.popupConfig, enabled: checked }
-                  })}
-                />
-              </div>
-
-              {data.popupConfig?.enabled && (
-                <PopupConfigEditor
-                  config={data.popupConfig}
-                  onChange={(popupConfig) => onChange({ ...data, popupConfig })}
-                />
-              )}
-
-              <div className="pt-4 border-t">
-                <a 
-                  href="/leads-admin" 
-                  target="_blank"
-                  className="inline-flex items-center gap-2 text-xs text-primary hover:underline"
-                >
-                  <Users className="w-3.5 h-3.5" />
-                  Acessar Painel de Leads →
-                </a>
-              </div>
-            </div>
-          </TabsContent>
 
           {/* Links Tab */}
           <TabsContent value="links" className="mt-0 h-full">

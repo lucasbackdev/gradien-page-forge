@@ -4,7 +4,7 @@ import { PresellData, translations } from '@/types/presell';
 import { FloatingHeader } from '@/types/sections';
 import { Trash2, ChevronUp, ChevronDown, Menu, X, GripHorizontal } from 'lucide-react';
 import { ViewportSize } from '@/components/ResponsivePreview';
-import { LeadPopup } from '@/components/LeadPopup';
+
 
 interface SectionPreviewProps {
   sections: PresellSection[];
@@ -35,7 +35,7 @@ export const SectionPreview = ({
   const [resizeStartY, setResizeStartY] = useState(0);
   const [resizeStartHeight, setResizeStartHeight] = useState(0);
   const trashRef = useRef<HTMLDivElement>(null);
-  const [showLeadPopup, setShowLeadPopup] = useState(false);
+  
 
   // No longer need the manual script loading - using unicornstudio-react package
 
@@ -433,14 +433,10 @@ export const SectionPreview = ({
       case 'button':
         const buttonClass = getButtonClass();
         const isShinyButton = presellData.buttonStyle.template === 'shiny-green';
-        const shouldOpenPopup = element.opensPopup && presellData.popupConfig?.enabled;
         const scrollTargetSection = element.scrollToSection;
         
         const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-          if (shouldOpenPopup) {
-            e.preventDefault();
-            setShowLeadPopup(true);
-          } else if (scrollTargetSection) {
+          if (scrollTargetSection) {
             e.preventDefault();
             const targetElement = document.getElementById(`section-${scrollTargetSection}`);
             if (targetElement) {
@@ -455,7 +451,7 @@ export const SectionPreview = ({
           <div key={element.id} className={`${widthClass} ${isInGroup ? '' : 'mb-4'} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
             <a
               {...dragProps}
-              href={shouldOpenPopup || scrollTargetSection ? '#' : (presellData.affiliateLink || element.link || '#')}
+              href={scrollTargetSection ? '#' : (presellData.affiliateLink || element.link || '#')}
               className={`${baseClass} ${animationClass} ${buttonClass} ${!isShinyButton && presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
               style={getButtonStyle(element)}
               onClick={handleButtonClick}
@@ -543,92 +539,6 @@ export const SectionPreview = ({
             />
           </div>
         ) : null;
-      case 'lead-form':
-        // Render inline lead form
-        const popupConfig = presellData.popupConfig;
-        const bgColor = popupConfig?.popupBackgroundColor || '#1a1a2e';
-        const textColor = popupConfig?.popupTextColor || '#ffffff';
-        return (
-          <div 
-            key={element.id}
-            {...dragProps}
-            className={`${widthClass} ${isInGroup ? '' : 'mb-4'} ${baseClass} ${animationClass}`}
-            style={{ width: isInGroup ? '100%' : '100%', maxWidth: '400px', margin: '0 auto' }}
-          >
-            <div 
-              className="rounded-xl p-6 shadow-lg"
-              style={{ backgroundColor: bgColor, color: textColor }}
-            >
-              <h3 className="text-xl font-bold text-center mb-4" style={{ color: textColor }}>
-                {popupConfig?.title || 'Cadastre-se'}
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm mb-1" style={{ color: textColor }}>
-                    Nome Completo {popupConfig?.fullNameRequired && <span className="text-red-500">*</span>}
-                  </label>
-                  <input 
-                    type="text" 
-                    placeholder="Digite seu nome completo"
-                    className="w-full px-3 py-2 rounded-lg border"
-                    style={{ 
-                      backgroundColor: 'rgba(255,255,255,0.1)', 
-                      borderColor: 'rgba(255,255,255,0.2)',
-                      color: textColor 
-                    }}
-                    disabled
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1" style={{ color: textColor }}>
-                    Email {popupConfig?.emailRequired && <span className="text-red-500">*</span>}
-                  </label>
-                  <input 
-                    type="email" 
-                    placeholder="Digite seu email"
-                    className="w-full px-3 py-2 rounded-lg border"
-                    style={{ 
-                      backgroundColor: 'rgba(255,255,255,0.1)', 
-                      borderColor: 'rgba(255,255,255,0.2)',
-                      color: textColor 
-                    }}
-                    disabled
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm mb-1" style={{ color: textColor }}>
-                    Telefone {popupConfig?.phoneRequired && <span className="text-red-500">*</span>}
-                  </label>
-                  <input 
-                    type="tel" 
-                    placeholder="Digite seu telefone"
-                    className="w-full px-3 py-2 rounded-lg border"
-                    style={{ 
-                      backgroundColor: 'rgba(255,255,255,0.1)', 
-                      borderColor: 'rgba(255,255,255,0.2)',
-                      color: textColor 
-                    }}
-                    disabled
-                  />
-                </div>
-                <button 
-                  className="w-full py-3 rounded-lg font-semibold text-white"
-                  style={{ backgroundColor: popupConfig?.buttonColor || '#8B5CF6' }}
-                  disabled
-                >
-                  {popupConfig?.buttonText || 'Enviar'}
-                </button>
-                {popupConfig?.showPrivacyTerms !== false && (popupConfig?.privacyLink || popupConfig?.termsLink) && (
-                  <div className="text-center text-xs mt-2" style={{ color: popupConfig?.privacyTextColor || '#888888' }}>
-                    {popupConfig?.termsLink && <span>Termos de Uso</span>}
-                    {popupConfig?.termsLink && popupConfig?.privacyLink && <span className="mx-1">|</span>}
-                    {popupConfig?.privacyLink && <span>Política de Privacidade</span>}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
       case 'card':
         const cardConfig = element.cardConfig || {
           title: 'Título',
@@ -1282,16 +1192,6 @@ export const SectionPreview = ({
         </div>
       )}
 
-      {/* Lead Capture Popup */}
-      {presellData.popupConfig?.enabled && userId && (
-        <LeadPopup
-          isOpen={showLeadPopup}
-          onClose={() => setShowLeadPopup(false)}
-          config={presellData.popupConfig}
-          userId={userId}
-          sourcePage={presellData.pageTitle || 'Página'}
-        />
-      )}
     </div>
   );
 };
