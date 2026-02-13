@@ -1298,8 +1298,9 @@ ${data.buttonStyle.template === 'shiny-green' ? `
     return null;
   }
 
-  // Check if subscription is active
-  const hasAccess = subscription?.status === 'active';
+  // Check if subscription is active - only block if we definitively know it's not active
+  // If subscription is null (still loading or fetch failed), don't block
+  const hasAccess = !subscription || subscription.status === 'active';
 
   if (!hasAccess) {
     return (

@@ -122,24 +122,26 @@ export const useAuth = () => {
 
     initSession();
 
-    // Proactively refresh session every 10 minutes to prevent expiration
+    // Proactively refresh session every 5 minutes to prevent expiration
     refreshInterval = setInterval(async () => {
       if (!mounted) return;
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-          // Check if token expires within next 5 minutes
           const expiresAt = session.expires_at ?? 0;
           const now = Math.floor(Date.now() / 1000);
-          if (expiresAt - now < 300) {
+          if (expiresAt - now < 600) {
             console.log('Token expiring soon, refreshing...');
-            await supabase.auth.refreshSession();
+            const { data } = await supabase.auth.refreshSession();
+            if (data.session?.user && mounted) {
+              fetchUserData(data.session.user.id);
+            }
           }
         }
       } catch (err) {
         console.error('Proactive refresh error:', err);
       }
-    }, 10 * 60 * 1000); // every 10 minutes
+    }, 5 * 60 * 1000); // every 5 minutes
 
     return () => {
       mounted = false;
@@ -148,21 +150,40 @@ export const useAuth = () => {
     };
   }, []);
 
-  const fetchUserData = async (userId: string) => {
+  const fetchUserData = async (userId: string, retried = false) => {
     try {
       // Check if user is admin
-      const { data: roles } = await supabase
+      const { data: roles, error: rolesError } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", userId)
         .eq("role", "admin");
 
+      // If JWT expired, try refreshing session and retry once
+      if (rolesError && (rolesError.message === 'JWT expired' || rolesError.code === 'PGRST303') && !retried) {
+        console.log('JWT expired during fetchUserData, refreshing...');
+        const { data: refreshData } = await supabase.auth.refreshSession();
+        if (refreshData.session) {
+          return fetchUserData(userId, true);
+        }
+      }
+
+      if (rolesError) throw rolesError;
+
       // Get subscription info
-      const { data: sub } = await supabase
+      const { data: sub, error: subError } = await supabase
         .from("subscriptions")
         .select("*")
         .eq("user_id", userId)
         .maybeSingle();
+
+      if (subError && (subError.message === 'JWT expired' || subError.code === 'PGRST303') && !retried) {
+        console.log('JWT expired during fetchUserData (sub), refreshing...');
+        const { data: refreshData } = await supabase.auth.refreshSession();
+        if (refreshData.session) {
+          return fetchUserData(userId, true);
+        }
+      }
 
       setAuthState((prev) => ({
         ...prev,
@@ -178,6 +199,7 @@ export const useAuth = () => {
       }));
     } catch (error) {
       console.error("Error fetching user data:", error);
+      // Don't clear subscription on transient errors - keep previous state
       setAuthState((prev) => ({ ...prev, loading: false }));
     }
   };
