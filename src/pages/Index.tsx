@@ -219,6 +219,14 @@ function declineCookies() {
           publicFolder.file('header-logo.png', logoData, { base64: true });
         }
       }
+
+      // Top Logo
+      if (presellData.topLogo?.enabled && presellData.topLogo.imageUrl && publicFolder) {
+        const topLogoData = presellData.topLogo.imageUrl.split(',')[1];
+        if (topLogoData) {
+          publicFolder.file('top-logo.png', topLogoData, { base64: true });
+        }
+      }
       
       if (presellData.favicon && publicFolder) {
         const faviconData = presellData.favicon.split(',')[1];
@@ -490,6 +498,15 @@ function declineCookies() {
     if (data.sections.length === 0) return '<div class="empty-message">Nenhuma seção adicionada</div>';
 
     let html = '';
+
+    // Top Logo (when floating header is disabled)
+    if (!data.floatingHeader.enabled && data.topLogo?.enabled && data.topLogo.imageUrl) {
+      const justify = data.topLogo.position === 'left' ? 'flex-start' : data.topLogo.position === 'right' ? 'flex-end' : 'center';
+      html += `
+<div style="padding: 1.5rem 2rem; display: flex; justify-content: ${justify};">
+  <img src="public/top-logo.png" alt="Logo" style="width: ${data.topLogo.size || 150}px; object-fit: contain;">
+</div>`;
+    }
 
     // Floating Header
     if (data.floatingHeader.enabled && data.sections.length > 0) {
