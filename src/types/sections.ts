@@ -94,7 +94,7 @@ export interface CardConfig {
 
 export interface SectionElement {
   id: string;
-  type: 'text' | 'image' | 'button' | 'video' | 'lead-form' | 'card';
+  type: 'text' | 'image' | 'button' | 'video' | 'card';
   content: string;
   textType?: TextType;
   bold?: boolean;
@@ -119,8 +119,6 @@ export interface SectionElement {
   responsiveSpacing?: ResponsiveSpacing;
   // Inline group - elements with same group stay on same line
   inlineGroup?: string;
-  // Opens lead popup instead of navigating to link
-  opensPopup?: boolean;
   // Individual button color configuration
   buttonColor?: ButtonColorConfig;
   // Card configuration

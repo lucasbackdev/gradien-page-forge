@@ -407,10 +407,6 @@ function declineCookies() {
       const videoTag = `<video src="public/section-${sectionIndex}-video-${elIndex}.mp4" controls class="element-video ${glowClass} ${shadowClass}" style="${glowStyle}" data-desktop-width="${desktopWidth}" data-tablet-width="${tabletWidth}" data-mobile-width="${mobileWidth}" data-desktop-spacing="${desktopSpacing}" data-tablet-spacing="${tabletSpacing}" data-mobile-spacing="${mobileSpacing}"></video>`;
       return `<div style="${alignWrapperStyle}">${videoTag}</div>`;
     }
-    if (el.type === 'lead-form') {
-      // Lead forms removed from exported HTML for Google Ads compliance
-      return '<!-- Lead form removed for compliance -->';
-    }
     if (el.type === 'card') {
       const cardConfig = el.cardConfig || {
         title: 'Título',

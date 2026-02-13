@@ -22,7 +22,7 @@ import {
   DialogTrigger,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronLeft, Bold, Link, Columns, ArrowLeftRight, Monitor, Tablet, Smartphone, Settings, GripVertical, MousePointerClick, UserPlus, LayoutGrid } from 'lucide-react';
+import { Plus, Trash2, AlignVerticalJustifyCenter, AlignHorizontalJustifyCenter, Image, Type, Video, ChevronLeft, Bold, Link, Columns, ArrowLeftRight, Monitor, Tablet, Smartphone, Settings, GripVertical, MousePointerClick, LayoutGrid } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveMediaSizeEditor, ResponsiveFontSizeEditor, ResponsiveSpacingEditor } from '@/components/ResponsiveSizeEditor';
@@ -97,7 +97,7 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
     const newElement: SectionElement = {
       id: Date.now().toString(),
       type,
-      content: type === 'text' ? 'Novo texto' : type === 'button' ? 'Novo botão' : type === 'lead-form' ? 'Formulário de Lead' : type === 'card' ? 'Card' : '',
+      content: type === 'text' ? 'Novo texto' : type === 'button' ? 'Novo botão' : type === 'card' ? 'Card' : '',
       fontSize: type === 'text' ? '18px' : '16px',
       color: '#ffffff',
       textType: type === 'text' ? 'description' : undefined,
@@ -299,13 +299,6 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
           <Button
             variant="outline"
             size="sm"
-            onClick={() => addElementToSection(selectedSection.id, 'lead-form')}
-          >
-            <UserPlus className="w-4 h-4 mr-1" /> Form Lead
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
             onClick={() => addElementToSection(selectedSection.id, 'card')}
           >
             <LayoutGrid className="w-4 h-4 mr-1" /> Card
@@ -330,14 +323,13 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                 <div className="flex items-center gap-3">
                   <GripVertical className="w-4 h-4 text-muted-foreground" />
                   <span className="text-lg">
-                    {element.type === 'text' ? '📝' : element.type === 'image' ? '🖼️' : element.type === 'video' ? '🎬' : element.type === 'lead-form' ? '📋' : element.type === 'card' ? '🃏' : '🔘'}
+                    {element.type === 'text' ? '📝' : element.type === 'image' ? '🖼️' : element.type === 'video' ? '🎬' : element.type === 'card' ? '🃏' : '🔘'}
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">
-                      {element.type === 'text' ? (element.textType === 'title' ? 'Título' : element.textType === 'subtitle' ? 'Subtítulo' : 'Texto') : 
+                    {element.type === 'text' ? (element.textType === 'title' ? 'Título' : element.textType === 'subtitle' ? 'Subtítulo' : 'Texto') : 
                        element.type === 'image' ? 'Imagem' : 
                        element.type === 'video' ? 'Vídeo' : 
-                       element.type === 'lead-form' ? 'Formulário Lead' :
                        element.type === 'card' ? 'Card' : 'Botão'}
                     </p>
                     <p className="text-xs text-muted-foreground truncate">
@@ -656,27 +648,8 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                   )}
                 </div>
                 
-                {/* Popup toggle */}
-                <div className="flex items-center gap-2 p-3 border rounded-lg bg-muted/30">
-                  <Switch
-                    checked={selectedElement.opensPopup || false}
-                    onCheckedChange={(checked) => updateSectionElement(selectedSection.id, selectedElement.id, { 
-                      opensPopup: checked,
-                      link: checked ? '' : selectedElement.link 
-                    })}
-                  />
-                  <div>
-                    <Label className="text-xs font-medium">Abrir Popup de Leads</Label>
-                    <p className="text-[10px] text-muted-foreground">
-                      Ao clicar, abre o formulário de captação
-                    </p>
-                  </div>
-                </div>
-
-                {!selectedElement.opensPopup && (
-                  <>
-                    {/* Scroll to section option */}
-                    <div className="space-y-2 p-3 border rounded-lg bg-muted/30">
+                {/* Scroll to section option */}
+                <div className="space-y-2 p-3 border rounded-lg bg-muted/30">
                       <Label className="text-xs font-medium flex items-center gap-1">
                         <ChevronLeft className="w-3 h-3 rotate-90" /> Rolar para Seção
                       </Label>
@@ -715,8 +688,6 @@ export const SectionEditor = ({ sections, onUpdateSections }: SectionEditorProps
                         />
                       </div>
                     )}
-                  </>
-                )}
               </>
             )}
 
