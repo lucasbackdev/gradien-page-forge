@@ -1,4 +1,4 @@
-import { PresellData, PresellElement, availableFonts, ButtonTemplate, translations } from '@/types/presell';
+import { PresellData, PresellElement, availableFonts, ButtonTemplate, translations, CookieBannerConfig } from '@/types/presell';
 import { PresellSection } from '@/types/sections';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,6 +20,7 @@ import {
   LayoutTemplate,
   Globe,
   Shield,
+  Cookie,
 } from 'lucide-react';
 import {
   Select,
@@ -61,7 +62,7 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
       <Tabs defaultValue="elements" className="flex-1 flex flex-col overflow-hidden">
         {/* Elementor-style Tabs */}
         <div className="border-b border-border bg-background">
-          <TabsList className="w-full h-10 bg-transparent rounded-none p-0 grid grid-cols-4">
+          <TabsList className="w-full h-10 bg-transparent rounded-none p-0 grid grid-cols-5">
             <TabsTrigger 
               value="elements" 
               className="h-full rounded-none border-b-2 border-transparent text-xs text-muted-foreground data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
@@ -82,6 +83,13 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
             >
               <Link2 className="w-3.5 h-3.5 mr-1" />
               Links
+            </TabsTrigger>
+            <TabsTrigger 
+              value="cookies" 
+              className="h-full rounded-none border-b-2 border-transparent text-xs text-muted-foreground data-[state=active]:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent bg-transparent"
+            >
+              <Cookie className="w-3.5 h-3.5 mr-1" />
+              Cookies
             </TabsTrigger>
             <TabsTrigger 
               value="style" 
@@ -451,11 +459,294 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                     />
                   </div>
                 </div>
+
+                {/* Footer Custom Text */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Texto Personalizado do Rodapé</Label>
+                  <Textarea
+                    value={data.footerStyle?.customText || ''}
+                    onChange={(e) => onChange({
+                      ...data,
+                      footerStyle: { ...data.footerStyle, customText: e.target.value }
+                    })}
+                    className="text-xs bg-muted border-border text-foreground placeholder:text-muted-foreground min-h-[60px]"
+                    placeholder="Adicione um texto personalizado ao rodapé (suporta quebra de linha)"
+                    rows={3}
+                  />
+                  <p className="text-[9px] text-muted-foreground">
+                    Use Enter para quebrar linhas
+                  </p>
+                </div>
+
+                {/* Copyright Text */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Texto de Copyright</Label>
+                  <Input
+                    value={data.footerStyle?.copyrightText ?? `© ${new Date().getFullYear()} Todos os direitos reservados.`}
+                    onChange={(e) => onChange({
+                      ...data,
+                      footerStyle: { ...data.footerStyle, copyrightText: e.target.value }
+                    })}
+                    className="h-8 text-xs bg-muted border-border text-foreground"
+                    placeholder="© 2026 Todos os direitos reservados."
+                  />
+                </div>
               </div>
             </div>
           </TabsContent>
 
-          {/* Style Tab */}
+          {/* Cookies Tab */}
+          <TabsContent value="cookies" className="mt-0 h-full">
+            <div className="p-3 space-y-4">
+              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border">
+                <Cookie className="w-3.5 h-3.5" />
+                Banner de Cookies (DSGVO)
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between py-1.5">
+                  <Label className="text-[10px] text-muted-foreground">Mostrar no Preview</Label>
+                  <Switch
+                    checked={data.cookieBanner?.showInPreview || false}
+                    onCheckedChange={(checked) => onChange({
+                      ...data,
+                      cookieBanner: { ...data.cookieBanner, showInPreview: checked }
+                    })}
+                  />
+                </div>
+                <p className="text-[9px] text-muted-foreground">
+                  O banner é sempre incluído no HTML exportado. Use esta opção apenas para pré-visualizar.
+                </p>
+
+                {/* Banner Text */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Texto do Banner</Label>
+                  <Textarea
+                    value={data.cookieBanner?.text || data.consentBannerText || 'Utilizamos cookies apenas após o seu consentimento, conforme nossa'}
+                    onChange={(e) => onChange({ 
+                      ...data, 
+                      cookieBanner: { ...data.cookieBanner, text: e.target.value },
+                      consentBannerText: e.target.value 
+                    })}
+                    className="text-xs bg-muted border-border text-foreground placeholder:text-muted-foreground min-h-[60px]"
+                    placeholder="Utilizamos cookies apenas após o seu consentimento, conforme nossa"
+                    rows={2}
+                  />
+                  <p className="text-[9px] text-muted-foreground">
+                    O link de Política de Privacidade é adicionado automaticamente após este texto
+                  </p>
+                </div>
+
+                {/* Button Texts */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Texto Aceitar</Label>
+                    <Input
+                      value={data.cookieBanner?.acceptText || 'Aceitar'}
+                      onChange={(e) => onChange({
+                        ...data,
+                        cookieBanner: { ...data.cookieBanner, acceptText: e.target.value }
+                      })}
+                      className="h-8 text-xs bg-muted border-border text-foreground"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Texto Recusar</Label>
+                    <Input
+                      value={data.cookieBanner?.declineText || 'Recusar'}
+                      onChange={(e) => onChange({
+                        ...data,
+                        cookieBanner: { ...data.cookieBanner, declineText: e.target.value }
+                      })}
+                      className="h-8 text-xs bg-muted border-border text-foreground"
+                    />
+                  </div>
+                </div>
+
+                {/* Colors Section */}
+                <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-2">
+                  <Palette className="w-3.5 h-3.5" />
+                  Cores do Banner
+                </div>
+
+                {/* Background Color */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Cor de Fundo</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={data.cookieBanner?.backgroundColor || '#1a1a2e'}
+                      onChange={(e) => onChange({
+                        ...data,
+                        cookieBanner: { ...data.cookieBanner, backgroundColor: e.target.value }
+                      })}
+                      className="h-8 w-10 p-1 bg-muted border-border"
+                    />
+                    <Input
+                      value={data.cookieBanner?.backgroundColor || '#1a1a2e'}
+                      onChange={(e) => onChange({
+                        ...data,
+                        cookieBanner: { ...data.cookieBanner, backgroundColor: e.target.value }
+                      })}
+                      className="flex-1 h-8 text-xs bg-muted border-border text-foreground"
+                    />
+                  </div>
+                </div>
+
+                {/* Text Color */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Cor do Texto</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={data.cookieBanner?.textColor || '#ffffff'}
+                      onChange={(e) => onChange({
+                        ...data,
+                        cookieBanner: { ...data.cookieBanner, textColor: e.target.value }
+                      })}
+                      className="h-8 w-10 p-1 bg-muted border-border"
+                    />
+                    <Input
+                      value={data.cookieBanner?.textColor || '#ffffff'}
+                      onChange={(e) => onChange({
+                        ...data,
+                        cookieBanner: { ...data.cookieBanner, textColor: e.target.value }
+                      })}
+                      className="flex-1 h-8 text-xs bg-muted border-border text-foreground"
+                    />
+                  </div>
+                </div>
+
+                {/* Link Color */}
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Cor do Link</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      value={data.cookieBanner?.linkColor || '#8B5CF6'}
+                      onChange={(e) => onChange({
+                        ...data,
+                        cookieBanner: { ...data.cookieBanner, linkColor: e.target.value }
+                      })}
+                      className="h-8 w-10 p-1 bg-muted border-border"
+                    />
+                    <Input
+                      value={data.cookieBanner?.linkColor || '#8B5CF6'}
+                      onChange={(e) => onChange({
+                        ...data,
+                        cookieBanner: { ...data.cookieBanner, linkColor: e.target.value }
+                      })}
+                      className="flex-1 h-8 text-xs bg-muted border-border text-foreground"
+                    />
+                  </div>
+                </div>
+
+                {/* Accept Button Colors */}
+                <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-2">
+                  <MousePointer2 className="w-3.5 h-3.5" />
+                  Botão Aceitar
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] text-muted-foreground">Fundo</Label>
+                    <div className="flex gap-1">
+                      <Input
+                        type="color"
+                        value={data.cookieBanner?.buttonAcceptBg || '#8B5CF6'}
+                        onChange={(e) => onChange({
+                          ...data,
+                          cookieBanner: { ...data.cookieBanner, buttonAcceptBg: e.target.value }
+                        })}
+                        className="h-7 w-8 p-0.5 bg-muted border-border"
+                      />
+                      <Input
+                        value={data.cookieBanner?.buttonAcceptBg || '#8B5CF6'}
+                        onChange={(e) => onChange({
+                          ...data,
+                          cookieBanner: { ...data.cookieBanner, buttonAcceptBg: e.target.value }
+                        })}
+                        className="flex-1 h-7 text-[10px] bg-muted border-border text-foreground"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] text-muted-foreground">Texto</Label>
+                    <div className="flex gap-1">
+                      <Input
+                        type="color"
+                        value={data.cookieBanner?.buttonAcceptText || '#ffffff'}
+                        onChange={(e) => onChange({
+                          ...data,
+                          cookieBanner: { ...data.cookieBanner, buttonAcceptText: e.target.value }
+                        })}
+                        className="h-7 w-8 p-0.5 bg-muted border-border"
+                      />
+                      <Input
+                        value={data.cookieBanner?.buttonAcceptText || '#ffffff'}
+                        onChange={(e) => onChange({
+                          ...data,
+                          cookieBanner: { ...data.cookieBanner, buttonAcceptText: e.target.value }
+                        })}
+                        className="flex-1 h-7 text-[10px] bg-muted border-border text-foreground"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Decline Button Colors */}
+                <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-2">
+                  <MousePointer2 className="w-3.5 h-3.5" />
+                  Botão Recusar
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] text-muted-foreground">Texto</Label>
+                    <div className="flex gap-1">
+                      <Input
+                        type="color"
+                        value={data.cookieBanner?.buttonDeclineText || '#ffffff'}
+                        onChange={(e) => onChange({
+                          ...data,
+                          cookieBanner: { ...data.cookieBanner, buttonDeclineText: e.target.value }
+                        })}
+                        className="h-7 w-8 p-0.5 bg-muted border-border"
+                      />
+                      <Input
+                        value={data.cookieBanner?.buttonDeclineText || '#ffffff'}
+                        onChange={(e) => onChange({
+                          ...data,
+                          cookieBanner: { ...data.cookieBanner, buttonDeclineText: e.target.value }
+                        })}
+                        className="flex-1 h-7 text-[10px] bg-muted border-border text-foreground"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] text-muted-foreground">Borda</Label>
+                    <div className="flex gap-1">
+                      <Input
+                        type="color"
+                        value={data.cookieBanner?.buttonDeclineBorder || '#ffffff'}
+                        onChange={(e) => onChange({
+                          ...data,
+                          cookieBanner: { ...data.cookieBanner, buttonDeclineBorder: e.target.value }
+                        })}
+                        className="h-7 w-8 p-0.5 bg-muted border-border"
+                      />
+                      <Input
+                        value={data.cookieBanner?.buttonDeclineBorder || '#ffffff'}
+                        onChange={(e) => onChange({
+                          ...data,
+                          cookieBanner: { ...data.cookieBanner, buttonDeclineBorder: e.target.value }
+                        })}
+                        className="flex-1 h-7 text-[10px] bg-muted border-border text-foreground"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
           <TabsContent value="style" className="mt-0 h-full">
             <div className="p-3 space-y-4">
               {/* Button Colors */}
@@ -683,68 +974,6 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                       placeholder="https://wa.me/5511999999999"
                       className="h-8 text-xs bg-muted border-border text-foreground placeholder:text-muted-foreground"
                     />
-                  </div>
-                )}
-              </div>
-
-              {/* Consent Banner */}
-              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-4">
-                <Shield className="w-3.5 h-3.5" />
-                Banner de Consentimento (DSGVO)
-              </div>
-
-              <div className="space-y-2">
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Texto do Banner</Label>
-                  <Textarea
-                    value={data.consentBannerText || 'Utilizamos cookies apenas após o seu consentimento, conforme nossa'}
-                    onChange={(e) => onChange({ ...data, consentBannerText: e.target.value })}
-                    className="text-xs bg-muted border-border text-foreground placeholder:text-muted-foreground min-h-[60px]"
-                    placeholder="Utilizamos cookies apenas após o seu consentimento, conforme nossa"
-                    rows={2}
-                  />
-                  <p className="text-[9px] text-muted-foreground">
-                    O link de Política de Privacidade é adicionado automaticamente após este texto
-                  </p>
-                </div>
-              </div>
-
-              {/* IP Tracking */}
-              <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-4">
-                <Settings className="w-3.5 h-3.5" />
-                IP Tracking
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between py-1.5">
-                  <Label className="text-[10px] text-muted-foreground">Ativar</Label>
-                  <Switch
-                    checked={data.ipTracking?.enabled || false}
-                    onCheckedChange={(checked) => onChange({
-                      ...data,
-                      ipTracking: { ...data.ipTracking, enabled: checked }
-                    })}
-                  />
-                </div>
-
-                {data.ipTracking?.enabled && (
-                  <div className="space-y-1.5">
-                    <Label className="text-[9px] text-muted-foreground">URL do pixel</Label>
-                    <Input
-                      value={data.ipTracking?.url || ''}
-                      onChange={(e) => {
-                        const url = e.target.value;
-                        onChange({ 
-                          ...data, 
-                          ipTracking: { ...data.ipTracking, url } 
-                        });
-                      }}
-                      placeholder="https://iplogger.org/xxxxxx"
-                      className="h-8 text-xs bg-muted border-border text-foreground placeholder:text-muted-foreground"
-                    />
-                    {data.ipTracking?.url && !data.ipTracking.url.match(/^https?:\/\//) && (
-                      <p className="text-[9px] text-destructive">URL inválida</p>
-                    )}
                   </div>
                 )}
               </div>

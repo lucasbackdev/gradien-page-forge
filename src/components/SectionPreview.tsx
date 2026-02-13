@@ -1142,6 +1142,16 @@ export const SectionPreview = ({
               style={{ borderColor: presellData.footerStyle?.textColor || '#888888' }}
             />
 
+            {/* Custom Footer Text */}
+            {presellData.footerStyle?.customText && (
+              <div 
+                className="text-center text-sm mb-4 whitespace-pre-line"
+                style={{ color: presellData.footerStyle?.textColor || '#888888' }}
+              >
+                {presellData.footerStyle.customText}
+              </div>
+            )}
+
             {/* Legal Links */}
             <div className="flex flex-wrap justify-center gap-4 mb-4">
               {presellData.termsLink && (
@@ -1173,10 +1183,71 @@ export const SectionPreview = ({
 
             {/* Copyright */}
             <div className="text-center text-xs opacity-50">
-              © {new Date().getFullYear()} Todos os direitos reservados.
+              {presellData.footerStyle?.copyrightText || `© ${new Date().getFullYear()} Todos os direitos reservados.`}
             </div>
           </div>
         </footer>
+      )}
+
+      {/* Cookie Consent Banner Preview */}
+      {presellData.cookieBanner?.showInPreview && (
+        <div
+          style={{
+            position: 'sticky',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: presellData.cookieBanner?.backgroundColor || '#1a1a2e',
+            color: presellData.cookieBanner?.textColor || '#ffffff',
+            padding: '1rem 2rem',
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap' as const,
+            gap: '1rem',
+            boxShadow: '0 -4px 20px rgba(0,0,0,0.3)',
+          }}
+        >
+          <p style={{ margin: 0, fontSize: '0.875rem', flex: 1, minWidth: '200px' }}>
+            {presellData.cookieBanner?.text || presellData.consentBannerText || 'Utilizamos cookies apenas após o seu consentimento, conforme nossa'}{' '}
+            <a 
+              href={presellData.privacyLink || '#'} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{ color: presellData.cookieBanner?.linkColor || '#8B5CF6', textDecoration: 'underline' }}
+            >
+              {t.privacy}
+            </a>.
+          </p>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              style={{
+                background: presellData.cookieBanner?.buttonAcceptBg || '#8B5CF6',
+                color: presellData.cookieBanner?.buttonAcceptText || '#ffffff',
+                border: 'none',
+                padding: '0.5rem 1.5rem',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+              }}
+            >
+              {presellData.cookieBanner?.acceptText || 'Aceitar'}
+            </button>
+            <button
+              style={{
+                background: presellData.cookieBanner?.buttonDeclineBg || 'transparent',
+                color: presellData.cookieBanner?.buttonDeclineText || '#ffffff',
+                border: `1px solid ${presellData.cookieBanner?.buttonDeclineBorder || 'rgba(255,255,255,0.3)'}`,
+                padding: '0.5rem 1.5rem',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+              }}
+            >
+              {presellData.cookieBanner?.declineText || 'Recusar'}
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Floating Trash */}

@@ -61,6 +61,21 @@ export interface PopupConfig {
   showPrivacyTerms: boolean;
 }
 
+export interface CookieBannerConfig {
+  showInPreview: boolean;
+  text: string;
+  backgroundColor: string;
+  textColor: string;
+  buttonAcceptBg: string;
+  buttonAcceptText: string;
+  buttonDeclineBg: string;
+  buttonDeclineText: string;
+  buttonDeclineBorder: string;
+  linkColor: string;
+  acceptText: string;
+  declineText: string;
+}
+
 export interface FooterStyle {
   backgroundColor: string;
   textColor: string;
@@ -68,6 +83,8 @@ export interface FooterStyle {
   termsText?: string;
   privacyText?: string;
   linksColor?: string;
+  customText?: string;
+  copyrightText?: string;
 }
 
 export interface PresellData {
@@ -166,6 +183,9 @@ export interface PresellData {
   // Consent Banner
   consentBannerText: string;
   
+  // Cookie Banner Config
+  cookieBanner: CookieBannerConfig;
+  
   // Lead Popup
   popupConfig: PopupConfig;
 }
@@ -258,9 +278,25 @@ export const defaultPresellData: PresellData = {
     termsText: '',
     privacyText: '',
     linksColor: '#888888',
+    customText: '',
+    copyrightText: `© ${new Date().getFullYear()} Todos os direitos reservados.`,
   },
   language: 'pt',
   consentBannerText: 'Utilizamos cookies apenas após o seu consentimento, conforme nossa',
+  cookieBanner: {
+    showInPreview: false,
+    text: 'Utilizamos cookies apenas após o seu consentimento, conforme nossa',
+    backgroundColor: '#1a1a2e',
+    textColor: '#ffffff',
+    buttonAcceptBg: '#8B5CF6',
+    buttonAcceptText: '#ffffff',
+    buttonDeclineBg: 'transparent',
+    buttonDeclineText: '#ffffff',
+    buttonDeclineBorder: 'rgba(255,255,255,0.3)',
+    linkColor: '#8B5CF6',
+    acceptText: 'Aceitar',
+    declineText: 'Recusar',
+  },
   popupConfig: {
     enabled: false,
     title: 'Cadastre-se',

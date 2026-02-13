@@ -136,11 +136,11 @@ ${presellData.whatsappEnabled && presellData.whatsappLink ? `
 ` : ''}
 
 <!-- Cookie Consent Banner (GDPR / DSGVO) -->
-<div id="cookieConsent" style="position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:#fff;padding:1rem 2rem;z-index:10000;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;box-shadow:0 -4px 20px rgba(0,0,0,0.3);">
-  <p style="margin:0;font-size:0.875rem;flex:1;min-width:200px;">${presellData.consentBannerText || 'Utilizamos cookies apenas após o seu consentimento, conforme nossa'} <a href="${presellData.privacyLink || '#'}" target="_blank" style="color:#8B5CF6;text-decoration:underline;">${translations[presellData.language || 'pt'].privacy}</a>.</p>
+<div id="cookieConsent" style="position:fixed;bottom:0;left:0;right:0;background:${presellData.cookieBanner?.backgroundColor || '#1a1a2e'};color:${presellData.cookieBanner?.textColor || '#fff'};padding:1rem 2rem;z-index:10000;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;box-shadow:0 -4px 20px rgba(0,0,0,0.3);">
+  <p style="margin:0;font-size:0.875rem;flex:1;min-width:200px;">${presellData.cookieBanner?.text || presellData.consentBannerText || 'Utilizamos cookies apenas após o seu consentimento, conforme nossa'} <a href="${presellData.privacyLink || '#'}" target="_blank" style="color:${presellData.cookieBanner?.linkColor || '#8B5CF6'};text-decoration:underline;">${translations[presellData.language || 'pt'].privacy}</a>.</p>
   <div style="display:flex;gap:0.5rem;">
-    <button onclick="acceptCookies()" style="background:#8B5CF6;color:#fff;border:none;padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-weight:bold;">Aceitar</button>
-    <button onclick="declineCookies()" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.3);padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;">Recusar</button>
+    <button onclick="acceptCookies()" style="background:${presellData.cookieBanner?.buttonAcceptBg || '#8B5CF6'};color:${presellData.cookieBanner?.buttonAcceptText || '#fff'};border:none;padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-weight:bold;">${presellData.cookieBanner?.acceptText || 'Aceitar'}</button>
+    <button onclick="declineCookies()" style="background:${presellData.cookieBanner?.buttonDeclineBg || 'transparent'};color:${presellData.cookieBanner?.buttonDeclineText || '#fff'};border:1px solid ${presellData.cookieBanner?.buttonDeclineBorder || 'rgba(255,255,255,0.3)'};padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;">${presellData.cookieBanner?.declineText || 'Recusar'}</button>
   </div>
 </div>
 
@@ -610,12 +610,13 @@ function declineCookies() {
     </nav>
     ` : ''}
     <div class="footer-divider" style="border-color: ${footerText}"></div>
+    ${data.footerStyle?.customText ? `<div class="footer-custom-text" style="color: ${footerText}; text-align: center; font-size: 0.875rem; margin-bottom: 1rem; white-space: pre-line;">${data.footerStyle.customText}</div>` : ''}
     <div class="footer-legal">
       ${data.termsLink ? `<a href="${data.termsLink}" target="_blank" rel="noopener noreferrer" style="color: ${data.footerStyle?.linksColor || footerText}">${data.footerStyle?.termsText || t.terms}</a>` : ''}
       ${data.termsLink && data.privacyLink ? '<span class="footer-separator">|</span>' : ''}
       ${data.privacyLink ? `<a href="${data.privacyLink}" target="_blank" rel="noopener noreferrer" style="color: ${data.footerStyle?.linksColor || footerText}">${data.footerStyle?.privacyText || t.privacy}</a>` : ''}
     </div>
-    <div class="footer-copyright">© ${new Date().getFullYear()} Todos os direitos reservados.</div>
+    <div class="footer-copyright">${data.footerStyle?.copyrightText || `© ${new Date().getFullYear()} Todos os direitos reservados.`}</div>
   </div>
 </footer>`;
 
