@@ -143,10 +143,26 @@ export const useAuth = () => {
       }
     }, 5 * 60 * 1000); // every 5 minutes
 
+    // Refresh session immediately when user returns to the tab
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState !== 'visible' || !mounted) return;
+      try {
+        console.log('Tab became visible, refreshing session...');
+        const { data } = await supabase.auth.refreshSession();
+        if (data.session?.user && mounted) {
+          fetchUserData(data.session.user.id);
+        }
+      } catch (err) {
+        console.error('Visibility refresh error:', err);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       mounted = false;
       subscription.unsubscribe();
       if (refreshInterval) clearInterval(refreshInterval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
@@ -159,13 +175,20 @@ export const useAuth = () => {
         .eq("user_id", userId)
         .eq("role", "admin");
 
-      // If JWT expired, try refreshing session and retry once
-      if (rolesError && (rolesError.message === 'JWT expired' || rolesError.code === 'PGRST303') && !retried) {
-        console.log('JWT expired during fetchUserData, refreshing...');
+      // If JWT expired or timeout, try refreshing session and retry once
+      if (rolesError && (rolesError.message === 'JWT expired' || rolesError.code === 'PGRST303' || rolesError.code === '57014') && !retried) {
+        console.log('Auth error during fetchUserData, refreshing...', rolesError.code);
         const { data: refreshData } = await supabase.auth.refreshSession();
         if (refreshData.session) {
           return fetchUserData(userId, true);
         }
+      }
+
+      // On timeout or transient errors, keep previous state
+      if (rolesError && (rolesError.code === '57014')) {
+        console.warn('Timeout fetching roles, keeping previous state');
+        setAuthState((prev) => ({ ...prev, loading: false }));
+        return;
       }
 
       if (rolesError) throw rolesError;
@@ -177,12 +200,19 @@ export const useAuth = () => {
         .eq("user_id", userId)
         .maybeSingle();
 
-      if (subError && (subError.message === 'JWT expired' || subError.code === 'PGRST303') && !retried) {
-        console.log('JWT expired during fetchUserData (sub), refreshing...');
+      if (subError && (subError.message === 'JWT expired' || subError.code === 'PGRST303' || subError.code === '57014') && !retried) {
+        console.log('Auth error during fetchUserData (sub), refreshing...', subError.code);
         const { data: refreshData } = await supabase.auth.refreshSession();
         if (refreshData.session) {
           return fetchUserData(userId, true);
         }
+      }
+
+      // On timeout, keep previous state
+      if (subError && subError.code === '57014') {
+        console.warn('Timeout fetching subscription, keeping previous state');
+        setAuthState((prev) => ({ ...prev, loading: false }));
+        return;
       }
 
       setAuthState((prev) => ({
