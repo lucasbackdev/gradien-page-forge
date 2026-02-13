@@ -1,4 +1,4 @@
-import { PresellData, PresellElement, availableFonts, ButtonTemplate, translations, CookieBannerConfig } from '@/types/presell';
+import { PresellData, PresellElement, availableFonts, ButtonTemplate, translations, CookieBannerConfig, TopLogoConfig } from '@/types/presell';
 import { PresellSection } from '@/types/sections';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import {
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
   Type,
   Image,
   PlayCircle,
@@ -46,6 +49,14 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       onChange({ ...data, [field]: e.target?.result as string });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleTopLogoUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      onChange({ ...data, topLogo: { ...data.topLogo, imageUrl: e.target?.result as string, enabled: true } });
     };
     reader.readAsDataURL(file);
   };
@@ -201,6 +212,75 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                   </div>
                 </div>
               </div>
+
+              {/* Top Logo (when floating header is off) */}
+              {!data.floatingHeader.enabled && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border">
+                    <Image className="w-3.5 h-3.5" />
+                    Logo do Topo
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Ativar Logo</Label>
+                    <Switch
+                      checked={data.topLogo?.enabled || false}
+                      onCheckedChange={(checked) => onChange({ ...data, topLogo: { ...(data.topLogo || { imageUrl: '', size: 150, position: 'center' }), enabled: checked } })}
+                    />
+                  </div>
+
+                  {data.topLogo?.enabled && (
+                    <div className="space-y-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Imagem da Logo</Label>
+                        <div className="flex items-center gap-2">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => e.target.files?.[0] && handleTopLogoUpload(e.target.files[0])}
+                            className="flex-1 h-8 text-xs bg-muted border-border text-foreground file:text-muted-foreground file:text-xs"
+                          />
+                          {data.topLogo.imageUrl && (
+                            <img src={data.topLogo.imageUrl} alt="Logo" className="h-8 object-contain" />
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Tamanho: {data.topLogo.size || 150}px</Label>
+                        <Slider
+                          value={[data.topLogo.size || 150]}
+                          onValueChange={(value) => onChange({ ...data, topLogo: { ...data.topLogo, size: value[0] } })}
+                          min={40}
+                          max={400}
+                          step={10}
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Posição</Label>
+                        <div className="flex gap-2">
+                          {(['left', 'center', 'right'] as const).map((pos) => (
+                            <button
+                              key={pos}
+                              onClick={() => onChange({ ...data, topLogo: { ...data.topLogo, position: pos } })}
+                              className={`flex-1 flex items-center justify-center gap-1 px-3 py-2 text-xs rounded border transition-colors ${
+                                data.topLogo.position === pos
+                                  ? 'bg-primary text-primary-foreground border-primary'
+                                  : 'bg-muted border-border hover:border-primary'
+                              }`}
+                            >
+                              {pos === 'left' && <><AlignLeft className="w-3 h-3" /> Esquerda</>}
+                              {pos === 'center' && <><AlignCenter className="w-3 h-3" /> Centro</>}
+                              {pos === 'right' && <><AlignRight className="w-3 h-3" /> Direita</>}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Header Editor */}
               <div className="space-y-3">

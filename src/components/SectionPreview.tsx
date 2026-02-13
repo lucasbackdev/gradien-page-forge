@@ -870,6 +870,26 @@ export const SectionPreview = ({
         `}
       </style>
 
+      {/* Top Logo (when floating header is disabled) */}
+      {!floatingHeader.enabled && presellData.topLogo?.enabled && presellData.topLogo.imageUrl && (
+        <div
+          style={{
+            padding: '1.5rem 2rem',
+            display: 'flex',
+            justifyContent: presellData.topLogo.position === 'left' ? 'flex-start' : presellData.topLogo.position === 'right' ? 'flex-end' : 'center',
+          }}
+        >
+          <img
+            src={presellData.topLogo.imageUrl}
+            alt="Logo"
+            style={{
+              width: `${presellData.topLogo.size || 150}px`,
+              objectFit: 'contain',
+            }}
+          />
+        </div>
+      )}
+
       {/* Floating Header */}
       {floatingHeader.enabled && sections.length > 0 && (
         <header

@@ -83,10 +83,20 @@ export interface FooterStyle {
   copyrightText?: string;
 }
 
+export interface TopLogoConfig {
+  enabled: boolean;
+  imageUrl: string;
+  size: number; // percentage width
+  position: 'left' | 'center' | 'right';
+}
+
 export interface PresellData {
   // Images
   logoImage: string;
   favicon: string;
+  
+  // Top Logo (when floating header is disabled)
+  topLogo: TopLogoConfig;
   
   // Page title (browser tab)
   pageTitle: string;
@@ -189,6 +199,12 @@ export interface PresellData {
 export const defaultPresellData: PresellData = {
   logoImage: '',
   favicon: '',
+  topLogo: {
+    enabled: false,
+    imageUrl: '',
+    size: 150,
+    position: 'center',
+  },
   pageTitle: '',
   affiliateLink: '',
   termsLink: '',
