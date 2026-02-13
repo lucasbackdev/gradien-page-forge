@@ -53,6 +53,7 @@ const Index = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [viewportSize, setViewportSize] = useState<ViewportSize>('desktop');
   const [currentPageId, setCurrentPageId] = useState<string | undefined>(undefined);
+  const [highlightedElement, setHighlightedElement] = useState<{ sectionId: string; elementId: string } | null>(null);
   
   // Dialog states
   const [templatesOpen, setTemplatesOpen] = useState(false);
@@ -1465,7 +1466,12 @@ ${data.buttonStyle.template === 'shiny-green' ? `
       <div className="flex-1 flex overflow-hidden">
         {/* Editor Panel - 25% */}
         <div className="w-[25%] min-w-[320px] border-r border-border bg-card overflow-hidden">
-          <EditorPanel data={presellData} onChange={setPresellData} />
+          <EditorPanel 
+            data={presellData} 
+            onChange={setPresellData} 
+            highlightedElement={highlightedElement}
+            onClearHighlight={() => setHighlightedElement(null)}
+          />
         </div>
 
         {/* Preview Panel - 80% */}
@@ -1493,6 +1499,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
                   onUpdateSectionHeight={handleUpdateSectionHeight}
                   viewportSize={viewportSize}
                   userId={user?.id}
+                  onElementClick={(sectionId, elementId) => setHighlightedElement({ sectionId, elementId })}
                 />
               ) : (
                 <PreviewPanel 
