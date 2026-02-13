@@ -42,7 +42,12 @@ export const usePublicTemplates = () => {
       }));
 
       setTemplates(mapped);
-    } catch (error) {
+    } catch (error: any) {
+      // Silently ignore timeout errors
+      if (error?.code === '57014') {
+        console.log('Timeout fetching templates, ignoring');
+        return;
+      }
       console.error('Error fetching templates:', error);
     } finally {
       setLoading(false);
@@ -52,10 +57,9 @@ export const usePublicTemplates = () => {
   useEffect(() => {
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      if (event === 'SIGNED_IN') {
         fetchTemplates();
       } else if (event === 'SIGNED_OUT') {
-        // Keep public templates visible even when logged out
         fetchTemplates();
       }
     });
