@@ -68,12 +68,8 @@ export interface CookieBannerConfig {
   textColor: string;
   buttonAcceptBg: string;
   buttonAcceptText: string;
-  buttonDeclineBg: string;
-  buttonDeclineText: string;
-  buttonDeclineBorder: string;
   linkColor: string;
   acceptText: string;
-  declineText: string;
 }
 
 export interface FooterStyle {
@@ -290,12 +286,8 @@ export const defaultPresellData: PresellData = {
     textColor: '#ffffff',
     buttonAcceptBg: '#8B5CF6',
     buttonAcceptText: '#ffffff',
-    buttonDeclineBg: 'transparent',
-    buttonDeclineText: '#ffffff',
-    buttonDeclineBorder: 'rgba(255,255,255,0.3)',
     linkColor: '#8B5CF6',
     acceptText: 'Aceitar',
-    declineText: 'Recusar',
   },
   popupConfig: {
     enabled: false,

@@ -550,17 +550,6 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                       className="h-8 text-xs bg-muted border-border text-foreground"
                     />
                   </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-[10px] text-muted-foreground uppercase tracking-wide">Texto Recusar</Label>
-                    <Input
-                      value={data.cookieBanner?.declineText || 'Recusar'}
-                      onChange={(e) => onChange({
-                        ...data,
-                        cookieBanner: { ...data.cookieBanner, declineText: e.target.value }
-                      })}
-                      className="h-8 text-xs bg-muted border-border text-foreground"
-                    />
-                  </div>
                 </div>
 
                 {/* Colors Section */}
@@ -686,58 +675,6 @@ export const EditorPanel = ({ data, onChange }: EditorPanelProps) => {
                         onChange={(e) => onChange({
                           ...data,
                           cookieBanner: { ...data.cookieBanner, buttonAcceptText: e.target.value }
-                        })}
-                        className="flex-1 h-7 text-[10px] bg-muted border-border text-foreground"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Decline Button Colors */}
-                <div className="flex items-center gap-2 py-2 text-xs font-medium text-muted-foreground border-b border-border mt-2">
-                  <MousePointer2 className="w-3.5 h-3.5" />
-                  Botão Recusar
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1.5">
-                    <Label className="text-[9px] text-muted-foreground">Texto</Label>
-                    <div className="flex gap-1">
-                      <Input
-                        type="color"
-                        value={data.cookieBanner?.buttonDeclineText || '#ffffff'}
-                        onChange={(e) => onChange({
-                          ...data,
-                          cookieBanner: { ...data.cookieBanner, buttonDeclineText: e.target.value }
-                        })}
-                        className="h-7 w-8 p-0.5 bg-muted border-border"
-                      />
-                      <Input
-                        value={data.cookieBanner?.buttonDeclineText || '#ffffff'}
-                        onChange={(e) => onChange({
-                          ...data,
-                          cookieBanner: { ...data.cookieBanner, buttonDeclineText: e.target.value }
-                        })}
-                        className="flex-1 h-7 text-[10px] bg-muted border-border text-foreground"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-[9px] text-muted-foreground">Borda</Label>
-                    <div className="flex gap-1">
-                      <Input
-                        type="color"
-                        value={data.cookieBanner?.buttonDeclineBorder || '#ffffff'}
-                        onChange={(e) => onChange({
-                          ...data,
-                          cookieBanner: { ...data.cookieBanner, buttonDeclineBorder: e.target.value }
-                        })}
-                        className="h-7 w-8 p-0.5 bg-muted border-border"
-                      />
-                      <Input
-                        value={data.cookieBanner?.buttonDeclineBorder || '#ffffff'}
-                        onChange={(e) => onChange({
-                          ...data,
-                          cookieBanner: { ...data.cookieBanner, buttonDeclineBorder: e.target.value }
                         })}
                         className="flex-1 h-7 text-[10px] bg-muted border-border text-foreground"
                       />

@@ -1234,18 +1234,6 @@ export const SectionPreview = ({
             >
               {presellData.cookieBanner?.acceptText || 'Aceitar'}
             </button>
-            <button
-              style={{
-                background: presellData.cookieBanner?.buttonDeclineBg || 'transparent',
-                color: presellData.cookieBanner?.buttonDeclineText || '#ffffff',
-                border: `1px solid ${presellData.cookieBanner?.buttonDeclineBorder || 'rgba(255,255,255,0.3)'}`,
-                padding: '0.5rem 1.5rem',
-                borderRadius: '0.5rem',
-                cursor: 'pointer',
-              }}
-            >
-              {presellData.cookieBanner?.declineText || 'Recusar'}
-            </button>
           </div>
         </div>
       )}

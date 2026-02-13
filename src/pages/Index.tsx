@@ -140,7 +140,6 @@ ${presellData.whatsappEnabled && presellData.whatsappLink ? `
   <p style="margin:0;font-size:0.875rem;flex:1;min-width:200px;">${presellData.cookieBanner?.text || presellData.consentBannerText || 'Utilizamos cookies apenas após o seu consentimento, conforme nossa'} <a href="${presellData.privacyLink || '#'}" target="_blank" style="color:${presellData.cookieBanner?.linkColor || '#8B5CF6'};text-decoration:underline;">${translations[presellData.language || 'pt'].privacy}</a>.</p>
   <div style="display:flex;gap:0.5rem;">
     <button onclick="acceptCookies()" style="background:${presellData.cookieBanner?.buttonAcceptBg || '#8B5CF6'};color:${presellData.cookieBanner?.buttonAcceptText || '#fff'};border:none;padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;font-weight:bold;">${presellData.cookieBanner?.acceptText || 'Aceitar'}</button>
-    <button onclick="declineCookies()" style="background:${presellData.cookieBanner?.buttonDeclineBg || 'transparent'};color:${presellData.cookieBanner?.buttonDeclineText || '#fff'};border:1px solid ${presellData.cookieBanner?.buttonDeclineBorder || 'rgba(255,255,255,0.3)'};padding:0.5rem 1.5rem;border-radius:0.5rem;cursor:pointer;">${presellData.cookieBanner?.declineText || 'Recusar'}</button>
   </div>
 </div>
 
