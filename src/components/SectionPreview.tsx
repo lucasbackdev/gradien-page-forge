@@ -443,14 +443,14 @@ export const SectionPreview = ({
         const scrollTargetSection = element.scrollToSection;
         
         const handleButtonClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onElementClick?.(sectionId, element.id);
           if (scrollTargetSection) {
-            e.preventDefault();
             const targetElement = document.getElementById(`section-${scrollTargetSection}`);
             if (targetElement) {
               targetElement.scrollIntoView({ behavior: 'smooth' });
             }
-          } else if (!presellData.affiliateLink && !element.link) {
-            e.preventDefault();
           }
         };
         
@@ -458,9 +458,7 @@ export const SectionPreview = ({
           <div key={element.id} className={`${widthClass} ${isInGroup ? '' : 'mb-4'} flex ${getResponsiveAlign(element) === 'left' ? 'justify-start' : getResponsiveAlign(element) === 'right' ? 'justify-end' : 'justify-center'}`}>
             <a
               {...dragProps}
-              href={scrollTargetSection ? '#' : (presellData.affiliateLink || element.link || '#')}
-              target={scrollTargetSection ? undefined : '_blank'}
-              rel={scrollTargetSection ? undefined : 'noopener noreferrer'}
+              href="#"
               className={`${baseClass} ${animationClass} ${buttonClass} ${!isShinyButton && presellData.buttonStyle.hoverEffect ? 'hover:opacity-90 hover:scale-105' : ''}`}
               style={getButtonStyle(element)}
               onClick={handleButtonClick}
@@ -494,10 +492,12 @@ export const SectionPreview = ({
           >
             <a
               {...dragProps}
-              href={presellData.affiliateLink || '#'}
-              target={presellData.affiliateLink ? '_blank' : undefined}
-              rel={presellData.affiliateLink ? 'noopener noreferrer' : undefined}
-              onClick={(e) => { if (!presellData.affiliateLink) e.preventDefault(); }}
+              href="#"
+              onClick={(e) => { 
+                e.preventDefault(); 
+                e.stopPropagation();
+                onElementClick?.(sectionId, element.id); 
+              }}
               className={`block ${baseClass} ${animationClass}`}
               style={{ width: isInGroup ? '100%' : `${effectiveImageWidth}%`, maxWidth: viewportSize === 'mobile' ? '100%' : '150%' }}
             >
