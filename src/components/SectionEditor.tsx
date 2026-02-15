@@ -52,6 +52,14 @@ export const SectionEditor = ({ sections, onUpdateSections, highlightedElement, 
       setSelectedSectionId(highlightedElement.sectionId);
       setCurrentView('section-elements');
       setSelectedElementId(null);
+      
+      // Scroll to the highlighted element card after render
+      setTimeout(() => {
+        const el = document.querySelector(`[data-element-id="${highlightedElement.elementId}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 150);
     }
   }, [highlightedElement]);
 
@@ -329,6 +337,7 @@ export const SectionEditor = ({ sections, onUpdateSections, highlightedElement, 
             return (
             <Card
               key={element.id}
+              data-element-id={element.id}
               className={`p-3 cursor-pointer hover:bg-accent/50 transition-colors ${isHighlighted ? 'animate-pulse-red-border' : ''}`}
               onClick={() => {
                 if (isHighlighted) {
