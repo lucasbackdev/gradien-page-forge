@@ -8,6 +8,7 @@ import { ResponsivePreview, ViewportSize, getViewportWidth } from '@/components/
 import { PresellData, PresellElement, defaultPresellData, translations } from '@/types/presell';
 import { PresellSection, SectionElement } from '@/types/sections';
 import { TrackingPanel } from '@/components/TrackingPanel';
+import { ChatBuilder } from '@/components/ChatBuilder';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { useSavedPages, SavedPage } from '@/hooks/useSavedPages';
@@ -56,6 +57,7 @@ const Index = () => {
   const [currentPageId, setCurrentPageId] = useState<string | undefined>(undefined);
   const [highlightedElement, setHighlightedElement] = useState<{ sectionId: string; elementId: string } | null>(null);
   const [trackingPanelOpen, setTrackingPanelOpen] = useState(false);
+  const [editorMode, setEditorMode] = useState<'editor' | 'chat'>('editor');
   
   // Dialog states
   const [templatesOpen, setTemplatesOpen] = useState(false);
@@ -1537,13 +1539,45 @@ ${data.buttonStyle.template === 'shiny-green' ? `
 
       <div className="flex-1 flex overflow-hidden">
         {/* Editor Panel - 25% */}
-        <div className="w-[25%] min-w-[320px] border-r border-border bg-card overflow-hidden">
-          <EditorPanel 
-            data={presellData} 
-            onChange={setPresellData} 
-            highlightedElement={highlightedElement}
-            onClearHighlight={() => setHighlightedElement(null)}
-          />
+        <div className="w-[25%] min-w-[320px] border-r border-border bg-card overflow-hidden flex flex-col">
+          {/* Mode Toggle */}
+          <div className="flex border-b border-border bg-muted/50">
+            <button
+              onClick={() => setEditorMode('editor')}
+              className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
+                editorMode === 'editor'
+                  ? 'bg-background text-foreground border-b-2 border-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              🛠️ Editor
+            </button>
+            <button
+              onClick={() => setEditorMode('chat')}
+              className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${
+                editorMode === 'chat'
+                  ? 'bg-background text-foreground border-b-2 border-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              💬 Assistente
+            </button>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            {editorMode === 'editor' ? (
+              <EditorPanel 
+                data={presellData} 
+                onChange={setPresellData} 
+                highlightedElement={highlightedElement}
+                onClearHighlight={() => setHighlightedElement(null)}
+              />
+            ) : (
+              <ChatBuilder
+                data={presellData}
+                onChange={setPresellData}
+              />
+            )}
+          </div>
         </div>
 
         {/* Preview Panel - 80% */}
