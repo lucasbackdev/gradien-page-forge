@@ -52,8 +52,10 @@ type ChatStep =
   | 'change_page_bg'
   | 'change_page_title'
   | 'edit_section_select'
+  | 'edit_section_menu'
   | 'edit_element_select'
   | 'edit_element_content'
+  | 'edit_element_new_text'
   | 'delete_section_select'
   | 'add_affiliate_link';
 
@@ -270,10 +272,54 @@ export const ChatBuilder = ({ data, onChange }: ChatBuilderProps) => {
         if (section) {
           addMessage('user', `Editar "${section.name}"`);
           setTempData({ ...tempData, currentSectionId: section.id });
-          askAddElement();
+          showEditSectionMenu(section);
         }
         break;
       }
+
+      case 'edit_existing_elements': {
+        const editSection = data.sections.find(s => s.id === tempData.currentSectionId);
+        if (editSection) {
+          const textElements = editSection.elements.filter(el => el.type === 'text' || el.type === 'button');
+          if (textElements.length === 0) {
+            addMessage('bot', '⚠️ Esta seção não tem textos ou botões para editar. Deseja adicionar elementos?', [
+              { label: '➕ Adicionar elemento', action: 'add_elements_to_section' },
+              { label: '↩️ Voltar ao menu', action: 'back_to_menu' },
+            ]);
+          } else {
+            const elementActions = textElements.map((el, i) => {
+              const icon = el.type === 'text' ? '📝' : '🔘';
+              const preview = (el.content || '').slice(0, 25) + ((el.content || '').length > 25 ? '...' : '');
+              return {
+                label: `${icon} ${preview}`,
+                action: 'select_element_to_edit',
+                payload: el.id,
+              };
+            });
+            addMessage('bot', '📝 Qual elemento deseja editar?', elementActions);
+            setCurrentStep('edit_element_select');
+          }
+        }
+        break;
+      }
+
+      case 'select_element_to_edit': {
+        const editSection2 = data.sections.find(s => s.id === tempData.currentSectionId);
+        const elementToEdit = editSection2?.elements.find(el => el.id === payload);
+        if (elementToEdit) {
+          const preview = (elementToEdit.content || '').slice(0, 40);
+          addMessage('user', `Editar: "${preview}"`);
+          setTempData({ ...tempData, editElementId: payload });
+          addMessage('bot', `Texto atual: **"${elementToEdit.content}"**\n\nDigite o novo texto:`);
+          setCurrentStep('edit_element_new_text');
+        }
+        break;
+      }
+
+      case 'add_elements_to_section':
+        addMessage('user', '➕ Adicionar elemento');
+        askAddElement();
+        break;
 
       case 'delete_section':
         addMessage('user', '🗑️ Remover seção');
@@ -316,6 +362,15 @@ export const ChatBuilder = ({ data, onChange }: ChatBuilderProps) => {
         showMenu();
         break;
     }
+  };
+
+  const showEditSectionMenu = (section: PresellSection) => {
+    addMessage('bot', `✏️ Seção **"${section.name}"** selecionada. O que deseja fazer?`, [
+      { label: '📝 Editar textos existentes', action: 'edit_existing_elements' },
+      { label: '➕ Adicionar novo elemento', action: 'add_elements_to_section' },
+      { label: '↩️ Voltar ao menu', action: 'back_to_menu' },
+    ]);
+    setCurrentStep('edit_section_menu');
   };
 
   const askAddElement = () => {
@@ -456,6 +511,32 @@ export const ChatBuilder = ({ data, onChange }: ChatBuilderProps) => {
         addElementToSection(sectionId, el);
         addMessage('bot', `✅ Botão **"${tempData.buttonText}"** adicionado!`);
         askAddElement();
+        break;
+      }
+
+      case 'edit_element_new_text': {
+        const editSectionId = tempData.currentSectionId;
+        const editElId = tempData.editElementId;
+        onChange({
+          ...data,
+          sections: data.sections.map(s =>
+            s.id === editSectionId
+              ? {
+                  ...s,
+                  elements: s.elements.map(el =>
+                    el.id === editElId ? { ...el, content: text } : el
+                  ),
+                }
+              : s
+          ),
+        });
+        addMessage('bot', `✅ Texto atualizado para: **"${text}"**`);
+        const editSection3 = data.sections.find(s => s.id === editSectionId);
+        if (editSection3) {
+          showEditSectionMenu(editSection3);
+        } else {
+          showMenu();
+        }
         break;
       }
 
