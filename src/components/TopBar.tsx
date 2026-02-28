@@ -202,9 +202,25 @@ export const TopBar = ({
             {user && (
               <>
                 <DropdownMenuSeparator />
+                {isAdmin && (
+                  <DropdownMenuItem onClick={() => navigate('/adm')} className="cursor-pointer">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Painel Admin
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
                   <LogOut className="h-4 w-4 mr-2" />
                   Sair
+                </DropdownMenuItem>
+              </>
+            )}
+            
+            {!user && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/auth')} className="cursor-pointer">
+                  <User className="h-4 w-4 mr-2" />
+                  Entrar
                 </DropdownMenuItem>
               </>
             )}
