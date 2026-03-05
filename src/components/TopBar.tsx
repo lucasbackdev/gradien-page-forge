@@ -28,6 +28,8 @@ interface TopBarProps {
   onOpen?: () => void;
   onTemplates?: () => void;
   currentPageName?: string | null;
+  autoSaveEnabled?: boolean;
+  onToggleAutoSave?: (enabled: boolean) => void;
 }
 
 export const TopBar = ({
