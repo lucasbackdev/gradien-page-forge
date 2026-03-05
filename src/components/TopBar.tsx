@@ -1,4 +1,4 @@
-import { Moon, Sun, Menu, Shield, LogOut, User, Upload, Tag } from 'lucide-react';
+import { Moon, Sun, Menu, Shield, LogOut, User, Upload, Tag, Save, FolderOpen, LayoutTemplate } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
