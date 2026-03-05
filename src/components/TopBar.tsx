@@ -24,6 +24,10 @@ interface TopBarProps {
   currentPageId?: string;
   onPageIdChange?: (id: string | undefined) => void;
   onOpenTracking?: () => void;
+  onSave?: () => void;
+  onOpen?: () => void;
+  onTemplates?: () => void;
+  currentPageName?: string | null;
 }
 
 export const TopBar = ({
