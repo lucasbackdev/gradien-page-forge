@@ -78,6 +78,7 @@ const Index = () => {
   const [creatingTemplate, setCreatingTemplate] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<PublicTemplate | null>(null);
   const [deleteTemplateDialogOpen, setDeleteTemplateDialogOpen] = useState(false);
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
