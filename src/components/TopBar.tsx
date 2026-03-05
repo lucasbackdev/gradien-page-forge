@@ -1,4 +1,4 @@
-import { Moon, Sun, Menu, Shield, LogOut, User, Upload, Tag, Save, FolderOpen, LayoutTemplate } from 'lucide-react';
+import { Moon, Sun, Menu, Shield, LogOut, User, Upload, Tag, Save, FolderOpen, LayoutTemplate, Timer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,8 @@ interface TopBarProps {
   onOpen?: () => void;
   onTemplates?: () => void;
   currentPageName?: string | null;
+  autoSaveEnabled?: boolean;
+  onToggleAutoSave?: (enabled: boolean) => void;
 }
 
 export const TopBar = ({
@@ -43,6 +45,8 @@ export const TopBar = ({
   onOpen,
   onTemplates,
   currentPageName,
+  autoSaveEnabled,
+  onToggleAutoSave,
 }: TopBarProps) => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
@@ -218,6 +222,16 @@ export const TopBar = ({
               <Tag className="h-4 w-4 mr-2" />
               Tags & Rastreamento
             </DropdownMenuItem>
+            
+            {user && currentPageId && (
+              <DropdownMenuItem 
+                onClick={() => onToggleAutoSave?.(!autoSaveEnabled)} 
+                className="cursor-pointer"
+              >
+                <Timer className="h-4 w-4 mr-2" />
+                {autoSaveEnabled ? '🟢 Auto-save ligado' : 'Auto-save (3 min)'}
+              </DropdownMenuItem>
+            )}
             
             <DropdownMenuSeparator />
             

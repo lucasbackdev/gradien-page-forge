@@ -78,6 +78,7 @@ const Index = () => {
   const [creatingTemplate, setCreatingTemplate] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<PublicTemplate | null>(null);
   const [deleteTemplateDialogOpen, setDeleteTemplateDialogOpen] = useState(false);
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -85,6 +86,22 @@ const Index = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [darkMode]);
+
+  // Auto-save every 3 minutes when enabled
+  useEffect(() => {
+    if (!autoSaveEnabled || !currentPageId) return;
+    const interval = setInterval(async () => {
+      const currentPage = savedPages.find(p => p.id === currentPageId);
+      if (!currentPage) return;
+      await updatePage(currentPageId, currentPage.name, presellData);
+      toast({
+        title: "✅ Salvo automaticamente",
+        description: "Sua página foi salva com sucesso.",
+        className: "bg-green-600 text-white border-green-700",
+      });
+    }, 3 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [autoSaveEnabled, currentPageId, presellData, savedPages, updatePage]);
 
   const handleUpdateElements = (elements: PresellElement[]) => {
     setPresellData(prev => ({ ...prev, elements }));
@@ -1549,6 +1566,8 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         onOpen={() => setLoadDialogOpen(true)}
         onTemplates={() => setTemplatesOpen(true)}
         currentPageName={currentPageName}
+        autoSaveEnabled={autoSaveEnabled}
+        onToggleAutoSave={setAutoSaveEnabled}
       />
 
       <div className="flex-1 flex overflow-hidden">
