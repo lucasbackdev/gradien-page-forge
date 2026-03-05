@@ -45,6 +45,8 @@ export const TopBar = ({
   onOpen,
   onTemplates,
   currentPageName,
+  autoSaveEnabled,
+  onToggleAutoSave,
 }: TopBarProps) => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();

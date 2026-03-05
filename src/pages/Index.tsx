@@ -1550,6 +1550,8 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         onOpen={() => setLoadDialogOpen(true)}
         onTemplates={() => setTemplatesOpen(true)}
         currentPageName={currentPageName}
+        autoSaveEnabled={autoSaveEnabled}
+        onToggleAutoSave={setAutoSaveEnabled}
       />
 
       <div className="flex-1 flex overflow-hidden">
