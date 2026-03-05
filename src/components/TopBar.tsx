@@ -223,6 +223,16 @@ export const TopBar = ({
               Tags & Rastreamento
             </DropdownMenuItem>
             
+            {user && currentPageId && (
+              <DropdownMenuItem 
+                onClick={() => onToggleAutoSave?.(!autoSaveEnabled)} 
+                className="cursor-pointer"
+              >
+                <Timer className="h-4 w-4 mr-2" />
+                {autoSaveEnabled ? '🟢 Auto-save ligado' : 'Auto-save (3 min)'}
+              </DropdownMenuItem>
+            )}
+            
             <DropdownMenuSeparator />
             
             <DropdownMenuItem onClick={onToggleDarkMode} className="cursor-pointer">
