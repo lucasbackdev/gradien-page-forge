@@ -39,6 +39,10 @@ export const TopBar = ({
   currentPageId,
   onPageIdChange,
   onOpenTracking,
+  onSave,
+  onOpen,
+  onTemplates,
+  currentPageName,
 }: TopBarProps) => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
