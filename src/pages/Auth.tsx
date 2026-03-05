@@ -123,6 +123,7 @@ const Auth = () => {
           title: "Login realizado com sucesso!",
           description: "Bem-vindo de volta!",
         });
+        navigate("/", { replace: true });
       }
     } catch (err: any) {
       console.error("Login error:", err);

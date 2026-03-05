@@ -25,8 +25,6 @@ export const usePublicTemplates = () => {
     try {
       setLoading(true);
       
-      // Wait for session to be ready
-      const { data: { session } } = await supabase.auth.getSession();
       
       const { data, error } = await supabase
         .from('public_templates')

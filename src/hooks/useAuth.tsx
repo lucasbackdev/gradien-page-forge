@@ -112,7 +112,15 @@ export const useAuth = () => {
         } else {
           setAuthState((prev) => ({ ...prev, loading: false }));
         }
-      } catch (err) {
+      } catch (err: any) {
+        if (err?.name === 'AbortError') {
+          if (mounted) {
+            setTimeout(() => {
+              if (mounted) initSession();
+            }, 300);
+          }
+          return;
+        }
         console.error('Init session error:', err);
         if (mounted) {
           setAuthState((prev) => ({ ...prev, loading: false }));
