@@ -1,4 +1,4 @@
-import { Moon, Sun, Menu, Shield, LogOut, User, Upload, Tag } from 'lucide-react';
+import { Moon, Sun, Menu, Shield, LogOut, User, Upload, Tag, Save, FolderOpen, LayoutTemplate } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,10 @@ interface TopBarProps {
   currentPageId?: string;
   onPageIdChange?: (id: string | undefined) => void;
   onOpenTracking?: () => void;
+  onSave?: () => void;
+  onOpen?: () => void;
+  onTemplates?: () => void;
+  currentPageName?: string | null;
 }
 
 export const TopBar = ({
@@ -35,6 +39,10 @@ export const TopBar = ({
   currentPageId,
   onPageIdChange,
   onOpenTracking,
+  onSave,
+  onOpen,
+  onTemplates,
+  currentPageName,
 }: TopBarProps) => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
@@ -156,6 +164,13 @@ export const TopBar = ({
       </div>
       
       <div className="flex items-center gap-3">
+        {/* Current page indicator */}
+        {currentPageName && (
+          <span className="text-sm text-muted-foreground truncate max-w-40 hidden sm:inline">
+            📄 {currentPageName}
+          </span>
+        )}
+
         <ShinyDownloadButton onClick={onDownload} />
 
         <input
@@ -173,6 +188,27 @@ export const TopBar = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
+            {user && (
+              <>
+                <DropdownMenuItem onClick={onSave} className="cursor-pointer">
+                  <Save className="h-4 w-4 mr-2" />
+                  Salvar Página
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem onClick={onOpen} className="cursor-pointer">
+                  <FolderOpen className="h-4 w-4 mr-2" />
+                  Minhas Páginas
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem onClick={onTemplates} className="cursor-pointer">
+                  <LayoutTemplate className="h-4 w-4 mr-2" />
+                  Templates
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+              </>
+            )}
+            
             <DropdownMenuItem onClick={() => fileInputRef.current?.click()} className="cursor-pointer">
               <Upload className="h-4 w-4 mr-2" />
               Importar ZIP

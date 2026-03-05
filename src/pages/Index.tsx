@@ -1406,6 +1406,16 @@ ${data.buttonStyle.template === 'shiny-green' ? `
       return;
     }
 
+    // Enforce 2-page limit
+    if (savedPages.length >= 2) {
+      toast({
+        title: "Limite atingido",
+        description: "Você pode salvar no máximo 2 páginas. Exclua uma para salvar outra.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSaving(true);
     const result = await savePage(pageName.trim(), presellData);
     setSaving(false);
@@ -1535,6 +1545,10 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         currentPageId={currentPageId}
         onPageIdChange={setCurrentPageId}
         onOpenTracking={() => setTrackingPanelOpen(true)}
+        onSave={handleUpdateCurrent}
+        onOpen={() => setLoadDialogOpen(true)}
+        onTemplates={() => setTemplatesOpen(true)}
+        currentPageName={currentPageName}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -1915,7 +1929,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
           <DialogHeader>
             <DialogTitle>Salvar Página</DialogTitle>
             <DialogDescription>
-              Dê um nome para salvar esta página na sua conta.
+              Dê um nome para salvar esta página na sua conta. ({savedPages.length}/2 páginas salvas)
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
