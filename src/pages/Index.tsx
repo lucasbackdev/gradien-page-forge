@@ -87,6 +87,22 @@ const Index = () => {
     }
   }, [darkMode]);
 
+  // Auto-save every 3 minutes when enabled
+  useEffect(() => {
+    if (!autoSaveEnabled || !currentPageId) return;
+    const interval = setInterval(async () => {
+      const currentPage = savedPages.find(p => p.id === currentPageId);
+      if (!currentPage) return;
+      await updatePage(currentPageId, currentPage.name, presellData);
+      toast({
+        title: "✅ Salvo automaticamente",
+        description: "Sua página foi salva com sucesso.",
+        className: "bg-green-600 text-white border-green-700",
+      });
+    }, 3 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [autoSaveEnabled, currentPageId, presellData, savedPages, updatePage]);
+
   const handleUpdateElements = (elements: PresellElement[]) => {
     setPresellData(prev => ({ ...prev, elements }));
   };
