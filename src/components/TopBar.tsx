@@ -188,6 +188,27 @@ export const TopBar = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
+            {user && (
+              <>
+                <DropdownMenuItem onClick={onSave} className="cursor-pointer">
+                  <Save className="h-4 w-4 mr-2" />
+                  Salvar Página
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem onClick={onOpen} className="cursor-pointer">
+                  <FolderOpen className="h-4 w-4 mr-2" />
+                  Minhas Páginas
+                </DropdownMenuItem>
+                
+                <DropdownMenuItem onClick={onTemplates} className="cursor-pointer">
+                  <LayoutTemplate className="h-4 w-4 mr-2" />
+                  Templates
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+              </>
+            )}
+            
             <DropdownMenuItem onClick={() => fileInputRef.current?.click()} className="cursor-pointer">
               <Upload className="h-4 w-4 mr-2" />
               Importar ZIP
