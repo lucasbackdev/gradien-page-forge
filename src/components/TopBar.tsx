@@ -164,6 +164,13 @@ export const TopBar = ({
       </div>
       
       <div className="flex items-center gap-3">
+        {/* Current page indicator */}
+        {currentPageName && (
+          <span className="text-sm text-muted-foreground truncate max-w-40 hidden sm:inline">
+            📄 {currentPageName}
+          </span>
+        )}
+
         <ShinyDownloadButton onClick={onDownload} />
 
         <input
