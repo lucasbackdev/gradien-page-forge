@@ -1929,7 +1929,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
           <DialogHeader>
             <DialogTitle>Salvar Página</DialogTitle>
             <DialogDescription>
-              Dê um nome para salvar esta página na sua conta.
+              Dê um nome para salvar esta página na sua conta. ({savedPages.length}/2 páginas salvas)
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
