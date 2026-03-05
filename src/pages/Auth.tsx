@@ -60,15 +60,24 @@ const Auth = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
-        navigate("/");
+        navigate("/", { replace: true });
       }
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        navigate("/");
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          navigate("/", { replace: true });
+        }
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          console.error('Session check error:', err);
+        }
       }
-    });
+    };
+
+    checkSession();
 
     return () => subscription.unsubscribe();
   }, [navigate]);
