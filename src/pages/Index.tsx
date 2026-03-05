@@ -1406,6 +1406,16 @@ ${data.buttonStyle.template === 'shiny-green' ? `
       return;
     }
 
+    // Enforce 2-page limit
+    if (savedPages.length >= 2) {
+      toast({
+        title: "Limite atingido",
+        description: "Você pode salvar no máximo 2 páginas. Exclua uma para salvar outra.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSaving(true);
     const result = await savePage(pageName.trim(), presellData);
     setSaving(false);
