@@ -1545,6 +1545,10 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         currentPageId={currentPageId}
         onPageIdChange={setCurrentPageId}
         onOpenTracking={() => setTrackingPanelOpen(true)}
+        onSave={handleUpdateCurrent}
+        onOpen={() => setLoadDialogOpen(true)}
+        onTemplates={() => setTemplatesOpen(true)}
+        currentPageName={currentPageName}
       />
 
       <div className="flex-1 flex overflow-hidden">
