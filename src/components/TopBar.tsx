@@ -1,4 +1,4 @@
-import { Moon, Sun, Menu, Shield, LogOut, User, Upload, Tag, Save, FolderOpen, LayoutTemplate, Timer } from 'lucide-react';
+import { Moon, Sun, Menu, Shield, LogOut, User, Upload, Tag, Save, FolderOpen, LayoutTemplate, Timer, Undo2, Redo2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -30,6 +30,10 @@ interface TopBarProps {
   currentPageName?: string | null;
   autoSaveEnabled?: boolean;
   onToggleAutoSave?: (enabled: boolean) => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
+  onUndo?: () => void;
+  onRedo?: () => void;
 }
 
 export const TopBar = ({
