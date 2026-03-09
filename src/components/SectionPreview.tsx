@@ -480,8 +480,8 @@ export const SectionPreview = ({
           backgroundClip: 'padding-box, border-box',
         } : {};
         const imageMediaWidth = getResponsiveMediaWidth(element);
-        // On mobile, expand media to fill more of the screen
-        const effectiveImageWidth = viewportSize === 'mobile' ? Math.max(imageMediaWidth, 100) : imageMediaWidth;
+        // Respect user's mobile size setting
+        const effectiveImageWidth = imageMediaWidth;
         const imageSpacing = getResponsiveSpacing(element);
         const showImageShadow = element.showShadow !== false;
         return element.imageUrl ? (
