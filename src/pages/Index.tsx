@@ -404,7 +404,7 @@ function declineCookies() {
       const sizeTablet = el.responsiveFontSize?.tablet || sizeDesktop;
       const sizeMobile = el.responsiveFontSize?.mobile || sizeTablet;
       
-      return `<div class="element-text" data-desktop-align="${alignDesktop}" data-tablet-align="${alignTablet}" data-mobile-align="${alignMobile}" data-desktop-size="${sizeDesktop}" data-tablet-size="${sizeTablet}" data-mobile-size="${sizeMobile}" style="${textStyle} text-align: ${alignDesktop}; font-size: ${sizeDesktop}; font-weight: ${el.fontWeight || 'normal'}; line-height: 1.4; margin-bottom: 0.75rem;">${content}</div>`;
+      return `<div class="element-text" data-desktop-align="${alignDesktop}" data-tablet-align="${alignTablet}" data-mobile-align="${alignMobile}" data-desktop-size="${sizeDesktop}" data-tablet-size="${sizeTablet}" data-mobile-size="${sizeMobile}" style="${textStyle} text-align: ${alignDesktop}; font-size: ${sizeDesktop}; font-weight: ${el.fontWeight || 'normal'}; line-height: 1.4; margin-bottom: 0.75rem; white-space: pre-line;">${content}</div>`;
     }
     if (el.type === 'button') {
       const isShinyButton = data.buttonStyle.template === 'shiny-green';
