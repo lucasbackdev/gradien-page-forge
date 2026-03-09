@@ -1656,14 +1656,14 @@ ${data.buttonStyle.template === 'shiny-green' ? `
             {editorMode === 'editor' ? (
               <EditorPanel 
                 data={presellData} 
-                onChange={setPresellData} 
+                onChange={handleSetPresellData} 
                 highlightedElement={highlightedElement}
                 onClearHighlight={() => setHighlightedElement(null)}
               />
             ) : (
               <ChatBuilder
                 data={presellData}
-                onChange={setPresellData}
+                onChange={handleSetPresellData}
               />
             )}
           </div>
