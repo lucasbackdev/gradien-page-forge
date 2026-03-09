@@ -51,6 +51,10 @@ export const TopBar = ({
   currentPageName,
   autoSaveEnabled,
   onToggleAutoSave,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
 }: TopBarProps) => {
   const navigate = useNavigate();
   const { user, isAdmin, signOut } = useAuth();
