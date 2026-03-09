@@ -1551,7 +1551,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
   };
 
   const handleLoadPage = (page: SavedPage) => {
-    setPresellData(page.data);
+    handleSetPresellData(page.data);
     setCurrentPageId(page.id);
     setLoadDialogOpen(false);
     toast({
