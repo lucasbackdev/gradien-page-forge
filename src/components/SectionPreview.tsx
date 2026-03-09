@@ -902,65 +902,155 @@ export const SectionPreview = ({
         </div>
       )}
 
-      {/* Floating Header */}
+      {/* Header - Floating or Fixed */}
       {floatingHeader.enabled && sections.length > 0 && (
-        <header
-          className="sticky top-4 z-50 px-6 py-3"
-          style={{
-            backgroundColor: `${floatingHeader.backgroundColor}${Math.round(floatingHeader.backgroundOpacity * 2.55).toString(16).padStart(2, '0')}`,
-            backdropFilter: floatingHeader.blur ? 'blur(12px)' : 'none',
-            borderRadius: floatingHeader.borderRadius,
-            width: `${floatingHeader.width || 60}%`,
-            maxWidth: '95%',
-            marginTop: '1rem',
-            marginBottom: '-4rem',
-            marginLeft: floatingHeader.position === 'left' ? '1rem' : floatingHeader.position === 'right' ? 'auto' : 'auto',
-            marginRight: floatingHeader.position === 'right' ? '1rem' : floatingHeader.position === 'left' ? 'auto' : 'auto',
-            ...(floatingHeader.position === 'center' && { marginLeft: 'auto', marginRight: 'auto' }),
-            boxShadow: floatingHeader.shadow ? '0 8px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2)' : 'none',
-          }}
-        >
-          <div className="flex items-center justify-between gap-8">
-            {floatingHeader.logoImage && (
-              <img src={floatingHeader.logoImage} alt="Logo" className="h-8 object-contain flex-shrink-0" />
+        floatingHeader.type === 'fixed' ? (
+          // Fixed header - full-width, stuck to top
+          <header
+            className="sticky top-0 z-50 px-6 py-3"
+            style={{
+              backgroundColor: floatingHeader.backgroundColor,
+              boxShadow: floatingHeader.shadow ? '0 4px 16px rgba(0, 0, 0, 0.3)' : 'none',
+            }}
+          >
+            <div className="flex items-center justify-between gap-8 max-w-6xl mx-auto">
+              {floatingHeader.logoImage && (
+                <img src={floatingHeader.logoImage} alt="Logo" className="h-8 object-contain flex-shrink-0" />
+              )}
+              <nav className="hidden md:flex items-center justify-center gap-4 flex-1">
+                {sections.map((section) => (
+                  <a
+                    key={section.id}
+                    href={`#section-${section.id}`}
+                    onClick={(e) => handleSmoothScroll(e, section.id)}
+                    className="text-sm transition-colors hover:opacity-80"
+                    style={{
+                      color: floatingHeader.navTextColor || '#ffffff',
+                      fontWeight: floatingHeader.navFontWeight || 'normal',
+                    }}
+                  >
+                    {section.name}
+                  </a>
+                ))}
+              </nav>
+              <div className="flex items-center gap-3">
+                {floatingHeader.fixedButton?.enabled && (
+                  <a
+                    href={floatingHeader.fixedButton.link || '#'}
+                    onClick={(e) => {
+                      if (!floatingHeader.fixedButton?.link || floatingHeader.fixedButton.link === '#') e.preventDefault();
+                    }}
+                    className="text-sm px-4 py-2 transition-opacity hover:opacity-90"
+                    style={{
+                      backgroundColor: floatingHeader.fixedButton.backgroundColor,
+                      color: floatingHeader.fixedButton.textColor,
+                      borderRadius: floatingHeader.fixedButton.borderRadius || '0.5rem',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {floatingHeader.fixedButton.text || 'Comprar'}
+                  </a>
+                )}
+                {/* Mobile menu button */}
+                <button 
+                  className="md:hidden p-2"
+                  style={{ color: floatingHeader.navTextColor || '#ffffff' }}
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                >
+                  {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </button>
+              </div>
+            </div>
+            
+            {/* Mobile menu */}
+            {mobileMenuOpen && (
+              <nav className="md:hidden mt-4 flex flex-col gap-2 border-t pt-4" style={{ borderColor: `${floatingHeader.navTextColor || '#ffffff'}30` }}>
+                {sections.map((section) => (
+                  <a
+                    key={section.id}
+                    href={`#section-${section.id}`}
+                    onClick={(e) => handleSmoothScroll(e, section.id)}
+                    className="text-sm transition-colors py-2 hover:opacity-80"
+                    style={{
+                      color: floatingHeader.navTextColor || '#ffffff',
+                      fontWeight: floatingHeader.navFontWeight || 'normal',
+                    }}
+                  >
+                    {section.name}
+                  </a>
+                ))}
+              </nav>
             )}
-            <nav className="hidden md:flex items-center justify-center gap-4 flex-1">
-              {sections.map((section) => (
-                <a
-                  key={section.id}
-                  href={`#section-${section.id}`}
-                  onClick={(e) => handleSmoothScroll(e, section.id)}
-                  className="text-sm text-white/80 hover:text-white transition-colors"
-                >
-                  {section.name}
-                </a>
-              ))}
-            </nav>
-            {/* Mobile menu button */}
-            <button 
-              className="md:hidden text-white p-2"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-          
-          {/* Mobile menu */}
-          {mobileMenuOpen && (
-            <nav className="md:hidden mt-4 flex flex-col gap-2 border-t border-white/20 pt-4">
-              {sections.map((section) => (
-                <a
-                  key={section.id}
-                  href={`#section-${section.id}`}
-                  onClick={(e) => handleSmoothScroll(e, section.id)}
-                  className="text-sm text-white/80 hover:text-white transition-colors py-2"
-                >
-                  {section.name}
-                </a>
-              ))}
-            </nav>
-          )}
-        </header>
+          </header>
+        ) : (
+          // Floating header
+          <header
+            className="sticky top-4 z-50 px-6 py-3"
+            style={{
+              backgroundColor: `${floatingHeader.backgroundColor}${Math.round(floatingHeader.backgroundOpacity * 2.55).toString(16).padStart(2, '0')}`,
+              backdropFilter: floatingHeader.blur ? 'blur(12px)' : 'none',
+              borderRadius: floatingHeader.borderRadius,
+              width: `${floatingHeader.width || 60}%`,
+              maxWidth: '95%',
+              marginTop: '1rem',
+              marginBottom: '-4rem',
+              marginLeft: floatingHeader.position === 'left' ? '1rem' : floatingHeader.position === 'right' ? 'auto' : 'auto',
+              marginRight: floatingHeader.position === 'right' ? '1rem' : floatingHeader.position === 'left' ? 'auto' : 'auto',
+              ...(floatingHeader.position === 'center' && { marginLeft: 'auto', marginRight: 'auto' }),
+              boxShadow: floatingHeader.shadow ? '0 8px 32px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(0, 0, 0, 0.2)' : 'none',
+            }}
+          >
+            <div className="flex items-center justify-between gap-8">
+              {floatingHeader.logoImage && (
+                <img src={floatingHeader.logoImage} alt="Logo" className="h-8 object-contain flex-shrink-0" />
+              )}
+              <nav className="hidden md:flex items-center justify-center gap-4 flex-1">
+                {sections.map((section) => (
+                  <a
+                    key={section.id}
+                    href={`#section-${section.id}`}
+                    onClick={(e) => handleSmoothScroll(e, section.id)}
+                    className="text-sm transition-colors hover:opacity-80"
+                    style={{
+                      color: floatingHeader.navTextColor || 'rgba(255,255,255,0.8)',
+                      fontWeight: floatingHeader.navFontWeight || 'normal',
+                    }}
+                  >
+                    {section.name}
+                  </a>
+                ))}
+              </nav>
+              {/* Mobile menu button */}
+              <button 
+                className="md:hidden p-2"
+                style={{ color: floatingHeader.navTextColor || '#ffffff' }}
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
+            
+            {/* Mobile menu */}
+            {mobileMenuOpen && (
+              <nav className="md:hidden mt-4 flex flex-col gap-2 border-t border-white/20 pt-4">
+                {sections.map((section) => (
+                  <a
+                    key={section.id}
+                    href={`#section-${section.id}`}
+                    onClick={(e) => handleSmoothScroll(e, section.id)}
+                    className="text-sm transition-colors py-2 hover:opacity-80"
+                    style={{
+                      color: floatingHeader.navTextColor || 'rgba(255,255,255,0.8)',
+                      fontWeight: floatingHeader.navFontWeight || 'normal',
+                    }}
+                  >
+                    {section.name}
+                  </a>
+                ))}
+              </nav>
+            )}
+          </header>
+        )
       )}
 
       {/* Sections */}
