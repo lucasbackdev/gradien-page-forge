@@ -1060,7 +1060,7 @@ export const SectionPreview = ({
             key={section.id}
             id={`section-${section.id}`}
             style={getSectionStyle(section)}
-            className={`relative group ${floatingHeader.enabled && index === 0 ? 'pt-24' : ''} ${draggedSectionIndex === index ? 'opacity-50' : ''}`}
+            className={`relative group ${floatingHeader.enabled && floatingHeader.type !== 'fixed' && index === 0 ? 'pt-24' : ''} ${draggedSectionIndex === index ? 'opacity-50' : ''}`}
             draggable
             onDragStart={(e) => handleSectionDragStart(e, index)}
             onDragOver={(e) => handleSectionDragOver(e, index)}
