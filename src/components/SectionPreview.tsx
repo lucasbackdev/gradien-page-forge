@@ -527,8 +527,8 @@ export const SectionPreview = ({
           backgroundClip: 'padding-box, border-box',
         } : {};
         const videoMediaWidth = getResponsiveMediaWidth(element);
-        // On mobile, expand video to fill more of the screen
-        const effectiveVideoWidth = viewportSize === 'mobile' ? Math.max(videoMediaWidth, 100) : videoMediaWidth;
+        // Respect user's mobile size setting
+        const effectiveVideoWidth = videoMediaWidth;
         const videoSpacing = getResponsiveSpacing(element);
         const showVideoShadow = element.showShadow !== false;
         return element.videoUrl ? (
