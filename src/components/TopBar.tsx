@@ -175,7 +175,29 @@ export const TopBar = ({
         <LogoBrand size="md" />
       </div>
       
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
+        {/* Undo/Redo */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onUndo}
+          disabled={!canUndo}
+          title="Desfazer"
+          className="h-8 w-8"
+        >
+          <Undo2 className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onRedo}
+          disabled={!canRedo}
+          title="Refazer"
+          className="h-8 w-8"
+        >
+          <Redo2 className="h-4 w-4" />
+        </Button>
+
         {/* Current page indicator */}
         {currentPageName && (
           <span className="text-sm text-muted-foreground truncate max-w-40 hidden sm:inline">
