@@ -59,6 +59,57 @@ const Index = () => {
   const [trackingPanelOpen, setTrackingPanelOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<'editor' | 'chat'>('editor');
   
+  // Undo/Redo history
+  const historyRef = useRef<PresellData[]>([defaultPresellData]);
+  const historyIndexRef = useRef(0);
+  const isUndoRedoRef = useRef(false);
+
+  const pushHistory = useCallback((data: PresellData) => {
+    if (isUndoRedoRef.current) {
+      isUndoRedoRef.current = false;
+      return;
+    }
+    const history = historyRef.current;
+    const index = historyIndexRef.current;
+    // Remove future states
+    historyRef.current = history.slice(0, index + 1);
+    historyRef.current.push(JSON.parse(JSON.stringify(data)));
+    // Keep max 30 states
+    if (historyRef.current.length > 30) {
+      historyRef.current = historyRef.current.slice(-30);
+    }
+    historyIndexRef.current = historyRef.current.length - 1;
+  }, []);
+
+  const handleSetPresellData = useCallback((updater: PresellData | ((prev: PresellData) => PresellData)) => {
+    setPresellData(prev => {
+      const newData = typeof updater === 'function' ? updater(prev) : updater;
+      pushHistory(newData);
+      return newData;
+    });
+  }, [pushHistory]);
+
+  const canUndo = historyIndexRef.current > 0;
+  const canRedo = historyIndexRef.current < historyRef.current.length - 1;
+
+  const handleUndo = useCallback(() => {
+    if (historyIndexRef.current > 0) {
+      historyIndexRef.current -= 1;
+      isUndoRedoRef.current = true;
+      const restored = JSON.parse(JSON.stringify(historyRef.current[historyIndexRef.current]));
+      setPresellData(restored);
+    }
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    if (historyIndexRef.current < historyRef.current.length - 1) {
+      historyIndexRef.current += 1;
+      isUndoRedoRef.current = true;
+      const restored = JSON.parse(JSON.stringify(historyRef.current[historyIndexRef.current]));
+      setPresellData(restored);
+    }
+  }, []);
+  
   // Dialog states
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
