@@ -1689,7 +1689,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
                   sections={presellData.sections}
                   presellData={presellData}
                   floatingHeader={presellData.floatingHeader}
-                  onReorderSections={(sections) => setPresellData(prev => ({ ...prev, sections }))}
+                  onReorderSections={(sections) => handleSetPresellData(prev => ({ ...prev, sections }))}
                   onUpdateSectionElements={handleUpdateSectionElements}
                   onUpdateSectionHeight={handleUpdateSectionHeight}
                   viewportSize={viewportSize}
