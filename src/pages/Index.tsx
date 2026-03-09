@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TopBar } from '@/components/TopBar';
 import { EditorPanel } from '@/components/EditorPanel';
@@ -59,6 +59,57 @@ const Index = () => {
   const [trackingPanelOpen, setTrackingPanelOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<'editor' | 'chat'>('editor');
   
+  // Undo/Redo history
+  const historyRef = useRef<PresellData[]>([defaultPresellData]);
+  const historyIndexRef = useRef(0);
+  const isUndoRedoRef = useRef(false);
+
+  const pushHistory = useCallback((data: PresellData) => {
+    if (isUndoRedoRef.current) {
+      isUndoRedoRef.current = false;
+      return;
+    }
+    const history = historyRef.current;
+    const index = historyIndexRef.current;
+    // Remove future states
+    historyRef.current = history.slice(0, index + 1);
+    historyRef.current.push(JSON.parse(JSON.stringify(data)));
+    // Keep max 30 states
+    if (historyRef.current.length > 30) {
+      historyRef.current = historyRef.current.slice(-30);
+    }
+    historyIndexRef.current = historyRef.current.length - 1;
+  }, []);
+
+  const handleSetPresellData = useCallback((updater: PresellData | ((prev: PresellData) => PresellData)) => {
+    setPresellData(prev => {
+      const newData = typeof updater === 'function' ? updater(prev) : updater;
+      pushHistory(newData);
+      return newData;
+    });
+  }, [pushHistory]);
+
+  const canUndo = historyIndexRef.current > 0;
+  const canRedo = historyIndexRef.current < historyRef.current.length - 1;
+
+  const handleUndo = useCallback(() => {
+    if (historyIndexRef.current > 0) {
+      historyIndexRef.current -= 1;
+      isUndoRedoRef.current = true;
+      const restored = JSON.parse(JSON.stringify(historyRef.current[historyIndexRef.current]));
+      setPresellData(restored);
+    }
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    if (historyIndexRef.current < historyRef.current.length - 1) {
+      historyIndexRef.current += 1;
+      isUndoRedoRef.current = true;
+      const restored = JSON.parse(JSON.stringify(historyRef.current[historyIndexRef.current]));
+      setPresellData(restored);
+    }
+  }, []);
+  
   // Dialog states
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
@@ -104,11 +155,11 @@ const Index = () => {
   }, [autoSaveEnabled, currentPageId, presellData, savedPages, updatePage]);
 
   const handleUpdateElements = (elements: PresellElement[]) => {
-    setPresellData(prev => ({ ...prev, elements }));
+    handleSetPresellData(prev => ({ ...prev, elements }));
   };
 
   const handleUpdateSectionElements = (sectionId: string, elements: SectionElement[]) => {
-    setPresellData(prev => ({
+    handleSetPresellData(prev => ({
       ...prev,
       sections: prev.sections.map(s => 
         s.id === sectionId ? { ...s, elements } : s
@@ -117,7 +168,7 @@ const Index = () => {
   };
 
   const handleUpdateSectionHeight = (sectionId: string, minHeight: string) => {
-    setPresellData(prev => ({
+    handleSetPresellData(prev => ({
       ...prev,
       sections: prev.sections.map(s => 
         s.id === sectionId ? { ...s, minHeight } : s
@@ -404,7 +455,7 @@ function declineCookies() {
       const sizeTablet = el.responsiveFontSize?.tablet || sizeDesktop;
       const sizeMobile = el.responsiveFontSize?.mobile || sizeTablet;
       
-      return `<div class="element-text" data-desktop-align="${alignDesktop}" data-tablet-align="${alignTablet}" data-mobile-align="${alignMobile}" data-desktop-size="${sizeDesktop}" data-tablet-size="${sizeTablet}" data-mobile-size="${sizeMobile}" style="${textStyle} text-align: ${alignDesktop}; font-size: ${sizeDesktop}; font-weight: ${el.fontWeight || 'normal'}; line-height: 1.4; margin-bottom: 0.75rem;">${content}</div>`;
+      return `<div class="element-text" data-desktop-align="${alignDesktop}" data-tablet-align="${alignTablet}" data-mobile-align="${alignMobile}" data-desktop-size="${sizeDesktop}" data-tablet-size="${sizeTablet}" data-mobile-size="${sizeMobile}" style="${textStyle} text-align: ${alignDesktop}; font-size: ${sizeDesktop}; font-weight: ${el.fontWeight || 'normal'}; line-height: 1.4; margin-bottom: 0.75rem; white-space: pre-line;">${content}</div>`;
     }
     if (el.type === 'button') {
       const isShinyButton = data.buttonStyle.template === 'shiny-green';
@@ -598,30 +649,59 @@ function declineCookies() {
 </div>`;
     }
 
-    // Floating Header
+    // Header (Floating or Fixed)
     if (data.floatingHeader.enabled && data.sections.length > 0) {
-      const headerPosition = data.floatingHeader.position || 'center';
-      const positionStyle = headerPosition === 'left' ? 'margin-left: 1rem; margin-right: auto;' 
-        : headerPosition === 'right' ? 'margin-left: auto; margin-right: 1rem;' 
-        : 'margin-left: auto; margin-right: auto;';
-      
-      html += `
+      const headerType = data.floatingHeader.type || 'floating';
+      const navColor = data.floatingHeader.navTextColor || 'rgba(255,255,255,0.8)';
+      const navWeight = data.floatingHeader.navFontWeight || 'normal';
+      const fixedBtn = data.floatingHeader.fixedButton;
+
+      if (headerType === 'fixed') {
+        html += `
+<header class="fixed-header" style="background-color: ${data.floatingHeader.backgroundColor}; ${data.floatingHeader.shadow ? 'box-shadow: 0 4px 16px rgba(0,0,0,0.3);' : ''}">
+  <div class="header-content" style="max-width: 72rem; margin: 0 auto;">
+    ${data.floatingHeader.logoImage ? '<img src="public/header-logo.png" alt="Logo" class="header-logo">' : ''}
+    <nav class="desktop-nav">
+      ${data.sections.map(s => `<a href="#section-${s.id}" style="color: ${navColor}; font-weight: ${navWeight};" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'})">${s.name}</a>`).join('')}
+    </nav>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      ${fixedBtn?.enabled ? `<a href="${fixedBtn.link || '#'}" class="fixed-header-btn" style="background-color: ${fixedBtn.backgroundColor}; color: ${fixedBtn.textColor}; border-radius: ${fixedBtn.borderRadius || '0.5rem'}; padding: 0.5rem 1rem; font-weight: bold; font-size: 0.875rem; text-decoration: none; display: inline-block; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">${fixedBtn.text || 'Comprar'}</a>` : ''}
+      <button class="mobile-menu-btn" style="color: ${navColor};">
+        <svg class="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <nav class="mobile-nav hidden">
+    ${data.sections.map(s => `<a href="#section-${s.id}" style="color: ${navColor}; font-weight: ${navWeight};" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'}); this.closest('.mobile-nav').classList.add('hidden')">${s.name}</a>`).join('')}
+  </nav>
+</header>`;
+      } else {
+        // Floating header
+        const headerPosition = data.floatingHeader.position || 'center';
+        const positionStyle = headerPosition === 'left' ? 'margin-left: 1rem; margin-right: auto;' 
+          : headerPosition === 'right' ? 'margin-left: auto; margin-right: 1rem;' 
+          : 'margin-left: auto; margin-right: auto;';
+        
+        html += `
 <header class="floating-header" style="${positionStyle}">
   <div class="header-content">
     ${data.floatingHeader.logoImage ? '<img src="public/header-logo.png" alt="Logo" class="header-logo">' : ''}
     <nav class="desktop-nav">
-      ${data.sections.map(s => `<a href="#section-${s.id}" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'})">${s.name}</a>`).join('')}
+      ${data.sections.map(s => `<a href="#section-${s.id}" style="color: ${navColor}; font-weight: ${navWeight};" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'})">${s.name}</a>`).join('')}
     </nav>
-    <button class="mobile-menu-btn">
+    <button class="mobile-menu-btn" style="color: ${navColor};">
       <svg class="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
       </svg>
     </button>
   </div>
   <nav class="mobile-nav hidden">
-    ${data.sections.map(s => `<a href="#section-${s.id}" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'}); this.closest('.mobile-nav').classList.add('hidden')">${s.name}</a>`).join('')}
+    ${data.sections.map(s => `<a href="#section-${s.id}" style="color: ${navColor}; font-weight: ${navWeight};" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'}); this.closest('.mobile-nav').classList.add('hidden')">${s.name}</a>`).join('')}
   </nav>
 </header>`;
+      }
     }
 
     // Sections
@@ -854,6 +934,14 @@ body {
 
 .page-main {
   flex: 1;
+}
+
+.fixed-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 0.75rem 1.5rem;
+  width: 100%;
 }
 
 .floating-header {
@@ -1244,6 +1332,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
 .element-text {
   line-height: 1.35;
   margin-bottom: 0.5rem;
+  white-space: pre-line;
 }
 
 .site-footer {
@@ -1462,7 +1551,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
   };
 
   const handleLoadPage = (page: SavedPage) => {
-    setPresellData(page.data);
+    handleSetPresellData(page.data);
     setCurrentPageId(page.id);
     setLoadDialogOpen(false);
     toast({
@@ -1484,7 +1573,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
 
   const handleSelectTemplate = (template: PublicTemplate) => {
     const clonedData = JSON.parse(JSON.stringify(template.data));
-    setPresellData(clonedData);
+    handleSetPresellData(clonedData);
     setCurrentPageId(undefined);
     setTemplatesOpen(false);
     toast({
@@ -1558,7 +1647,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         onToggleDarkMode={() => setDarkMode(!darkMode)}
         onDownload={handleDownload}
         currentData={presellData}
-        onLoadPage={setPresellData}
+        onLoadPage={handleSetPresellData}
         currentPageId={currentPageId}
         onPageIdChange={setCurrentPageId}
         onOpenTracking={() => setTrackingPanelOpen(true)}
@@ -1568,6 +1657,10 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         currentPageName={currentPageName}
         autoSaveEnabled={autoSaveEnabled}
         onToggleAutoSave={setAutoSaveEnabled}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -1600,14 +1693,14 @@ ${data.buttonStyle.template === 'shiny-green' ? `
             {editorMode === 'editor' ? (
               <EditorPanel 
                 data={presellData} 
-                onChange={setPresellData} 
+                onChange={handleSetPresellData} 
                 highlightedElement={highlightedElement}
                 onClearHighlight={() => setHighlightedElement(null)}
               />
             ) : (
               <ChatBuilder
                 data={presellData}
-                onChange={setPresellData}
+                onChange={handleSetPresellData}
               />
             )}
           </div>
@@ -1633,7 +1726,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
                   sections={presellData.sections}
                   presellData={presellData}
                   floatingHeader={presellData.floatingHeader}
-                  onReorderSections={(sections) => setPresellData(prev => ({ ...prev, sections }))}
+                  onReorderSections={(sections) => handleSetPresellData(prev => ({ ...prev, sections }))}
                   onUpdateSectionElements={handleUpdateSectionElements}
                   onUpdateSectionHeight={handleUpdateSectionHeight}
                   viewportSize={viewportSize}
@@ -2054,7 +2147,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         open={trackingPanelOpen}
         onOpenChange={setTrackingPanelOpen}
         config={presellData.trackingConfig || { gtmId: '', googleAdsId: '', conversionId: '', conversionLabel: '' }}
-        onChange={(trackingConfig) => setPresellData(prev => ({ ...prev, trackingConfig }))}
+        onChange={(trackingConfig) => handleSetPresellData(prev => ({ ...prev, trackingConfig }))}
       />
     </div>
   );

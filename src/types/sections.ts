@@ -186,9 +186,20 @@ export interface PresellSection {
 }
 
 export type HeaderPosition = 'left' | 'center' | 'right';
+export type HeaderType = 'floating' | 'fixed';
+
+export interface FixedHeaderButton {
+  enabled: boolean;
+  text: string;
+  link: string;
+  backgroundColor: string;
+  textColor: string;
+  borderRadius: string;
+}
 
 export interface FloatingHeader {
   enabled: boolean;
+  type?: HeaderType;
   backgroundColor: string;
   backgroundOpacity: number;
   blur: boolean;
@@ -197,6 +208,10 @@ export interface FloatingHeader {
   shadow: boolean;
   position: HeaderPosition;
   width: number;
+  // Fixed header specific
+  navTextColor?: string;
+  navFontWeight?: string;
+  fixedButton?: FixedHeaderButton;
 }
 
 export const sectionTemplates: Record<SectionType, { name: string; icon: string; defaultElements: SectionElement[] }> = {
