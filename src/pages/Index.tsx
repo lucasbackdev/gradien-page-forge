@@ -1573,7 +1573,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
 
   const handleSelectTemplate = (template: PublicTemplate) => {
     const clonedData = JSON.parse(JSON.stringify(template.data));
-    setPresellData(clonedData);
+    handleSetPresellData(clonedData);
     setCurrentPageId(undefined);
     setTemplatesOpen(false);
     toast({
