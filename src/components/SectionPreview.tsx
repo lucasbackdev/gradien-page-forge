@@ -285,23 +285,25 @@ export const SectionPreview = ({
   };
 
   const handleSectionDragEnd = (e: React.DragEvent) => {
-    if (trashRef.current && draggedSectionIndex !== null) {
-      const trashRect = trashRef.current.getBoundingClientRect();
-      const { clientX, clientY } = e;
-      
-      if (
-        clientX >= trashRect.left &&
-        clientX <= trashRect.right &&
-        clientY >= trashRect.top &&
-        clientY <= trashRect.bottom
-      ) {
-        const newSections = sections.filter((_, i) => i !== draggedSectionIndex);
-        onReorderSections(newSections);
+    try {
+      if (trashRef.current && draggedSectionIndex !== null) {
+        const trashRect = trashRef.current.getBoundingClientRect();
+        const { clientX, clientY } = e;
+        
+        if (
+          clientX >= trashRect.left &&
+          clientX <= trashRect.right &&
+          clientY >= trashRect.top &&
+          clientY <= trashRect.bottom
+        ) {
+          const newSections = sections.filter((_, i) => i !== draggedSectionIndex);
+          onReorderSections(newSections);
+        }
       }
+    } finally {
+      setDraggedSectionIndex(null);
+      setShowTrash(false);
     }
-    
-    setDraggedSectionIndex(null);
-    setShowTrash(false);
   };
 
   const handleElementDragStart = (e: React.DragEvent, sectionId: string, elementIndex: number) => {
