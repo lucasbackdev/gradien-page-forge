@@ -1610,7 +1610,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         onToggleDarkMode={() => setDarkMode(!darkMode)}
         onDownload={handleDownload}
         currentData={presellData}
-        onLoadPage={setPresellData}
+        onLoadPage={handleSetPresellData}
         currentPageId={currentPageId}
         onPageIdChange={setCurrentPageId}
         onOpenTracking={() => setTrackingPanelOpen(true)}
@@ -1620,6 +1620,10 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         currentPageName={currentPageName}
         autoSaveEnabled={autoSaveEnabled}
         onToggleAutoSave={setAutoSaveEnabled}
+        canUndo={canUndo}
+        canRedo={canRedo}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
       />
 
       <div className="flex-1 flex overflow-hidden">
