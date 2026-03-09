@@ -649,30 +649,59 @@ function declineCookies() {
 </div>`;
     }
 
-    // Floating Header
+    // Header (Floating or Fixed)
     if (data.floatingHeader.enabled && data.sections.length > 0) {
-      const headerPosition = data.floatingHeader.position || 'center';
-      const positionStyle = headerPosition === 'left' ? 'margin-left: 1rem; margin-right: auto;' 
-        : headerPosition === 'right' ? 'margin-left: auto; margin-right: 1rem;' 
-        : 'margin-left: auto; margin-right: auto;';
-      
-      html += `
+      const headerType = data.floatingHeader.type || 'floating';
+      const navColor = data.floatingHeader.navTextColor || 'rgba(255,255,255,0.8)';
+      const navWeight = data.floatingHeader.navFontWeight || 'normal';
+      const fixedBtn = data.floatingHeader.fixedButton;
+
+      if (headerType === 'fixed') {
+        html += `
+<header class="fixed-header" style="background-color: ${data.floatingHeader.backgroundColor}; ${data.floatingHeader.shadow ? 'box-shadow: 0 4px 16px rgba(0,0,0,0.3);' : ''}">
+  <div class="header-content" style="max-width: 72rem; margin: 0 auto;">
+    ${data.floatingHeader.logoImage ? '<img src="public/header-logo.png" alt="Logo" class="header-logo">' : ''}
+    <nav class="desktop-nav">
+      ${data.sections.map(s => `<a href="#section-${s.id}" style="color: ${navColor}; font-weight: ${navWeight};" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'})">${s.name}</a>`).join('')}
+    </nav>
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      ${fixedBtn?.enabled ? `<a href="${fixedBtn.link || '#'}" class="fixed-header-btn" style="background-color: ${fixedBtn.backgroundColor}; color: ${fixedBtn.textColor}; border-radius: ${fixedBtn.borderRadius || '0.5rem'}; padding: 0.5rem 1rem; font-weight: bold; font-size: 0.875rem; text-decoration: none; display: inline-block; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">${fixedBtn.text || 'Comprar'}</a>` : ''}
+      <button class="mobile-menu-btn" style="color: ${navColor};">
+        <svg class="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <nav class="mobile-nav hidden">
+    ${data.sections.map(s => `<a href="#section-${s.id}" style="color: ${navColor}; font-weight: ${navWeight};" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'}); this.closest('.mobile-nav').classList.add('hidden')">${s.name}</a>`).join('')}
+  </nav>
+</header>`;
+      } else {
+        // Floating header
+        const headerPosition = data.floatingHeader.position || 'center';
+        const positionStyle = headerPosition === 'left' ? 'margin-left: 1rem; margin-right: auto;' 
+          : headerPosition === 'right' ? 'margin-left: auto; margin-right: 1rem;' 
+          : 'margin-left: auto; margin-right: auto;';
+        
+        html += `
 <header class="floating-header" style="${positionStyle}">
   <div class="header-content">
     ${data.floatingHeader.logoImage ? '<img src="public/header-logo.png" alt="Logo" class="header-logo">' : ''}
     <nav class="desktop-nav">
-      ${data.sections.map(s => `<a href="#section-${s.id}" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'})">${s.name}</a>`).join('')}
+      ${data.sections.map(s => `<a href="#section-${s.id}" style="color: ${navColor}; font-weight: ${navWeight};" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'})">${s.name}</a>`).join('')}
     </nav>
-    <button class="mobile-menu-btn">
+    <button class="mobile-menu-btn" style="color: ${navColor};">
       <svg class="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
       </svg>
     </button>
   </div>
   <nav class="mobile-nav hidden">
-    ${data.sections.map(s => `<a href="#section-${s.id}" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'}); this.closest('.mobile-nav').classList.add('hidden')">${s.name}</a>`).join('')}
+    ${data.sections.map(s => `<a href="#section-${s.id}" style="color: ${navColor}; font-weight: ${navWeight};" onclick="event.preventDefault(); document.getElementById('section-${s.id}').scrollIntoView({behavior: 'smooth'}); this.closest('.mobile-nav').classList.add('hidden')">${s.name}</a>`).join('')}
   </nav>
 </header>`;
+      }
     }
 
     // Sections
