@@ -2110,7 +2110,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
         open={trackingPanelOpen}
         onOpenChange={setTrackingPanelOpen}
         config={presellData.trackingConfig || { gtmId: '', googleAdsId: '', conversionId: '', conversionLabel: '' }}
-        onChange={(trackingConfig) => setPresellData(prev => ({ ...prev, trackingConfig }))}
+        onChange={(trackingConfig) => handleSetPresellData(prev => ({ ...prev, trackingConfig }))}
       />
     </div>
   );
