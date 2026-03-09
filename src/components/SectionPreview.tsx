@@ -330,26 +330,28 @@ export const SectionPreview = ({
   };
 
   const handleElementDragEnd = (e: React.DragEvent) => {
-    if (trashRef.current && draggedElementInfo) {
-      const trashRect = trashRef.current.getBoundingClientRect();
-      const { clientX, clientY } = e;
-      
-      if (
-        clientX >= trashRect.left &&
-        clientX <= trashRect.right &&
-        clientY >= trashRect.top &&
-        clientY <= trashRect.bottom
-      ) {
-        const section = sections.find(s => s.id === draggedElementInfo.sectionId);
-        if (section) {
-          const newElements = section.elements.filter((_, i) => i !== draggedElementInfo.elementIndex);
-          onUpdateSectionElements(draggedElementInfo.sectionId, newElements);
+    try {
+      if (trashRef.current && draggedElementInfo) {
+        const trashRect = trashRef.current.getBoundingClientRect();
+        const { clientX, clientY } = e;
+        
+        if (
+          clientX >= trashRect.left &&
+          clientX <= trashRect.right &&
+          clientY >= trashRect.top &&
+          clientY <= trashRect.bottom
+        ) {
+          const section = sections.find(s => s.id === draggedElementInfo.sectionId);
+          if (section) {
+            const newElements = section.elements.filter((_, i) => i !== draggedElementInfo.elementIndex);
+            onUpdateSectionElements(draggedElementInfo.sectionId, newElements);
+          }
         }
       }
+    } finally {
+      setDraggedElementInfo(null);
+      setShowTrash(false);
     }
-    
-    setDraggedElementInfo(null);
-    setShowTrash(false);
   };
 
   const moveSectionUp = (index: number) => {
