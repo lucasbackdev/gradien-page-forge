@@ -426,13 +426,13 @@ export const SectionPreview = ({
 
     switch (element.type) {
       case 'text':
-        const textMarginClass = viewportSize === 'mobile' ? 'mb-2' : 'mb-3';
+        const textSpacing = getResponsiveSpacing(element);
         return (
           <div 
             key={element.id} 
             {...dragProps}
-            style={getTextStyle(element)} 
-            className={`${isInGroup ? '' : textMarginClass} ${widthClass} ${baseClass} ${animationClass} ${alignClass}`}
+            style={{ ...getTextStyle(element), whiteSpace: 'pre-line', marginBottom: isInGroup ? 0 : `${textSpacing}rem` }} 
+            className={`${widthClass} ${baseClass} ${animationClass} ${alignClass}`}
           >
             {renderTextWithHighlight(element.content || '', element)}
           </div>
