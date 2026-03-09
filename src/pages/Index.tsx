@@ -936,6 +936,14 @@ body {
   flex: 1;
 }
 
+.fixed-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 0.75rem 1.5rem;
+  width: 100%;
+}
+
 .floating-header {
   position: sticky;
   top: 1rem;
