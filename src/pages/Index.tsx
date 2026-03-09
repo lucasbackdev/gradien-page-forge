@@ -1244,6 +1244,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
 .element-text {
   line-height: 1.35;
   margin-bottom: 0.5rem;
+  white-space: pre-line;
 }
 
 .site-footer {
