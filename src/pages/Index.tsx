@@ -155,7 +155,7 @@ const Index = () => {
   }, [autoSaveEnabled, currentPageId, presellData, savedPages, updatePage]);
 
   const handleUpdateElements = (elements: PresellElement[]) => {
-    setPresellData(prev => ({ ...prev, elements }));
+    handleSetPresellData(prev => ({ ...prev, elements }));
   };
 
   const handleUpdateSectionElements = (sectionId: string, elements: SectionElement[]) => {
