@@ -703,12 +703,9 @@ export const SectionPreview = ({
       return { backgroundColor: presellData.colors.background || footerBgColor };
     }
 
+    // Don't duplicate the background image on the wrapper - section handles it
     if (first.backgroundImage) {
-      return {
-        backgroundImage: `url(${first.backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      };
+      return { backgroundColor: 'transparent' };
     }
 
     if (first.backgroundGradient?.enabled) {
