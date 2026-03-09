@@ -228,8 +228,8 @@ export const SectionPreview = ({
     if (element.responsiveSpacing) {
       return element.responsiveSpacing[viewportSize];
     }
-    // Default values based on viewport
-    if (viewportSize === 'mobile') return 0.5;
+    // Default values based on viewport - more spacing on mobile for cleaner look
+    if (viewportSize === 'mobile') return 1;
     if (viewportSize === 'tablet') return 0.75;
     return 1;
   };
