@@ -168,7 +168,7 @@ const Index = () => {
   };
 
   const handleUpdateSectionHeight = (sectionId: string, minHeight: string) => {
-    setPresellData(prev => ({
+    handleSetPresellData(prev => ({
       ...prev,
       sections: prev.sections.map(s => 
         s.id === sectionId ? { ...s, minHeight } : s
