@@ -22,12 +22,12 @@ export const LogoBrand = ({ size = 'md', showText = true }: LogoBrandProps) => {
     <div className="flex items-center gap-3">
       <img 
         src={llomelloLogo} 
-        alt="Llomello Pages" 
+        alt="Devhorn Editor" 
         className={`${sizeClasses[size]} object-contain`} 
       />
       {showText && (
         <span className={`font-sora font-semibold ${textSizeClasses[size]} text-foreground`}>
-          Llomello Pages
+          Devhorn Editor
         </span>
       )}
     </div>
