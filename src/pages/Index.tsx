@@ -81,6 +81,12 @@ const Index = () => {
     historyIndexRef.current = historyRef.current.length - 1;
   }, []);
 
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/auth', { replace: true });
+    }
+  }, [authLoading, user, navigate]);
+
   const handleSetPresellData = useCallback((updater: PresellData | ((prev: PresellData) => PresellData)) => {
     setPresellData(prev => {
       const newData = typeof updater === 'function' ? updater(prev) : updater;
@@ -1472,7 +1478,6 @@ ${data.buttonStyle.template === 'shiny-green' ? `
 
   // Redirect to auth if not logged in
   if (!user) {
-    navigate('/auth');
     return null;
   }
 
