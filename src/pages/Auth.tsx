@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import presellGadsLogo from "@/assets/presell-gads-logo.png.asset.json";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres");
@@ -22,7 +23,7 @@ const passwordSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres
 const GradientButton = ({ children, className = "", ...props }: any) => (
   <button
     {...props}
-    className={`relative inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all duration-300 ${className}`}
+    className={`relative inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-[#4F46E5] to-[#4F46E5] shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all duration-300 ${className}`}
   >
     {children}
   </button>
@@ -58,7 +59,7 @@ const SectionTitle = ({ eyebrow, title, subtitle }: any) => (
     className="text-center max-w-3xl mx-auto mb-16"
   >
     {eyebrow && (
-      <span className="inline-block text-sm font-semibold uppercase tracking-widest bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] bg-clip-text text-transparent mb-4">
+      <span className="inline-block text-sm font-semibold uppercase tracking-widest bg-gradient-to-r from-[#4F46E5] to-[#4F46E5] bg-clip-text text-transparent mb-4">
         {eyebrow}
       </span>
     )}
@@ -81,8 +82,7 @@ const Navbar = ({ onGoLogin }: { onGoLogin: () => void }) => {
     <header className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
         <a href="#top" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#4F46E5] to-[#8B5CF6] flex items-center justify-center text-white font-bold text-sm">P</div>
-          <span className="font-extrabold text-lg tracking-tight text-gray-900">Presell Gads</span>
+          <img src={presellGadsLogo.url} alt="Presell Gads" className="h-9 w-auto object-contain" />
         </a>
         <nav className="hidden md:flex items-center gap-8">
           {items.map((i) => (
@@ -119,7 +119,7 @@ const EditorMockup = () => (
     transition={{ duration: 0.8, delay: 0.2 }}
     className="relative"
   >
-    <div className="absolute -inset-8 bg-gradient-to-tr from-indigo-500/20 via-purple-500/20 to-pink-400/10 blur-3xl rounded-full" />
+    <div className="absolute -inset-8 bg-gradient-to-tr from-indigo-500/20 via-blue-500/20 to-blue-400/10 blur-3xl rounded-full" />
     <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
       <div className="h-9 bg-gray-50 border-b border-gray-100 flex items-center gap-2 px-4">
         <span className="w-3 h-3 rounded-full bg-red-400" />
@@ -134,7 +134,7 @@ const EditorMockup = () => (
           ))}
         </div>
         <div className="col-span-9 p-6 space-y-4">
-          <div className="h-24 rounded-xl bg-gradient-to-br from-[#4F46E5] to-[#8B5CF6] flex items-center justify-center text-white font-bold text-lg shadow-lg">
+          <div className="h-24 rounded-xl bg-gradient-to-br from-[#4F46E5] to-[#4F46E5] flex items-center justify-center text-white font-bold text-lg shadow-lg">
             Sua Presell aqui
           </div>
           <div className="grid grid-cols-3 gap-3">
@@ -144,7 +144,7 @@ const EditorMockup = () => (
           </div>
           <div className="h-4 rounded bg-gray-200 w-4/5" />
           <div className="h-4 rounded bg-gray-200 w-3/5" />
-          <div className="inline-block px-5 py-2.5 rounded-full bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] text-white text-sm font-semibold shadow-md">
+          <div className="inline-block px-5 py-2.5 rounded-full bg-gradient-to-r from-[#4F46E5] to-[#4F46E5] text-white text-sm font-semibold shadow-md">
             Comprar Agora
           </div>
         </div>
@@ -291,7 +291,7 @@ const LoginForm = () => {
 
   return (
     <div className="relative w-full max-w-md mx-auto">
-      <div className="absolute -inset-4 bg-gradient-to-br from-[#4F46E5]/20 to-[#8B5CF6]/20 blur-2xl rounded-3xl" />
+      <div className="absolute -inset-4 bg-gradient-to-br from-[#4F46E5]/20 to-[#4F46E5]/20 blur-2xl rounded-3xl" />
       <div className="relative bg-white border border-gray-100 rounded-3xl shadow-xl p-8">
         <div className="text-center mb-6">
           <h3 className="text-2xl font-bold text-gray-900">Acesse a plataforma</h3>
@@ -299,8 +299,8 @@ const LoginForm = () => {
         </div>
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2 bg-gray-100 mb-5">
-            <TabsTrigger value="login" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#4F46E5] data-[state=active]:to-[#8B5CF6] data-[state=active]:text-white">Entrar</TabsTrigger>
-            <TabsTrigger value="signup" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#4F46E5] data-[state=active]:to-[#8B5CF6] data-[state=active]:text-white">Criar Conta</TabsTrigger>
+            <TabsTrigger value="login" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#4F46E5] data-[state=active]:to-[#4F46E5] data-[state=active]:text-white">Entrar</TabsTrigger>
+            <TabsTrigger value="signup" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#4F46E5] data-[state=active]:to-[#4F46E5] data-[state=active]:text-white">Criar Conta</TabsTrigger>
           </TabsList>
           <TabsContent value="login">
             <form onSubmit={handleLogin} className="space-y-4">
@@ -389,7 +389,7 @@ const Auth = () => {
       <section className="relative pt-32 pb-24 px-6 overflow-hidden">
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-20 -left-20 w-96 h-96 bg-indigo-400/20 rounded-full blur-[120px]" />
-          <div className="absolute top-40 right-0 w-96 h-96 bg-purple-400/20 rounded-full blur-[120px]" />
+          <div className="absolute top-40 right-0 w-96 h-96 bg-blue-400/20 rounded-full blur-[120px]" />
         </div>
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} transition={{ duration: 0.7 }}>
@@ -398,7 +398,7 @@ const Auth = () => {
             </span>
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.05] text-gray-900">
               Crie Presells de{" "}
-              <span className="bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#4F46E5] to-[#4F46E5] bg-clip-text text-transparent">
                 Alta Conversão
               </span>{" "}
               para Google Ads em Minutos
@@ -430,7 +430,7 @@ const Auth = () => {
               variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.06 }}
               className="group bg-white p-8 rounded-2xl border border-gray-100 hover:border-transparent hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4F46E5] to-[#8B5CF6] flex items-center justify-center text-white mb-5 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#4F46E5] to-[#4F46E5] flex items-center justify-center text-white mb-5 group-hover:scale-110 transition-transform">
                 <b.icon className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">{b.title}</h3>
@@ -451,7 +451,7 @@ const Auth = () => {
           ].map((s, i) => (
             <motion.div key={s.n} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.1 }}
               className="relative bg-white p-8 rounded-2xl border border-gray-100 text-center">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-[#4F46E5] to-[#8B5CF6] text-white text-xl font-bold flex items-center justify-center mb-5 shadow-lg shadow-indigo-500/30">{s.n}</div>
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-[#4F46E5] to-[#4F46E5] text-white text-xl font-bold flex items-center justify-center mb-5 shadow-lg shadow-indigo-500/30">{s.n}</div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">{s.t}</h3>
               <p className="text-gray-500">{s.d}</p>
             </motion.div>
@@ -482,13 +482,13 @@ const Auth = () => {
           {templates.map((t, i) => (
             <motion.div key={t.name} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.05 }}
               className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all">
-              <div className="h-44 bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 relative overflow-hidden">
+              <div className="h-44 bg-gradient-to-br from-indigo-100 via-blue-100 to-blue-100 relative overflow-hidden">
                 <div className="absolute inset-4 rounded-xl bg-white/70 backdrop-blur flex items-center justify-center">
                   <div className="w-2/3 space-y-2">
-                    <div className="h-3 rounded bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] w-3/4" />
+                    <div className="h-3 rounded bg-gradient-to-r from-[#4F46E5] to-[#4F46E5] w-3/4" />
                     <div className="h-2 rounded bg-gray-300 w-full" />
                     <div className="h-2 rounded bg-gray-300 w-5/6" />
-                    <div className="h-6 mt-3 rounded-full bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] w-1/2" />
+                    <div className="h-6 mt-3 rounded-full bg-gradient-to-r from-[#4F46E5] to-[#4F46E5] w-1/2" />
                   </div>
                 </div>
               </div>
@@ -497,7 +497,7 @@ const Auth = () => {
                   <h3 className="font-bold text-gray-900">{t.name}</h3>
                   <span className="text-xs font-medium text-[#4F46E5] bg-indigo-50 px-2 py-1 rounded-full">{t.tag}</span>
                 </div>
-                <button onClick={goLogin} className="w-full py-2.5 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] hover:opacity-90 transition">Usar Template</button>
+                <button onClick={goLogin} className="w-full py-2.5 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-[#4F46E5] to-[#4F46E5] hover:opacity-90 transition">Usar Template</button>
               </div>
             </motion.div>
           ))}
@@ -513,7 +513,7 @@ const Auth = () => {
               <tr className="text-left">
                 <th className="p-5 text-sm font-semibold text-gray-500">Recurso</th>
                 {compCols.map((c, i) => (
-                  <th key={c} className={`p-5 text-center text-sm font-bold ${i === 3 ? "bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] text-white" : "text-gray-700"}`}>{c}</th>
+                  <th key={c} className={`p-5 text-center text-sm font-bold ${i === 3 ? "bg-gradient-to-r from-[#4F46E5] to-[#4F46E5] text-white" : "text-gray-700"}`}>{c}</th>
                 ))}
               </tr>
             </thead>
@@ -545,7 +545,7 @@ const Auth = () => {
               </div>
               <p className="text-gray-700 leading-relaxed mb-6">"{t.text}"</p>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#8B5CF6] text-white flex items-center justify-center font-bold">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#4F46E5] text-white flex items-center justify-center font-bold">
                   {t.name.split(" ").map(n => n[0]).join("")}
                 </div>
                 <div>
@@ -559,7 +559,7 @@ const Auth = () => {
       </Section>
 
       {/* STATS */}
-      <Section className="bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] text-white">
+      <Section className="bg-gradient-to-r from-[#4F46E5] to-[#4F46E5] text-white">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {stats.map((s) => (
             <div key={s.label}>
@@ -576,7 +576,7 @@ const Auth = () => {
         <div className="grid md:grid-cols-3 gap-6">
           {plans.map((p, i) => (
             <motion.div key={p.name} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.08 }}
-              className={`relative rounded-3xl p-8 border transition-all ${p.highlight ? "bg-gradient-to-br from-[#4F46E5] to-[#8B5CF6] text-white border-transparent scale-105 shadow-2xl shadow-indigo-500/30" : "bg-white border-gray-100"}`}>
+              className={`relative rounded-3xl p-8 border transition-all ${p.highlight ? "bg-gradient-to-br from-[#4F46E5] to-[#4F46E5] text-white border-transparent scale-105 shadow-2xl shadow-indigo-500/30" : "bg-white border-gray-100"}`}>
               {p.badge && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-white text-[#4F46E5] text-xs font-bold px-3 py-1 rounded-full shadow-md">{p.badge}</span>
               )}
@@ -609,7 +609,7 @@ const Auth = () => {
             <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
               <button onClick={() => setOpenFaq(openFaq === i ? null : i)} className="w-full flex items-center justify-between p-5 text-left">
                 <span className="font-semibold text-gray-900">{f.q}</span>
-                <span className={`w-8 h-8 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#8B5CF6] text-white flex items-center justify-center text-lg transition-transform ${openFaq === i ? "rotate-45" : ""}`}>+</span>
+                <span className={`w-8 h-8 rounded-full bg-gradient-to-br from-[#4F46E5] to-[#4F46E5] text-white flex items-center justify-center text-lg transition-transform ${openFaq === i ? "rotate-45" : ""}`}>+</span>
               </button>
               {openFaq === i && <div className="px-5 pb-5 text-gray-600 leading-relaxed">{f.a}</div>}
             </div>
@@ -619,12 +619,12 @@ const Auth = () => {
 
       {/* CTA FINAL + LOGIN */}
       <section ref={loginRef} id="entrar" className="relative py-24 px-6 overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-50 via-white to-purple-50" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-50 via-white to-blue-50" />
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
               Comece hoje a criar Presells que{" "}
-              <span className="bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] bg-clip-text text-transparent">realmente convertem</span>.
+              <span className="bg-gradient-to-r from-[#4F46E5] to-[#4F46E5] bg-clip-text text-transparent">realmente convertem</span>.
             </h2>
             <p className="mt-5 text-lg text-gray-500 max-w-lg">
               Junte-se a milhares de afiliados que já elevaram o nível das suas campanhas com o Presell Gads.
@@ -644,13 +644,12 @@ const Auth = () => {
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-10">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#4F46E5] to-[#8B5CF6] flex items-center justify-center text-white font-bold">P</div>
-              <span className="font-extrabold text-lg text-white">Presell Gads</span>
+              <img src={presellGadsLogo.url} alt="Presell Gads" className="h-9 w-auto object-contain bg-white rounded-md p-1" />
             </div>
             <p className="max-w-sm text-sm leading-relaxed">A plataforma definitiva para criar presells otimizadas para campanhas de Google Ads.</p>
             <div className="flex items-center gap-3 mt-5">
               {[Facebook, Instagram, Twitter, Youtube].map((I, i) => (
-                <a key={i} href="#" className="w-9 h-9 rounded-full bg-gray-800 hover:bg-gradient-to-br hover:from-[#4F46E5] hover:to-[#8B5CF6] flex items-center justify-center transition-all">
+                <a key={i} href="#" className="w-9 h-9 rounded-full bg-gray-800 hover:bg-gradient-to-br hover:from-[#4F46E5] hover:to-[#4F46E5] flex items-center justify-center transition-all">
                   <I className="w-4 h-4 text-white" />
                 </a>
               ))}
