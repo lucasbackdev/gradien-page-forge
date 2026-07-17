@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import presellGadsLogo from "@/assets/presell-gads-logo.png.asset.json";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres");
@@ -81,8 +82,7 @@ const Navbar = ({ onGoLogin }: { onGoLogin: () => void }) => {
     <header className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-100">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 h-16">
         <a href="#top" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#4F46E5] to-[#4F46E5] flex items-center justify-center text-white font-bold text-sm">P</div>
-          <span className="font-extrabold text-lg tracking-tight text-gray-900">Presell Gads</span>
+          <img src={presellGadsLogo.url} alt="Presell Gads" className="h-9 w-auto object-contain" />
         </a>
         <nav className="hidden md:flex items-center gap-8">
           {items.map((i) => (
