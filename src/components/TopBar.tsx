@@ -1,4 +1,4 @@
-import { Moon, Sun, Menu, Shield, LogOut, User, Upload, Tag, Save, FolderOpen, LayoutTemplate, Timer, Undo2, Redo2 } from 'lucide-react';
+import { Moon, Sun, Menu, Shield, LogOut, User, Upload, Tag, Save, FolderOpen, LayoutTemplate, Timer, Undo2, Redo2, FileText, CircleDot } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -200,8 +200,9 @@ export const TopBar = ({
 
         {/* Current page indicator */}
         {currentPageName && (
-          <span className="text-sm text-muted-foreground truncate max-w-40 hidden sm:inline">
-            📄 {currentPageName}
+          <span className="text-sm text-muted-foreground truncate max-w-40 hidden sm:inline-flex items-center gap-1.5">
+            <FileText className="h-3.5 w-3.5" />
+            {currentPageName}
           </span>
         )}
 
@@ -258,8 +259,12 @@ export const TopBar = ({
                 onClick={() => onToggleAutoSave?.(!autoSaveEnabled)} 
                 className="cursor-pointer"
               >
-                <Timer className="h-4 w-4 mr-2" />
-                {autoSaveEnabled ? '🟢 Auto-save ligado' : 'Auto-save (3 min)'}
+                {autoSaveEnabled ? (
+                  <CircleDot className="h-4 w-4 mr-2 text-green-500" />
+                ) : (
+                  <Timer className="h-4 w-4 mr-2" />
+                )}
+                {autoSaveEnabled ? 'Auto-save ligado' : 'Auto-save (3 min)'}
               </DropdownMenuItem>
             )}
             
