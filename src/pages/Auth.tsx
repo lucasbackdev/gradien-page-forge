@@ -133,20 +133,12 @@ const EditorMockup = () => (
             <div key={n} className="text-xs font-medium text-gray-600 px-3 py-2 rounded-lg hover:bg-white cursor-pointer">{n}</div>
           ))}
         </div>
-        <div className="col-span-9 p-6 space-y-4">
-          <div className="h-24 rounded-xl bg-gradient-to-br from-[#0b57d0] to-[#0b57d0] flex items-center justify-center text-white font-bold text-lg shadow-lg">
-            Sua Presell aqui
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="h-20 rounded-lg bg-gray-100" />
-            <div className="h-20 rounded-lg bg-gray-100" />
-            <div className="h-20 rounded-lg bg-gray-100" />
-          </div>
-          <div className="h-4 rounded bg-gray-200 w-4/5" />
-          <div className="h-4 rounded bg-gray-200 w-3/5" />
-          <div className="inline-block px-5 py-2.5 rounded-full bg-gradient-to-r from-[#0b57d0] to-[#0b57d0] text-white text-sm font-semibold shadow-md">
-            Comprar Agora
-          </div>
+        <div className="col-span-9 bg-white">
+          <img
+            src={editorMockupImg.url}
+            alt="Editor Presell Gads em ação"
+            className="w-full h-full object-cover object-left-top"
+          />
         </div>
       </div>
     </div>
