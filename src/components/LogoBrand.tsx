@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/presell-gads-logo-v2.png.asset.json";
+import logoAsset from "@/assets/presellgads-logo-v3.png.asset.json";
 
 interface LogoBrandProps {
   size?: 'sm' | 'md' | 'lg';
