@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TopBar } from '@/components/TopBar';
+import { PlansPopup } from '@/components/PlansPopup';
 import { EditorPanel } from '@/components/EditorPanel';
 import { PreviewPanel } from '@/components/PreviewPanel';
 import { SectionPreview } from '@/components/SectionPreview';
@@ -1647,6 +1648,7 @@ ${data.buttonStyle.template === 'shiny-green' ? `
 
   return (
     <div className="h-screen flex flex-col bg-background">
+      <PlansPopup />
       <TopBar
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode(!darkMode)}

@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import presellGadsLogo from "@/assets/presellgads-logo-v3.png.asset.json";
+import planos from "@/assets/planos.png.asset.json";
+import { PresellCarousel } from "@/components/PresellCarousel";
 
 const emailSchema = z.string().email("Email inválido");
 const passwordSchema = z.string().min(6, "Senha deve ter no mínimo 6 caracteres");
@@ -165,9 +167,15 @@ const Auth = () => {
   }, [navigate]);
 
   return (
-    <main className="min-h-screen bg-white text-gray-900 font-sans antialiased flex flex-col items-center justify-center px-6 py-16">
+    <main className="min-h-screen bg-white text-gray-900 font-sans antialiased flex flex-col items-center px-6 py-12">
       <img src={presellGadsLogo.url} alt="Presell Gads" className="h-12 w-auto object-contain mb-10" />
-      <LoginForm />
+      <PresellCarousel />
+      <div className="w-full max-w-5xl grid gap-8 lg:grid-cols-2 items-center">
+        <LoginForm />
+        <a href="https://presellgads.io" target="_blank" rel="noopener noreferrer" className="block">
+          <img src={planos.url} alt="Planos e preços Presell Gads" className="w-full rounded-2xl shadow-xl border border-gray-100" />
+        </a>
+      </div>
     </main>
   );
 };
