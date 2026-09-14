@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import planos from "@/assets/planos.png.asset.json";
+import planos from "@/assets/planos.png";
 
 export const PlansPopup = () => {
   const [open, setOpen] = useState(false);
@@ -27,7 +27,7 @@ export const PlansPopup = () => {
           <X className="h-5 w-5" />
         </button>
         <a href="https://presellgads.io" target="_blank" rel="noopener noreferrer">
-          <img src={planos.url} alt="Planos Presell Gads" className="w-full rounded-2xl shadow-2xl" />
+          <img src={planos} alt="Planos Presell Gads" className="w-full rounded-2xl shadow-2xl" />
         </a>
       </div>
     </div>
