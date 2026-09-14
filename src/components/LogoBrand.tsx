@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/presellgads-logo-v3.png.asset.json";
+import logoAsset from "@/assets/presellgads-logo-v3.png";
 
 interface LogoBrandProps {
   size?: 'sm' | 'md' | 'lg';
@@ -13,7 +13,7 @@ export const LogoBrand = ({ size = 'md' }: LogoBrandProps) => {
 
   return (
     <img
-      src={logoAsset.url}
+      src={logoAsset}
       alt="Presell Gads"
       className={`${sizeClasses[size]} object-contain w-auto`} 
     />

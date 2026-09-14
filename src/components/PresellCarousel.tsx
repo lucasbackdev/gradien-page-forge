@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
-import s1 from "@/assets/presell-gads1.png.asset.json";
-import s2 from "@/assets/presell-gads2.png.asset.json";
-import s3 from "@/assets/presell-gads3.png.asset.json";
-import s4 from "@/assets/presell-gads4.png.asset.json";
-import s5 from "@/assets/presell-gads5.png.asset.json";
-import s6 from "@/assets/presell-gads6.png.asset.json";
-import s7 from "@/assets/presell-gads7.png.asset.json";
-import s8 from "@/assets/presell-gads8.png.asset.json";
-import s9 from "@/assets/presell-gads9.png.asset.json";
+import s1 from "@/assets/presell-gads1.png";
+import s2 from "@/assets/presell-gads2.png";
+import s3 from "@/assets/presell-gads3.png";
+import s4 from "@/assets/presell-gads4.png";
+import s5 from "@/assets/presell-gads5.png";
+import s6 from "@/assets/presell-gads6.png";
+import s7 from "@/assets/presell-gads7.png";
+import s8 from "@/assets/presell-gads8.png";
+import s9 from "@/assets/presell-gads9.png";
 
 const slides = [s1, s2, s3, s4, s5, s6, s7, s8, s9];
 
@@ -33,7 +33,7 @@ export const PresellCarousel = () => {
           {slides.map((slide, i) => (
             <img
               key={i}
-              src={slide.url}
+              src={slide}
               alt={`Exemplo de presell automática ${i + 1}`}
               loading="lazy"
               className="w-full shrink-0 object-cover"
