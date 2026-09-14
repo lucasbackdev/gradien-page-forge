@@ -83,7 +83,7 @@ const LoginForm = () => {
       <div className="absolute -inset-4 bg-[#0b57d0]/10 blur-2xl rounded-3xl" />
       <div className="relative bg-white border border-gray-100 rounded-3xl shadow-xl p-8">
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Acesse a plataforma</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Acessar Editor Manual</h1>
           <p className="text-sm text-gray-500 mt-1">Entre ou crie sua conta gratuitamente</p>
         </div>
         <Tabs defaultValue="login" className="w-full">
